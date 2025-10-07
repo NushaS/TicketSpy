@@ -1,14 +1,3 @@
-# TicketSpy
-CSE403 Project
-
-THis README should:
-- briefly describe the idea and goals of our project
-- explain the layout of the repository
-
-
-
-
-
 # Ticket Spy
 
 ## Description
