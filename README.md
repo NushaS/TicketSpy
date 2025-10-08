@@ -8,7 +8,49 @@ TicketSpy seeks to turn real local driver experiences with parking tickets into 
 Our goal is to deliver a resouce that the local community can engage with in order to minimize the likelihood of being issued a parking ticket. In a city where ticket fine values and ticket issuance frequency are both on the rise, and where poorly marked parking spaces are not uncommon, providing drivers with a resource for avoiding preventable parking tickets is integral to decreasing confusion and ticket fines. This aligns with our ultimate goal of improving local driver confidence and satisfaction. 
 
 ### Repository Layout
-An in-depth paragraph about your project and overview of use.
+ticketspy/
+├── README.md
+├── package.json
+├── tsconfig.json / jsconfig.json
+├── next.config.js
+├── postcss.config.js
+├── tailwind.config.js
+├── .env.local
+├── .gitignore
+│
+├── public/
+│   ├── favicon.ico
+│   ├── logo.png
+│   └── icons/
+│
+├── src/
+│   ├── app/                      
+│   │   ├── layout.tsx            # Root layout (applied to all pages)
+│   │   ├── page.tsx              # Landing page with map visualization
+│   │   ├── report/
+│   │   │   └── page.tsx          # Form page for users to self-report tickets
+│   │   ├── api/
+│   │   │   └── tickets/
+│   │   │       └── route.ts      # API route for fetching/adding ticket data (Next.js serverless functions)
+│   │   └── _components/
+│   │       ├── MapView.tsx       # Interactive map & heatmap visualization
+│   │       ├── TicketForm.tsx    # User input form for self-reporting
+│   │       ├── Navbar.tsx        # Navigation bar
+│   │       └── Footer.tsx        # Footer component
+│   │
+│   ├── lib/
+│   │   ├── supabaseClient.ts     # Supabase client configuration
+│   │   ├── fetchTickets.ts       # Helper for fetching data via TanStack Query
+│   │   └── mapUtils.ts           # Functions for map/heatmap data processing
+│   │
+│   ├── styles/
+│   │   └── globals.css           # Tailwind global styles
+│   │
+│   └── types/
+│       └── ticket.ts             # TypeScript interfaces for ticket data
+│
+└── vercel.json                   # (Optional) Vercel deployment configuration
+
 
 
 
