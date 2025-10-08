@@ -7,6 +7,8 @@ TicketSpy seeks to turn real local driver experiences with parking tickets into 
 ### Project Goals
 Our goal is to deliver a resouce that the local community can engage with in order to minimize the likelihood of being issued a parking ticket. In a city where ticket fine values and ticket issuance frequency are both on the rise, and where poorly marked parking spaces are not uncommon, providing drivers with a resource for avoiding preventable parking tickets is integral to decreasing confusion and ticket fines. This aligns with our ultimate goal of improving local driver confidence and satisfaction. 
 
+### Repository Layout
+'''
 ticketspy/
 ├── README.md
 ├── package.json
@@ -51,7 +53,7 @@ ticketspy/
 └── vercel.json                   # (Optional) Deployment configuration
 
 
-
+'''
 
 ## Getting Started
 ### Dependencies, Installing, Executing program
