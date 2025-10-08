@@ -72,12 +72,7 @@ code blocks for commands
 
 
 ## Authors
-Nusha Sepehri
-Abigail McClure
-Timofei Kachan
-Ahana Roy
-Aya Griswold
-Leonardo Paredes
+Nusha Sepehri, Abigail McClure, Timofei Kachan, Ahana Roy, Aya Griswold, Leonardo Paredes
 
 
 
