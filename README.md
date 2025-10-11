@@ -57,17 +57,21 @@ ticketspy/
 
 ## Getting Started
 ### Dependencies, Installing, Executing program
-* Describe any prerequisites, libraries, OS version, etc., needed before installing program.
-* ex. Windows 10
+DEPENDENCIES
+1.) Install node.js v22.20.0 in google
+2.) npm install -g npm@10.9.3 
 
-* How/where to download your program
-* Any modifications needed to be made to files/folders
+git clone our repo
 
-* How to run the program
-* Step-by-step bullets
-```
-code blocks for commands
-```
+1.) cd ticketspy
+2.) add a .env.local file under TicketSpy/ticketspy for the Supabase credentials
+___.env.local___
+NEXT_PUBLIC_SUPABASE_URL=YourSupabaseUrl
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_OR_ANON_KEY=YourSupabaseApiKey
+3.) npm install
+4.) npm run dev
+
+head to ``http://localhost:3000/instruments`` and see if it worked!
 
 
 
