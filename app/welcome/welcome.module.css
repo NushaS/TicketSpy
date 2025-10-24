@@ -1,0 +1,182 @@
+/* Container */
+.container {
+  position: relative;
+  width: 100%;
+  min-height: 100vh;
+  background-color: #f5f1e8;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Header */
+.header {
+  background-color: #4a5d4a;
+  padding: 1.5rem 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.backButton {
+  position: absolute;
+  left: 1rem;
+  color: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+}
+
+.backButton:hover {
+  opacity: 0.8;
+}
+
+.logoContainer {
+  display: flex;
+  justify-content: center;
+}
+
+.logoText {
+  font-size: 1.75rem;
+  font-weight: 500;
+  color: white;
+  letter-spacing: 0.05em;
+}
+
+/* Content */
+.content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 2rem 1rem;
+}
+
+.welcomeText {
+  font-size: 2.5rem;
+  font-weight: 400;
+  color: #4a5d4a;
+  margin-bottom: 3rem;
+  text-align: center;
+}
+
+/* Form Container */
+.formContainer {
+  width: 100%;
+  max-width: 500px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.formTitle {
+  font-size: 2rem;
+  font-weight: 500;
+  color: #4a5d4a;
+  margin-bottom: 2.5rem;
+  text-align: center;
+  letter-spacing: 0.02em;
+}
+
+/* Form */
+.form {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.formGroup {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.label {
+  font-size: 1.125rem;
+  color: #333;
+  min-width: 140px;
+  text-align: right;
+}
+
+.input {
+  flex: 1;
+  padding: 0.75rem 1rem;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 1rem;
+  background-color: white;
+  transition: border-color 0.2s;
+}
+
+.input:focus {
+  outline: none;
+  border-color: #4a5d4a;
+}
+
+.input::placeholder {
+  color: #999;
+}
+
+/* Error message */
+.error {
+  color: #dc2626;
+  font-size: 0.875rem;
+  text-align: center;
+  margin-top: -1rem;
+}
+
+/* Create button */
+.createButton {
+  margin-top: 2rem;
+  padding: 0.875rem 3rem;
+  background-color: #6b856b;
+  color: white;
+  border: none;
+  border-radius: 50px;
+  font-size: 1.125rem;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  justify-content: center;
+  align-self: center;
+  transition: background-color 0.2s;
+}
+
+.createButton:hover:not(:disabled) {
+  background-color: #5a7259;
+}
+
+.createButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Responsive adjustments */
+@media (max-width: 640px) {
+  .formGroup {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .label {
+    min-width: auto;
+    text-align: left;
+  }
+
+  .input {
+    width: 100%;
+  }
+
+  .welcomeText {
+    font-size: 2rem;
+  }
+
+  .formTitle {
+    font-size: 1.5rem;
+  }
+}

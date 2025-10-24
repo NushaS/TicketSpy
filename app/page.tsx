@@ -1,17 +1,63 @@
 "use client";
 
 import React, { useState } from 'react';
-import { Menu, Info } from 'lucide-react';
+import { Menu, Info, Check, X } from 'lucide-react';
 import Image from 'next/image';
 import logo from './logo.png';
 import Map, { Source, Layer } from 'react-map-gl/maplibre';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { createClient } from '@/lib/supabase/client';
 import styles from './page.module.css';
 import { geojsonData, heatmapLayer, initialViewState, mapStyleURL } from './heatmapConfig';
 
 const TicketSpyHeatMap: React.FC = () => {
   const [showInstructions, setShowInstructions] = useState(false);
+  const [showLoginModal, setShowLoginModal] = useState(false);
+  const [phoneNumber, setPhoneNumber] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const router = useRouter();
+
+  // Check if user is logged in
+  React.useEffect(() => {
+    const checkAuth = async () => {
+      const supabase = createClient();
+      const { data: { session } } = await supabase.auth.getSession();
+      setIsLoggedIn(!!session);
+    };
+    checkAuth();
+  }, []);
+
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const supabase = createClient();
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      // Convert phone number to email format
+      const email = `${phoneNumber.replace(/\D/g, '')}@ticketspy.com`;
+      
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+      
+      if (error) throw error;
+      
+      setShowLoginModal(false);
+      setIsLoggedIn(true);
+      router.refresh();
+    } catch (error: unknown) {
+      setError(error instanceof Error ? error.message : "An error occurred");
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <div className={styles.container}>
@@ -36,12 +82,13 @@ const TicketSpyHeatMap: React.FC = () => {
             <Info size={18} />
             <span>instructions</span>
           </button>
-          <Link href="/auth/login">
-            <button className={styles.loginButton}>
-              log in
-            </button>
-          </Link>
-          <Link href="/auth/sign-up">
+          <button 
+            onClick={() => setShowLoginModal(true)}
+            className={styles.loginButton}
+          >
+            log in
+          </button>
+          <Link href="/welcome">
             <button className={styles.signupButton}>
               create account
             </button>
@@ -69,13 +116,59 @@ const TicketSpyHeatMap: React.FC = () => {
       </div>
 
       {/* Instructions Modal */}
-      {showInstructions && (
+      {showInstructions && !isLoggedIn && (
+        <div className={styles.modalOverlay}>
+          <div className={styles.unauthInstructionsContent}>
+            <button 
+              onClick={() => setShowInstructions(false)}
+              className={styles.closeButton}
+            >
+              <X size={24} color="#999" />
+            </button>
+            
+            <div className={styles.actionButtons}>
+              <button className={styles.reportTicketButton}>
+                report a ticket
+              </button>
+              <button className={styles.reportEnforcementButton}>
+                report parking enforcement nearby
+              </button>
+            </div>
+            
+            <div className={styles.instructionsText}>
+              <p>
+                To <strong>mark where you parked</strong>, get <strong>notifications for tickets issued</strong> or <strong>parking enforcement spotted</strong> near your important locations, and <strong>bookmark your favorite parking spots:</strong>
+              </p>
+            </div>
+            
+            <div className={styles.authButtons}>
+              <Link href="/welcome">
+                <button className={styles.createAccountBtn}>
+                  create an account
+                </button>
+              </Link>
+              <span className={styles.orText}>or</span>
+              <button 
+                onClick={() => {
+                  setShowInstructions(false);
+                  setShowLoginModal(true);
+                }}
+                className={styles.logInBtn}
+              >
+                log in
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Instructions Modal (Logged In) */}
+      {showInstructions && isLoggedIn && (
         <div className={styles.modalOverlay}>
           <div className={styles.modalContent}>
             <h2 className={styles.modalTitle}>How to Use TicketSpy</h2>
             <p className={styles.modalText}>
-              The heat map shows ticket availability and pricing hotspots across the Seattle area. 
-              Red areas indicate high-demand zones, while blue areas show lower activity.
+              EXAMPLE
             </p>
             <button
               onClick={() => setShowInstructions(false)}
@@ -83,6 +176,57 @@ const TicketSpyHeatMap: React.FC = () => {
             >
               Got it!
             </button>
+          </div>
+        </div>
+      )}
+
+      {/* Login Modal */}
+      {showLoginModal && (
+        <div className={styles.modalOverlay}>
+          <div className={styles.loginModalContent}>
+            <button 
+              onClick={() => setShowLoginModal(false)}
+              className={styles.closeButton}
+            >
+              <X size={24} color="#999" />
+            </button>
+            
+            <h2 className={styles.loginTitle}>log in</h2>
+            
+            <form onSubmit={handleLogin} className={styles.loginForm}>
+              <div className={styles.loginFormGroup}>
+                <label className={styles.loginLabel}>phone number:</label>
+                <input
+                  type="tel"
+                  className={styles.loginInput}
+                  value={phoneNumber}
+                  onChange={(e) => setPhoneNumber(e.target.value)}
+                  required
+                />
+              </div>
+
+              <div className={styles.loginFormGroup}>
+                <label className={styles.loginLabel}>password:</label>
+                <input
+                  type="password"
+                  className={styles.loginInput}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                />
+              </div>
+
+              {error && <p className={styles.loginError}>{error}</p>}
+
+              <button 
+                type="submit" 
+                className={styles.submitButton}
+                disabled={isLoading}
+              >
+                <Check size={20} />
+                <span>{isLoading ? 'logging in...' : 'submit'}</span>
+              </button>
+            </form>
           </div>
         </div>
       )}
