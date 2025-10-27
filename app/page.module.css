@@ -311,7 +311,18 @@
   flex-wrap: wrap;
 }
 
-.reportTicketButton,
+.reportTicketButton {
+  padding: 1rem 1.5rem;
+  background-color: rgb(98, 83, 92);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
 .reportEnforcementButton {
   padding: 1rem 1.5rem;
   background-color: #957070;
@@ -356,7 +367,7 @@
 
 .createAccountBtn {
   padding: 0.875rem 2rem;
-  background-color: #a07070;
+  background-color: rgb(129, 154, 121);
   color: white;
   border: none;
   border-radius: 50px;
@@ -405,8 +416,30 @@
   }
 
   .authButtons {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+  
+    width: fit-content;          /* <— key */
+    margin-inline: auto;         /* <— key */
+  }
+  
+  .orText {
+    display: inline-flex;
+    align-items: center;
+    font-size: 1.125rem;
+    color: #666;
+    font-weight: 500;
+  }
+  
+  /* (Optional) Make sure the modal stacks content centered */
+  .unauthInstructionsContent {
+    display: flex;
     flex-direction: column;
-    width: 100%;
+    gap: 1.5rem;
+    align-items: center;
   }
 
   .createAccountBtn,
