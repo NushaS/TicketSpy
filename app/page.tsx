@@ -10,7 +10,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import styles from './page.module.css';
-import { geojsonData, heatmapLayer, initialViewState, mapStyleURL } from './heatmapConfig';
+import { getDynamicDatapoints, oldDataPoints, getGeoJsonData, heatmapLayer, initialViewState, mapStyleURL } from './heatmapConfig';
 
 const TicketSpyHeatMap: React.FC = () => {
   const [showInstructions, setShowInstructions] = useState(false);
@@ -21,6 +21,11 @@ const TicketSpyHeatMap: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const router = useRouter();
+
+  // 1.) Supabase query for data
+  const testData = getDynamicDatapoints();
+  const geoJsonData = getGeoJsonData(testData);
+  // TODO: validate testData in heatmapConfig.ts
 
   // Check if user is logged in
   React.useEffect(() => {
@@ -109,7 +114,7 @@ const TicketSpyHeatMap: React.FC = () => {
           style={{ width: '100%', height: '100%' }}
           mapStyle={mapStyleURL}
         >
-          <Source id="tickets" type="geojson" data={geojsonData}>
+          <Source id="tickets" type="geojson" data={geoJsonData}>
             <Layer {...heatmapLayer} />
           </Source>
         </Map>
