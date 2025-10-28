@@ -336,7 +336,9 @@
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-.reportTicketButton:hover,
+.reportTicketButton:hover{
+  background-color: rgb(76, 64, 71);
+}
 .reportEnforcementButton:hover {
   background-color: #8f5f5f;
 }
@@ -422,8 +424,8 @@
     gap: 1rem;
     flex-wrap: wrap;
   
-    width: fit-content;          /* <— key */
-    margin-inline: auto;         /* <— key */
+    width: fit-content;
+    margin-inline: auto;
   }
   
   .orText {
@@ -434,7 +436,7 @@
     font-weight: 500;
   }
   
-  /* (Optional) Make sure the modal stacks content centered */
+  /* Make sure the modal stacks content centered */
   .unauthInstructionsContent {
     display: flex;
     flex-direction: column;
