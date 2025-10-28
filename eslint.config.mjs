@@ -6,21 +6,40 @@ import prettierConfig from 'eslint-plugin-prettier/recommended'
 import globals from 'globals'
 
 export default tseslint.config([
+  {
+    ignores: [
+      'node_modules/**',
+      '.next/**',
+      'dist/**',
+      'build/**',
+      '*.config.js',
+      '*.config.mjs',
+      'coverage/**',
+      'next-env.d.ts',
+    ],
+  },
   js.configs.recommended,
-  tseslint.configs.recommended,
-  reactHooks.configs['recommended-latest'],
-  reactRefresh.configs.vite,
+  ...tseslint.configs.recommended,
   prettierConfig,
   {
-    files: ['**/*.{ts,tsx}'],
+    files: ['**/*.{ts,tsx,js,jsx}'],
     languageOptions: {
       ecmaVersion: 2020,
       globals: globals.browser,
+    },
+    plugins: {
+      'react-hooks': reactHooks,
+      'react-refresh': reactRefresh,
     },
     settings: {
       react: { version: 'detect' },
     },
     rules: {
+      ...reactHooks.configs.recommended.rules,
+      'react-refresh/only-export-components': [
+        'warn',
+        { allowConstantExport: true },
+      ],
       'prettier/prettier': [
         'error',
         {

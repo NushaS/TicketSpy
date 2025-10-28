@@ -1,5 +1,5 @@
-import { render, screen } from '@testing-library/react'
-import Page from '../page'
+import { render, screen } from '@testing-library/react';
+import Page from '../page';
 
 // Mock Next.js navigation
 jest.mock('next/navigation', () => ({
@@ -12,29 +12,29 @@ jest.mock('next/navigation', () => ({
       pathname: '/welcome',
       query: {},
       asPath: '/welcome',
-    }
+    };
   },
   useSearchParams() {
-    return new URLSearchParams()
+    return new URLSearchParams();
   },
   usePathname() {
-    return '/welcome'
+    return '/welcome';
   },
-}))
+}));
 
 describe('Welcome Page', () => {
   it('renders the welcome page without crashing', () => {
-    render(<Page />)
-    
+    render(<Page />);
+
     // Check if the page renders without crashing
-    expect(document.body).toBeInTheDocument()
-  })
+    expect(document.body).toBeInTheDocument();
+  });
 
   it('contains form elements', () => {
-    render(<Page />)
-    
+    render(<Page />);
+
     // Check for form inputs
-    const inputs = screen.queryAllByRole('textbox')
-    expect(inputs.length).toBeGreaterThanOrEqual(0)
-  })
-})
+    const inputs = screen.queryAllByRole('textbox');
+    expect(inputs.length).toBeGreaterThanOrEqual(0);
+  });
+});

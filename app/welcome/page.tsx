@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import React, { useState } from 'react';
 import { ArrowLeft, Check } from 'lucide-react';
@@ -31,13 +31,13 @@ const WelcomePage: React.FC = () => {
           },
         },
       });
-      
+
       if (error) throw error;
-      
+
       // Redirect to map page after successful signup
       router.push('/');
     } catch (error: unknown) {
-      setError(error instanceof Error ? error.message : "An error occurred");
+      setError(error instanceof Error ? error.message : 'An error occurred');
     } finally {
       setIsLoading(false);
     }
@@ -58,10 +58,10 @@ const WelcomePage: React.FC = () => {
       {/* Content */}
       <div className={styles.content}>
         <h1 className={styles.welcomeText}>welcome!</h1>
-        
+
         <div className={styles.formContainer}>
           <h2 className={styles.formTitle}>create account</h2>
-          
+
           {/* Input Fields */}
           <form onSubmit={handleSignup} className={styles.form}>
             <div className={styles.formGroup}>
@@ -104,11 +104,7 @@ const WelcomePage: React.FC = () => {
             {error && <p className={styles.error}>{error}</p>}
 
             {/* Submit Button */}
-            <button 
-              type="submit" 
-              className={styles.createButton}
-              disabled={isLoading}
-            >
+            <button type="submit" className={styles.createButton} disabled={isLoading}>
               <Check className={styles.check} />
               <span>{isLoading ? 'creating...' : 'create'}</span>
             </button>
