@@ -1,8 +1,30 @@
+import { useQuery } from '@tanstack/react-query';
 import type { LayerProps } from 'react-map-gl/maplibre';
+import { useTicketTable } from './test-query/page';
 
+export type DataPoint = {
+  latitude: number;
+  longitude: number;
+  intensity: number;
+};
 // Mock data points representing parking ticket locations with intensity values for testing
+const globalIntensity = 1;
+export function getDynamicDatapoints() {
+  const { data, error, isLoading, isFetching } = useTicketTable();
+  const longLatOnlyData = data?.map(currRow => {
+    return { latitude: Number(currRow.latitude), longitude: Number(currRow.longitude), intensity: globalIntensity }
+  });
+  // const filteredPoints: DataPoint[] = longLatOnlyData?.filter(row => typeof row.latitude === 'number' && typeof row.longitude === 'number' && typeof row.intensity === 'number');
+  const filteredPoints: DataPoint[] = longLatOnlyData || [];
+  // TODO: use .filter() to validate data!
+  console.log(JSON.stringify(filteredPoints));
 
-export const dataPoints = [
+  console.log("test");
+
+  return filteredPoints;
+}
+
+export const oldDataPoints : DataPoint[] = [
   // Downtown Seattle cluster (high intensity)
   { longitude: -122.3321, latitude: 47.6062, intensity: 0.9 },
   { longitude: -122.3315, latitude: 47.6065, intensity: 0.95 },
@@ -64,17 +86,20 @@ export const dataPoints = [
 ];
 
 // Convert data points to GeoJSON format
-export const geojsonData = {
-  type: 'FeatureCollection' as const,
-  features: dataPoints.map((point, index) => ({
-    type: 'Feature' as const,
-    properties: { intensity: point.intensity },
-    geometry: {
-      type: 'Point' as const,
-      coordinates: [point.longitude, point.latitude]
-    }
-  }))
-};
+export function getGeoJsonData(data : DataPoint[]) {
+  const geojsonData = {
+    type: 'FeatureCollection' as const,
+    features: data.map((point, index) => ({
+      type: 'Feature' as const,
+      properties: { intensity: point.intensity },
+      geometry: {
+        type: 'Point' as const,
+        coordinates: [point.longitude, point.latitude]
+      }
+    }))
+  };
+  return geojsonData;
+}
 
 // Heatmap layer configuration
 export const heatmapLayer: LayerProps = {
