@@ -96,9 +96,11 @@ const TicketSpyHeatMap: React.FC = () => {
             <Info size={18} />
             <span>instructions</span>
           </button>
+          {/*login button routes to login page*/}
           <Link href="/auth/login" className={styles.loginButton}>
             log in
           </Link>
+          {/*login button routes to sign up page*/}
           <Link href="/auth/sign-up">
             <button className={styles.signupButton}>create account</button>
           </Link>
