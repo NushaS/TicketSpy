@@ -142,7 +142,7 @@ const TicketSpyHeatMap: React.FC = () => {
             
             <div className={styles.instructionsText}>
               <p>
-                To <strong>mark where you parked</strong>, get <strong>notifications for tickets issued</strong> or <strong>parking enforcement spotted</strong> near your important locations, and <strong>bookmark your favorite parking spots:</strong>
+                to <strong>mark where you parked</strong>, get <strong>notifications for tickets issued</strong> or <strong>parking enforcement spotted</strong> near your important locations, and <strong>bookmark your favorite parking spots:</strong>
               </p>
             </div>
             
