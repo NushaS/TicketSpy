@@ -3,23 +3,7 @@
 // users cannot access this
 // to test that tanstack query works
 // will show ticket data at localhost:3000/test-query but need to be logged in
-import { useQuery } from '@tanstack/react-query';
-import { createClient } from '@/lib/supabase/client';
-
-async function fetchTickets() {
-  const supabase = createClient();
-  const { data, error } = await supabase.from('tickets').select('*');
-  if (error) throw new Error(error.message);
-  return data;
-}
-
-export function useTicketTable() {
-  return useQuery({
-    queryKey: ['tickets'], // unique cache key
-    queryFn: fetchTickets,
-    staleTime: 1000 * 60, // cache for 1 min
-  });
-}
+import { useTicketTable } from '@/lib/hooks/useTicketTable';
 
 export default function TestQuery() {
   const { data, error, isLoading, isFetching } = useTicketTable();
