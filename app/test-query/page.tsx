@@ -1,5 +1,8 @@
 'use client';
 
+// users cannot access this
+// to test that tanstack query works
+// will show ticket data at localhost:3000/test-query but need to be logged in
 import { useQuery } from '@tanstack/react-query';
 import { createClient } from '@/lib/supabase/client';
 
