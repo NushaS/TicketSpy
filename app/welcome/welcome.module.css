@@ -32,6 +32,16 @@
   opacity: 0.8;
 }
 
+.check {
+  size: 20
+}
+
+.arrowLeft {
+  width: 32px;
+  height: 32px;
+  color: white;
+}
+
 .logoContainer {
   display: flex;
   justify-content: center;

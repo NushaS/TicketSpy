@@ -22,18 +22,14 @@ const WelcomePage: React.FC = () => {
     setError(null);
 
     try {
-      // Use phone number as email for now (you can modify this logic)
-      const email = `${phoneNumber.replace(/\D/g, '')}@ticketspy.com`;
-      
       const { error } = await supabase.auth.signUp({
-        email,
+        phone: phoneNumber,
         password,
         options: {
           data: {
             name,
-            phone_number: phoneNumber,
-          }
-        }
+          },
+        },
       });
       
       if (error) throw error;
@@ -52,7 +48,7 @@ const WelcomePage: React.FC = () => {
       {/* Header */}
       <header className={styles.header}>
         <Link href="/" className={styles.backButton}>
-          <ArrowLeft size={32} color="white" />
+          <ArrowLeft className={styles.arrowLeft} />
         </Link>
         <div className={styles.logoContainer}>
           <span className={styles.logoText}>ticketspy</span>
@@ -66,6 +62,7 @@ const WelcomePage: React.FC = () => {
         <div className={styles.formContainer}>
           <h2 className={styles.formTitle}>create account</h2>
           
+          {/* Input Fields */}
           <form onSubmit={handleSignup} className={styles.form}>
             <div className={styles.formGroup}>
               <label className={styles.label}>name:</label>
@@ -103,14 +100,16 @@ const WelcomePage: React.FC = () => {
               />
             </div>
 
+            {/* Error Box */}
             {error && <p className={styles.error}>{error}</p>}
 
+            {/* Submit Button */}
             <button 
               type="submit" 
               className={styles.createButton}
               disabled={isLoading}
             >
-              <Check size={20} />
+              <Check className={styles.check} />
               <span>{isLoading ? 'creating...' : 'create'}</span>
             </button>
           </form>

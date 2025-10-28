@@ -27,7 +27,7 @@ const TicketSpyHeatMap: React.FC = () => {
   const geoJsonData = getGeoJsonData(testData);
   // TODO: validate testData in heatmapConfig.ts
 
-  // Check if user is logged in
+  // TODO: check if user is logged in, non functional
   React.useEffect(() => {
     const checkAuth = async () => {
       const supabase = createClient();
@@ -44,8 +44,8 @@ const TicketSpyHeatMap: React.FC = () => {
     setError(null);
 
     try {
-      // Convert phone number to email format
-      const email = `${phoneNumber.replace(/\D/g, '')}@ticketspy.com`;
+      // will change to phone login when we setup phone auth
+      const email = `temp`;
       
       const { error } = await supabase.auth.signInWithPassword({
         email,
