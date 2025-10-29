@@ -12,7 +12,6 @@ import { createClient } from '@/lib/supabase/client';
 import styles from './page.module.css';
 import {
   useDynamicDatapoints,
-  oldDataPoints,
   getGeoJsonData,
   heatmapLayer,
   initialViewState,
