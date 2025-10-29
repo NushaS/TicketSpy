@@ -1,6 +1,5 @@
-import { useQuery } from '@tanstack/react-query';
 import type { LayerProps } from 'react-map-gl/maplibre';
-import { useTicketTable } from './test-query/page';
+import { useTicketTable } from '@/lib/hooks/useTicketTable';
 
 export type DataPoint = {
   latitude: number;
