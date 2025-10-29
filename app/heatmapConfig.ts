@@ -18,7 +18,16 @@ export function useDynamicDatapoints() {
     };
   });
   // const filteredPoints: DataPoint[] = longLatOnlyData?.filter(row => typeof row.latitude === 'number' && typeof row.longitude === 'number' && typeof row.intensity === 'number');
-  const filteredPoints: DataPoint[] = longLatOnlyData || [];
+  const filteredPoints: DataPoint[] = (longLatOnlyData ?? []).filter(
+    (row): row is DataPoint =>
+      typeof row.latitude === 'number' &&
+      typeof row.longitude === 'number' &&
+      Number.isFinite(row.latitude) &&
+      Number.isFinite(row.longitude) &&
+      typeof row.intensity === 'number' &&
+      Number.isFinite(row.intensity)
+  );
+
   // TODO: use .filter() to validate data!
   console.log(JSON.stringify(filteredPoints));
 
