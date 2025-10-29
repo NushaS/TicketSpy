@@ -95,10 +95,12 @@ const TicketSpyHeatMap: React.FC = () => {
             <Info size={18} />
             <span>instructions</span>
           </button>
-          <button onClick={() => setShowLoginModal(true)} className={styles.loginButton}>
+          {/*login button routes to login page*/}
+          <Link href="/auth/login" className={styles.loginButton}>
             log in
-          </button>
-          <Link href="/welcome">
+          </Link>
+          {/*login button routes to sign up page*/}
+          <Link href="/auth/sign-up">
             <button className={styles.signupButton}>create account</button>
           </Link>
         </div>

@@ -95,6 +95,8 @@ Leonardo Paredes
 
 ## Testing
 
+added husky to do pre-push testing locally
+TESTing test
 ### Husky for pre-commit testing
 
 `.husky/pre-commit`
