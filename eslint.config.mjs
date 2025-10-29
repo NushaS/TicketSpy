@@ -8,14 +8,14 @@ import globals from 'globals'
 export default tseslint.config([
   {
     ignores: [
-      'node_modules/**',
-      '.next/**',
-      'dist/**',
-      'build/**',
+      '**/node_modules/**',
+      '**/.next/**',
+      '**/dist/**',
+      '**/build/**',
       '*.config.js',
       '*.config.mjs',
-      'coverage/**',
-      'next-env.d.ts',
+      '**/coverage/**',
+      '**/next-env.d.ts',
     ],
   },
   js.configs.recommended,
