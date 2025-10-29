@@ -1,4 +1,5 @@
 'use client';
+// import from supabase
 import { createClient } from '@/lib/supabase/client';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
