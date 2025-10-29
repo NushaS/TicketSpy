@@ -60,32 +60,46 @@ export const heatmapLayer: LayerProps = {
   paint: {
     // Increase weight as intensity increases
     'heatmap-weight': ['get', 'intensity'],
-    // Increase intensity as zoom level increases
-    'heatmap-intensity': ['interpolate', ['linear'], ['zoom'], 0, 1, 15, 3],
-    // Color ramp for heatmap (blue -> cyan -> lime -> yellow -> red)
+    // Increase intensity as zoom level increases (boosted so dense areas darken more)
+    'heatmap-intensity': ['interpolate', ['linear'], ['zoom'], 0, 1, 15, 4],
+    // Classic heatmap ramp: transparent at 0 (so background shows through),
+    // then light-blue -> darker blue -> cyan -> yellow/orange -> red.
+    // Higher density stops are more opaque/darker so areas with lots of data
+    // read as stronger/darker colors.
     'heatmap-color': [
       'interpolate',
       ['linear'],
       ['heatmap-density'],
+      // 0 is transparent so the background (light blue) shows where there's no data
       0,
-      'rgba(33,102,172,0)',
+      'rgba(230,247,255,0)',
+      // very low density: faint light-blue tint
+      0.05,
+      'rgba(173,216,230,0.22)',
+      // low-medium: soft steel blue
       0.2,
-      'rgb(103,169,207)',
+      'rgba(70,130,180,0.38)',
+      // medium: stronger blue
       0.4,
-      'rgb(209,229,240)',
+      'rgba(0,99,255,0.56)',
+      // high: yellow/orange (becomes visible and moves toward red)
       0.6,
-      'rgb(253,219,199)',
+      'rgba(255,200,0,0.72)',
       0.8,
-      'rgb(239,138,98)',
+      'rgba(255,120,0,0.86)',
+      // highest density: red (less transparent but not fully black)
       1,
-      'rgb(178,24,43)',
+      'rgba(178,24,43,0.95)',
     ],
     // Adjust the heatmap radius by zoom level
     'heatmap-radius': ['interpolate', ['linear'], ['zoom'], 0, 2, 15, 20],
-    // Transition from heatmap to circle layer by zoom level
-    'heatmap-opacity': ['interpolate', ['linear'], ['zoom'], 7, 1, 15, 0.5],
+    // Baseline opacity increased moderately so colors are less transparent at 100%.
+    // Slider still multiplies these values in the UI.
+    'heatmap-opacity': ['interpolate', ['linear'], ['zoom'], 0, 0.6, 8, 0.5, 15, 0.35],
   },
 };
+
+// (background managed via map style onLoad in page.tsx)
 
 // Map initial view state (Seattle area) TODO: use user's general location via ip
 export const initialViewState = {
