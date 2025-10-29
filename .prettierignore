@@ -1,0 +1,11 @@
+node_modules
+.next
+dist
+build
+coverage
+*.config.js
+*.config.mjs
+next-env.d.ts
+package-lock.json
+.git
+.husky

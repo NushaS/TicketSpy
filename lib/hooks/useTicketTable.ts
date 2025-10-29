@@ -1,0 +1,17 @@
+import { useQuery } from '@tanstack/react-query';
+import { createClient } from '@/lib/supabase/client';
+
+async function fetchTickets() {
+  const supabase = createClient();
+  const { data, error } = await supabase.from('tickets').select('*');
+  if (error) throw new Error(error.message);
+  return data;
+}
+
+export function useTicketTable() {
+  return useQuery({
+    queryKey: ['tickets'], // unique cache key
+    queryFn: fetchTickets,
+    staleTime: 1000 * 60, // cache for 1 min
+  });
+}

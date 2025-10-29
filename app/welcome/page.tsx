@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import React, { useState } from 'react';
 import { ArrowLeft, Check } from 'lucide-react';
@@ -22,26 +22,22 @@ const WelcomePage: React.FC = () => {
     setError(null);
 
     try {
-      // Use phone number as email for now (you can modify this logic)
-      const email = `${phoneNumber.replace(/\D/g, '')}@ticketspy.com`;
-      
       const { error } = await supabase.auth.signUp({
-        email,
+        phone: phoneNumber,
         password,
         options: {
           data: {
             name,
-            phone_number: phoneNumber,
-          }
-        }
+          },
+        },
       });
-      
+
       if (error) throw error;
-      
+
       // Redirect to map page after successful signup
       router.push('/');
     } catch (error: unknown) {
-      setError(error instanceof Error ? error.message : "An error occurred");
+      setError(error instanceof Error ? error.message : 'An error occurred');
     } finally {
       setIsLoading(false);
     }
@@ -52,7 +48,7 @@ const WelcomePage: React.FC = () => {
       {/* Header */}
       <header className={styles.header}>
         <Link href="/" className={styles.backButton}>
-          <ArrowLeft size={32} color="white" />
+          <ArrowLeft className={styles.arrowLeft} />
         </Link>
         <div className={styles.logoContainer}>
           <span className={styles.logoText}>ticketspy</span>
@@ -62,10 +58,11 @@ const WelcomePage: React.FC = () => {
       {/* Content */}
       <div className={styles.content}>
         <h1 className={styles.welcomeText}>welcome!</h1>
-        
+
         <div className={styles.formContainer}>
           <h2 className={styles.formTitle}>create account</h2>
-          
+
+          {/* Input Fields */}
           <form onSubmit={handleSignup} className={styles.form}>
             <div className={styles.formGroup}>
               <label className={styles.label}>name:</label>
@@ -103,14 +100,12 @@ const WelcomePage: React.FC = () => {
               />
             </div>
 
+            {/* Error Box */}
             {error && <p className={styles.error}>{error}</p>}
 
-            <button 
-              type="submit" 
-              className={styles.createButton}
-              disabled={isLoading}
-            >
-              <Check size={20} />
+            {/* Submit Button */}
+            <button type="submit" className={styles.createButton} disabled={isLoading}>
+              <Check className={styles.check} />
               <span>{isLoading ? 'creating...' : 'create'}</span>
             </button>
           </form>

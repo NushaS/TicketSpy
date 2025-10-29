@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import React, { useState } from 'react';
 import { Menu, Info, Check, X } from 'lucide-react';
@@ -10,7 +10,14 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import styles from './page.module.css';
-import { getDynamicDatapoints, oldDataPoints, getGeoJsonData, heatmapLayer, initialViewState, mapStyleURL } from './heatmapConfig';
+import {
+  useDynamicDatapoints,
+  oldDataPoints,
+  getGeoJsonData,
+  heatmapLayer,
+  initialViewState,
+  mapStyleURL,
+} from './heatmapConfig';
 
 const TicketSpyHeatMap: React.FC = () => {
   const [showInstructions, setShowInstructions] = useState(false);
@@ -23,15 +30,17 @@ const TicketSpyHeatMap: React.FC = () => {
   const router = useRouter();
 
   // 1.) Supabase query for data
-  const testData = getDynamicDatapoints();
+  const testData = useDynamicDatapoints();
   const geoJsonData = getGeoJsonData(testData);
   // TODO: validate testData in heatmapConfig.ts
 
-  // Check if user is logged in
+  // TODO: check if user is logged in, non functional
   React.useEffect(() => {
     const checkAuth = async () => {
       const supabase = createClient();
-      const { data: { session } } = await supabase.auth.getSession();
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
       setIsLoggedIn(!!session);
     };
     checkAuth();
@@ -44,21 +53,21 @@ const TicketSpyHeatMap: React.FC = () => {
     setError(null);
 
     try {
-      // Convert phone number to email format
-      const email = `${phoneNumber.replace(/\D/g, '')}@ticketspy.com`;
-      
+      // will change to phone login when we setup phone auth
+      const email = `temp`;
+
       const { error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
-      
+
       if (error) throw error;
-      
+
       setShowLoginModal(false);
       setIsLoggedIn(true);
       router.refresh();
     } catch (error: unknown) {
-      setError(error instanceof Error ? error.message : "An error occurred");
+      setError(error instanceof Error ? error.message : 'An error occurred');
     } finally {
       setIsLoading(false);
     }
@@ -69,16 +78,16 @@ const TicketSpyHeatMap: React.FC = () => {
       {/* Header */}
       <header className={styles.header}>
         <div className={styles.logoContainer}>
-          <Image 
-            src={logo} 
-            alt="TicketSpy Logo" 
-            width={150} 
+          <Image
+            src={logo}
+            alt="TicketSpy Logo"
+            width={150}
             height={50}
             priority
             className={styles.logo}
           />
         </div>
-        
+
         <div className={styles.buttonGroup}>
           <button
             onClick={() => setShowInstructions(!showInstructions)}
@@ -87,16 +96,11 @@ const TicketSpyHeatMap: React.FC = () => {
             <Info size={18} />
             <span>instructions</span>
           </button>
-          <button 
-            onClick={() => setShowLoginModal(true)}
-            className={styles.loginButton}
-          >
+          <button onClick={() => setShowLoginModal(true)} className={styles.loginButton}>
             log in
           </button>
           <Link href="/welcome">
-            <button className={styles.signupButton}>
-              create account
-            </button>
+            <button className={styles.signupButton}>create account</button>
           </Link>
         </div>
       </header>
@@ -124,36 +128,32 @@ const TicketSpyHeatMap: React.FC = () => {
       {showInstructions && !isLoggedIn && (
         <div className={styles.modalOverlay}>
           <div className={styles.unauthInstructionsContent}>
-            <button 
-              onClick={() => setShowInstructions(false)}
-              className={styles.closeButton}
-            >
+            <button onClick={() => setShowInstructions(false)} className={styles.closeButton}>
               <X size={24} color="#999" />
             </button>
-            
+
             <div className={styles.actionButtons}>
-              <button className={styles.reportTicketButton}>
-                report a ticket
-              </button>
+              <button className={styles.reportTicketButton}>report a ticket</button>
               <button className={styles.reportEnforcementButton}>
                 report parking enforcement nearby
               </button>
             </div>
-            
+
             <div className={styles.instructionsText}>
               <p>
-                to <strong>mark where you parked</strong>, get <strong>notifications for tickets issued</strong> or <strong>parking enforcement spotted</strong> near your important locations, and <strong>bookmark your favorite parking spots:</strong>
+                to <strong>mark where you parked</strong>, get{' '}
+                <strong>notifications for tickets issued</strong> or{' '}
+                <strong>parking enforcement spotted</strong> near your important locations, and{' '}
+                <strong>bookmark your favorite parking spots:</strong>
               </p>
             </div>
-            
+
             <div className={styles.authButtons}>
               <Link href="/welcome">
-                <button className={styles.createAccountBtn}>
-                  create an account
-                </button>
+                <button className={styles.createAccountBtn}>create an account</button>
               </Link>
               <span className={styles.orText}>or</span>
-              <button 
+              <button
                 onClick={() => {
                   setShowInstructions(false);
                   setShowLoginModal(true);
@@ -172,13 +172,8 @@ const TicketSpyHeatMap: React.FC = () => {
         <div className={styles.modalOverlay}>
           <div className={styles.modalContent}>
             <h2 className={styles.modalTitle}>How to Use TicketSpy</h2>
-            <p className={styles.modalText}>
-              EXAMPLE
-            </p>
-            <button
-              onClick={() => setShowInstructions(false)}
-              className={styles.modalButton}
-            >
+            <p className={styles.modalText}>EXAMPLE</p>
+            <button onClick={() => setShowInstructions(false)} className={styles.modalButton}>
               Got it!
             </button>
           </div>
@@ -189,15 +184,12 @@ const TicketSpyHeatMap: React.FC = () => {
       {showLoginModal && (
         <div className={styles.modalOverlay}>
           <div className={styles.loginModalContent}>
-            <button 
-              onClick={() => setShowLoginModal(false)}
-              className={styles.closeButton}
-            >
+            <button onClick={() => setShowLoginModal(false)} className={styles.closeButton}>
               <X size={24} color="#999" />
             </button>
-            
+
             <h2 className={styles.loginTitle}>log in</h2>
-            
+
             <form onSubmit={handleLogin} className={styles.loginForm}>
               <div className={styles.loginFormGroup}>
                 <label className={styles.loginLabel}>phone number:</label>
@@ -223,11 +215,7 @@ const TicketSpyHeatMap: React.FC = () => {
 
               {error && <p className={styles.loginError}>{error}</p>}
 
-              <button 
-                type="submit" 
-                className={styles.submitButton}
-                disabled={isLoading}
-              >
+              <button type="submit" className={styles.submitButton} disabled={isLoading}>
                 <Check size={20} />
                 <span>{isLoading ? 'logging in...' : 'submit'}</span>
               </button>
