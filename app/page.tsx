@@ -12,7 +12,6 @@ import { createClient } from '@/lib/supabase/client';
 import styles from './page.module.css';
 import {
   useDynamicDatapoints,
-  oldDataPoints,
   getGeoJsonData,
   heatmapLayer,
   initialViewState,
@@ -22,6 +21,7 @@ import {
 const TicketSpyHeatMap: React.FC = () => {
   const [showInstructions, setShowInstructions] = useState(false);
   const [showLoginModal, setShowLoginModal] = useState(false);
+  const [heatmapOpacityMultiplier, setHeatmapOpacityMultiplier] = useState(1);
   const [phoneNumber, setPhoneNumber] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
@@ -32,6 +32,32 @@ const TicketSpyHeatMap: React.FC = () => {
   // 1.) Supabase query for data
   const testData = useDynamicDatapoints();
   const geoJsonData = getGeoJsonData(testData);
+  const adjustableHeatmap = React.useMemo(() => {
+    // create a copy of heatmapLayer with adjusted opacity stops multiplied by the slider
+    const mult = heatmapOpacityMultiplier;
+    // avoid `any` by treating heatmapLayer as unknown and accessing paint as a Record
+    const base = heatmapLayer as unknown as { paint?: Record<string, unknown> };
+    const basePaint = base.paint ?? {};
+    const newPaint: Record<string, unknown> = {
+      ...basePaint,
+      'heatmap-opacity': [
+        'interpolate',
+        ['linear'],
+        ['zoom'],
+        0,
+        0.48 * mult,
+        8,
+        0.36 * mult,
+        15,
+        0.2 * mult,
+      ],
+    };
+    const newLayer = {
+      ...(heatmapLayer as unknown as object),
+      paint: newPaint,
+    } as unknown as import('react-map-gl/maplibre').LayerProps;
+    return newLayer;
+  }, [heatmapOpacityMultiplier]);
   // TODO: validate testData in heatmapConfig.ts
 
   // TODO: check if user is logged in, non functional
@@ -113,13 +139,55 @@ const TicketSpyHeatMap: React.FC = () => {
 
       {/* MapLibre Map */}
       <div className={styles.mapContainer}>
+        {/* opacity control: positioned over the map */}
+        <div
+          style={{
+            position: 'absolute',
+            top: 84,
+            right: 16,
+            background: 'rgba(255,255,255,0.9)',
+            padding: '8px 10px',
+            borderRadius: 8,
+            zIndex: 1000,
+            boxShadow: '0 2px 6px rgba(0,0,0,0.12)',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 6,
+            alignItems: 'stretch',
+            width: 180,
+          }}
+        >
+          <label style={{ fontSize: 12, color: '#222' }}>
+            Heatmap opacity: {Math.round(heatmapOpacityMultiplier * 100)}%
+          </label>
+          <input
+            type="range"
+            min={0}
+            max={1}
+            step={0.01}
+            value={heatmapOpacityMultiplier}
+            onChange={(e) => setHeatmapOpacityMultiplier(Number(e.target.value))}
+            aria-label="Heatmap opacity"
+          />
+        </div>
         <Map
           initialViewState={initialViewState}
           style={{ width: '100%', height: '100%' }}
           mapStyle={mapStyleURL}
+          onLoad={(e) => {
+            // set the existing style's background layer color so we don't cover tiles
+            const map = e.target as unknown as {
+              setPaintProperty?: (layer: string, prop: string, value: unknown) => void;
+            };
+            try {
+              map.setPaintProperty?.('background', 'background-color', '#e6f7ff');
+            } catch (err) {
+              // ignore if background layer not present or setPaintProperty fails
+            }
+          }}
         >
           <Source id="tickets" type="geojson" data={geoJsonData}>
-            <Layer {...heatmapLayer} />
+            <Layer {...adjustableHeatmap} />
           </Source>
         </Map>
       </div>
