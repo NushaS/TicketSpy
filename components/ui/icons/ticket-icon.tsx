@@ -23,7 +23,7 @@ export const TicketIcon: React.FC<TicketIconProps> = ({
     width={size}
     height={size * (22 / 16)} // preserve original aspect ratio (16x22)
     viewBox="0 0 16 22"
-    fill="none"
+    fill="white"
     className={className}
   >
     <rect x="0.4" y="0.4" width="15.2" height="20.7385" rx="1.6" stroke={color} strokeWidth="0.8" />
