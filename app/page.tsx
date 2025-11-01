@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { Menu, Info, Check, X } from 'lucide-react';
 import Image from 'next/image';
 import logo from './logo.png';
-import Map, { Source, Layer } from 'react-map-gl/maplibre';
+import Map, { Source, Layer, Marker } from 'react-map-gl/maplibre';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -27,6 +27,7 @@ const TicketSpyHeatMap: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [pinLocation, setPinLocation] = useState<{ lng: number; lat: number } | null>(null);
   const router = useRouter();
 
   // 1.) Supabase query for data
@@ -116,7 +117,10 @@ const TicketSpyHeatMap: React.FC = () => {
 
         <div className={styles.buttonGroup}>
           <button
-            onClick={() => setShowInstructions(!showInstructions)}
+            onClick={() => {
+              setShowInstructions(!showInstructions);
+              setPinLocation(null);
+            }}
             className={styles.instructionsButton}
           >
             <Info size={18} />
@@ -187,19 +191,48 @@ const TicketSpyHeatMap: React.FC = () => {
               // ignore if background layer not present or setPaintProperty fails
             }
           }}
+          onClick={(e) => {
+            setPinLocation({ lng: e.lngLat.lng, lat: e.lngLat.lat });
+            setShowInstructions(false);
+            console.log('Longitude:', e.lngLat.lng);
+            console.log('Latitude:', e.lngLat.lat);
+          }}
         >
           <Source id="tickets" type="geojson" data={geoJsonData}>
             <Layer {...adjustableHeatmap} />
           </Source>
+          {pinLocation && (
+            <Marker longitude={pinLocation.lng} latitude={pinLocation.lat} anchor="bottom">
+              <div className={styles.mapMarkerWrapper}>
+                <svg viewBox="0 0 24 24" className={styles.mapMarkerSvg}>
+                  <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" />
+                  <circle cx="12" cy="9" r="2.5" fill="#fff" />
+                </svg>
+              </div>
+            </Marker>
+          )}
         </Map>
       </div>
 
-      {/* Instructions Modal */}
-      {showInstructions && !isLoggedIn && (
+      {/* Instructions Modal (Logged In) */}
+      {showInstructions && (
         <div className={styles.modalOverlay}>
+          <div className={styles.modalContent}>
+            <h2 className={styles.modalTitle}>How to Use TicketSpy</h2>
+            <p className={styles.modalText}>EXAMPLE</p>
+            <button onClick={() => setShowInstructions(false)} className={styles.modalButton}>
+              Got it!
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Pin Location Popup Modal */}
+      {pinLocation && (
+        <div className={styles.pinPopupWrapper}>
           <div className={styles.unauthInstructionsContent}>
-            <button onClick={() => setShowInstructions(false)} className={styles.closeButton}>
-              <X size={24} color="#999" />
+            <button onClick={() => setPinLocation(null)} className={styles.closeButton}>
+              <X className={styles.mapIcon} />
             </button>
 
             <div className={styles.actionButtons}>
@@ -211,7 +244,7 @@ const TicketSpyHeatMap: React.FC = () => {
 
             <div className={styles.instructionsText}>
               <p>
-                to <strong>mark where you parked</strong>, get{' '}
+                To <strong>mark where you parked</strong>, get{' '}
                 <strong>notifications for tickets issued</strong> or{' '}
                 <strong>parking enforcement spotted</strong> near your important locations, and{' '}
                 <strong>bookmark your favorite parking spots:</strong>
@@ -225,7 +258,7 @@ const TicketSpyHeatMap: React.FC = () => {
               <span className={styles.orText}>or</span>
               <button
                 onClick={() => {
-                  setShowInstructions(false);
+                  setPinLocation(null);
                   setShowLoginModal(true);
                 }}
                 className={styles.logInBtn}
@@ -237,25 +270,12 @@ const TicketSpyHeatMap: React.FC = () => {
         </div>
       )}
 
-      {/* Instructions Modal (Logged In) */}
-      {showInstructions && isLoggedIn && (
-        <div className={styles.modalOverlay}>
-          <div className={styles.modalContent}>
-            <h2 className={styles.modalTitle}>How to Use TicketSpy</h2>
-            <p className={styles.modalText}>EXAMPLE</p>
-            <button onClick={() => setShowInstructions(false)} className={styles.modalButton}>
-              Got it!
-            </button>
-          </div>
-        </div>
-      )}
-
       {/* Login Modal */}
       {showLoginModal && (
         <div className={styles.modalOverlay}>
           <div className={styles.loginModalContent}>
             <button onClick={() => setShowLoginModal(false)} className={styles.closeButton}>
-              <X size={24} color="#999" />
+              <X className={styles.mapIcon} />
             </button>
 
             <h2 className={styles.loginTitle}>log in</h2>
