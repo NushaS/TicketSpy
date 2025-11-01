@@ -28,11 +28,6 @@ export function useDynamicDatapoints() {
       Number.isFinite(row.intensity)
   );
 
-  // TODO: use .filter() to validate data!
-  console.log(JSON.stringify(filteredPoints));
-
-  console.log('test');
-
   return filteredPoints;
 }
 
