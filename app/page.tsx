@@ -28,6 +28,12 @@ const TicketSpyHeatMap: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [pinLocation, setPinLocation] = useState<{ lng: number; lat: number } | null>(null);
+  const [showTicketReportModal, setShowTicketReportModal] = useState(false);
+  const [ticketDateIssued, setTicketDateIssued] = useState('');
+  const [ticketTimeIssued, setTicketTimeIssued] = useState('');
+  const [ticketViolationType, setTicketViolationType] = useState('');
+  const [reportLocation, setReportLocation] = useState<{ lng: number; lat: number } | null>(null);
+  const [username, setUsername] = useState<string | null>(null);
   const router = useRouter();
 
   // 1.) Supabase query for data
@@ -69,6 +75,10 @@ const TicketSpyHeatMap: React.FC = () => {
         data: { session },
       } = await supabase.auth.getSession();
       setIsLoggedIn(!!session);
+      // Set username from session if available
+      if (session?.user) {
+        setUsername(session.user.email || session.user.phone || 'Anonymous');
+      }
     };
     checkAuth();
   }, []);
@@ -194,8 +204,6 @@ const TicketSpyHeatMap: React.FC = () => {
           onClick={(e) => {
             setPinLocation({ lng: e.lngLat.lng, lat: e.lngLat.lat });
             setShowInstructions(false);
-            console.log('Longitude:', e.lngLat.lng);
-            console.log('Latitude:', e.lngLat.lat);
           }}
         >
           <Source id="tickets" type="geojson" data={geoJsonData}>
@@ -236,7 +244,16 @@ const TicketSpyHeatMap: React.FC = () => {
             </button>
 
             <div className={styles.actionButtons}>
-              <button className={styles.reportTicketButton}>report a ticket</button>
+              <button
+                className={styles.reportTicketButton}
+                onClick={() => {
+                  setShowTicketReportModal(true);
+                  setReportLocation(pinLocation);
+                  setPinLocation(null);
+                }}
+              >
+                report a ticket
+              </button>
               <button className={styles.reportEnforcementButton}>
                 report parking enforcement nearby
               </button>
@@ -266,6 +283,86 @@ const TicketSpyHeatMap: React.FC = () => {
                 log in
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Ticket Report Modal */}
+      {showTicketReportModal && (
+        <div className={styles.modalOverlay}>
+          <div className={styles.ticketReportModalContent}>
+            <button
+              onClick={() => {
+                setShowTicketReportModal(false);
+                setTicketDateIssued('');
+                setTicketTimeIssued('');
+                setTicketViolationType('');
+              }}
+              className={styles.ticketReportCloseButton}
+            >
+              <X size={24} />
+            </button>
+
+            <h2 className={styles.ticketReportTitle}>Report a ticket:</h2>
+
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                // Log all ticket information
+                console.log('Ticket submitted:', {
+                  latitude: reportLocation?.lat,
+                  longitude: reportLocation?.lng,
+                  date: ticketDateIssued,
+                  time: ticketTimeIssued,
+                  username: username || 'Anonymous',
+                  violationType: ticketViolationType,
+                });
+                setShowTicketReportModal(false);
+                setTicketDateIssued('');
+                setTicketTimeIssued('');
+                setTicketViolationType('');
+                setReportLocation(null);
+              }}
+              className={styles.ticketReportForm}
+            >
+              <div className={styles.ticketReportFormGroup}>
+                <label className={styles.ticketReportLabel}>Date issued:</label>
+                <input
+                  type="date"
+                  className={styles.ticketReportInput}
+                  value={ticketDateIssued}
+                  onChange={(e) => setTicketDateIssued(e.target.value)}
+                  required
+                />
+              </div>
+
+              <div className={styles.ticketReportFormGroup}>
+                <label className={styles.ticketReportLabel}>Time issued:</label>
+                <input
+                  type="time"
+                  className={styles.ticketReportInput}
+                  value={ticketTimeIssued}
+                  onChange={(e) => setTicketTimeIssued(e.target.value)}
+                  required
+                />
+              </div>
+
+              <div className={styles.ticketReportFormGroup}>
+                <label className={styles.ticketReportLabel}>Violation type:</label>
+                <input
+                  type="text"
+                  className={styles.ticketReportInput}
+                  value={ticketViolationType}
+                  onChange={(e) => setTicketViolationType(e.target.value)}
+                  required
+                />
+              </div>
+
+              <button type="submit" className={styles.ticketReportSubmitButton}>
+                <Check size={20} />
+                <span>Submit ticket report</span>
+              </button>
+            </form>
           </div>
         </div>
       )}

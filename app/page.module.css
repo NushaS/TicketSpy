@@ -269,6 +269,119 @@
   cursor: not-allowed;
 }
 
+/* Ticket Report Modal */
+.ticketReportModalContent {
+  background-color: #f5f1e8;
+  border-radius: 1rem;
+  padding: 2.5rem 2rem;
+  max-width: 550px;
+  width: 90%;
+  margin: 0 1rem;
+  position: relative;
+}
+
+.ticketReportCloseButton {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.25rem;
+  display: flex;
+  align-items: center;
+  color: #999;
+}
+
+.ticketReportCloseButton:hover {
+  color: #666;
+}
+
+.ticketReportTitle {
+  font-size: 1.75rem;
+  font-weight: 500;
+  color: #333;
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.ticketReportForm {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.ticketReportFormGroup {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.ticketReportLabel {
+  font-size: 1rem;
+  color: #333;
+  min-width: 130px;
+  text-align: left;
+}
+
+.ticketReportInput {
+  flex: 1;
+  padding: 0.625rem 1rem;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 1rem;
+  background-color: white;
+  transition: border-color 0.2s;
+}
+
+.ticketReportInput:focus {
+  outline: none;
+  border-color: #6b856b;
+}
+
+.ticketReportSubmitButton {
+  margin-top: 1rem;
+  padding: 0.875rem 2rem;
+  background-color: #6b856b;
+  color: white;
+  border: none;
+  border-radius: 50px;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  justify-content: center;
+  align-self: center;
+  transition: background-color 0.2s;
+}
+
+.ticketReportSubmitButton:hover {
+  background-color: #5a7259;
+}
+
+/* Responsive adjustments for ticket report modal */
+@media (max-width: 640px) {
+  .ticketReportFormGroup {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .ticketReportLabel {
+    min-width: auto;
+  }
+
+  .ticketReportInput {
+    width: 100%;
+  }
+
+  .ticketReportTitle {
+    font-size: 1.5rem;
+  }
+}
+
 /* Responsive adjustments for login modal */
 @media (max-width: 640px) {
   .loginFormGroup {
