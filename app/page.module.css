@@ -336,7 +336,7 @@
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-.reportTicketButton:hover{
+.reportTicketButton:hover {
   background-color: rgb(76, 64, 71);
 }
 .reportEnforcementButton:hover {
@@ -380,7 +380,7 @@
 }
 
 .createAccountBtn:hover {
-  background-color: #8f5f5f;
+  background-color: rgb(111, 132, 104);
 }
 
 .orText {
@@ -405,6 +405,33 @@
   background-color: #5a7259;
 }
 
+/* Pin Location Popup Wrapper */
+.pinPopupWrapper {
+  position: fixed;
+  bottom: 0px;
+  left: 58%;
+  transform: translateX(-50%);
+  z-index: 2000;
+  max-width: 90%;
+  width: 800px;
+}
+
+.mapMarkerWrapper {
+  width: 30;
+  height: 40;
+  cursor: 'pointer';
+}
+/* Map Marker SVG */
+.mapMarkerSvg {
+  fill: #e63946;
+  stroke: #000;
+  stroke-width: 1.5;
+}
+.mapIcon {
+  size: 24;
+  color: '#999';
+}
+
 /* Responsive adjustments for unauth instructions */
 @media (max-width: 640px) {
   .actionButtons {
@@ -423,11 +450,11 @@
     justify-content: center;
     gap: 1rem;
     flex-wrap: wrap;
-  
+
     width: fit-content;
     margin-inline: auto;
   }
-  
+
   .orText {
     display: inline-flex;
     align-items: center;
@@ -435,7 +462,7 @@
     color: #666;
     font-weight: 500;
   }
-  
+
   /* Make sure the modal stacks content centered */
   .unauthInstructionsContent {
     display: flex;
