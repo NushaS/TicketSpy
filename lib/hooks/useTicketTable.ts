@@ -9,9 +9,14 @@ async function fetchTickets() {
 }
 
 export function useTicketTable() {
-  return useQuery({
+  const query = useQuery({
     queryKey: ['tickets'], // unique cache key
     queryFn: fetchTickets,
     staleTime: 1000 * 60, // cache for 1 min
   });
+
+  return {
+    ...query,
+    refetch: query.refetch, // Explicitly expose refetch for manual updates
+  };
 }
