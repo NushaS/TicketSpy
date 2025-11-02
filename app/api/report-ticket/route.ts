@@ -1,3 +1,5 @@
+// deprecated route, TODO: remove in future
+
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient as createSupabaseClient } from '@supabase/supabase-js';
 

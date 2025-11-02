@@ -333,8 +333,8 @@ const TicketSpyHeatMap: React.FC = () => {
                 const ticketData = {
                   latitude: reportLocation?.lat,
                   longitude: reportLocation?.lng,
-                  date: ticketDateIssued,
-                  time: ticketTimeIssued,
+                  ticket_report_date: ticketDateIssued,
+                  ticket_report_hour: ticketTimeIssued,
                   username: username || 'Anonymous',
                   violationType: ticketViolationType,
                 };
@@ -342,7 +342,7 @@ const TicketSpyHeatMap: React.FC = () => {
                 try {
                   console.log('Submitting ticket data:', ticketData);
 
-                  const response = await fetch('/api/report-ticket', {
+                  const response = await fetch('/api/post-ticket', {
                     method: 'POST',
                     headers: {
                       'Content-Type': 'application/json',
