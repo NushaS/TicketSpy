@@ -166,6 +166,57 @@
   background-color: rgb(243, 244, 246);
 }
 
+/* Success Toast */
+.successToast {
+  position: fixed;
+  top: 6rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  background-color: #10b981;
+  color: white;
+  border-radius: 8px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  font-size: 0.95rem;
+  font-weight: 500;
+  animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+/* Error Toast */
+.errorToast {
+  position: fixed;
+  top: 6rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  background-color: #ef4444;
+  color: white;
+  border-radius: 8px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  font-size: 0.95rem;
+  font-weight: 500;
+  animation: slideDown 0.3s ease-out;
+}
+
 /* Login Modal */
 .loginModalContent {
   background-color: #f5f1e8;

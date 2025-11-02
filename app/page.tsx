@@ -17,6 +17,7 @@ import {
   initialViewState,
   mapStyleURL,
 } from './heatmapConfig';
+import { useTicketTable } from '@/lib/hooks/useTicketTable';
 
 const TicketSpyHeatMap: React.FC = () => {
   const [showInstructions, setShowInstructions] = useState(false);
@@ -34,9 +35,13 @@ const TicketSpyHeatMap: React.FC = () => {
   const [ticketViolationType, setTicketViolationType] = useState('');
   const [reportLocation, setReportLocation] = useState<{ lng: number; lat: number } | null>(null);
   const [username, setUsername] = useState<string | null>(null);
+  const [showSuccessToast, setShowSuccessToast] = useState(false);
+  const [showErrorToast, setShowErrorToast] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
   const router = useRouter();
 
   // 1.) Supabase query for data
+  const { data: ticketData, refetch: refetchTickets } = useTicketTable();
   const testData = useDynamicDatapoints();
   const geoJsonData = getGeoJsonData(testData);
   const adjustableHeatmap = React.useMemo(() => {
@@ -112,6 +117,22 @@ const TicketSpyHeatMap: React.FC = () => {
 
   return (
     <div className={styles.container}>
+      {/* Success Toast */}
+      {showSuccessToast && (
+        <div className={styles.successToast}>
+          <Check size={20} />
+          <span>Ticket reported successfully!</span>
+        </div>
+      )}
+
+      {/* Error Toast */}
+      {showErrorToast && (
+        <div className={styles.errorToast}>
+          <X size={20} />
+          <span>{errorMessage}</span>
+        </div>
+      )}
+
       {/* Header */}
       <header className={styles.header}>
         <div className={styles.logoContainer}>
@@ -306,17 +327,54 @@ const TicketSpyHeatMap: React.FC = () => {
             <h2 className={styles.ticketReportTitle}>Report a ticket:</h2>
 
             <form
-              onSubmit={(e) => {
+              onSubmit={async (e) => {
                 e.preventDefault();
-                // Log all ticket information
-                console.log('Ticket submitted:', {
+
+                const ticketData = {
                   latitude: reportLocation?.lat,
                   longitude: reportLocation?.lng,
                   date: ticketDateIssued,
                   time: ticketTimeIssued,
                   username: username || 'Anonymous',
                   violationType: ticketViolationType,
-                });
+                };
+
+                try {
+                  console.log('Submitting ticket data:', ticketData);
+
+                  const response = await fetch('/api/report-ticket', {
+                    method: 'POST',
+                    headers: {
+                      'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(ticketData),
+                  });
+
+                  console.log('Response status:', response.status);
+
+                  const result = await response.json();
+                  console.log('Response data:', result);
+
+                  if (response.ok) {
+                    console.log('Ticket submitted successfully:', result);
+                    // Refresh the heatmap data to show the new ticket
+                    refetchTickets();
+                    // Show success toast
+                    setShowSuccessToast(true);
+                    setTimeout(() => setShowSuccessToast(false), 3000);
+                  } else {
+                    console.error('Error submitting ticket:', result);
+                    setErrorMessage(result.error || 'Failed to submit ticket');
+                    setShowErrorToast(true);
+                    setTimeout(() => setShowErrorToast(false), 3000);
+                  }
+                } catch (error) {
+                  console.error('Network error:', error);
+                  setErrorMessage('Network error: Failed to submit ticket');
+                  setShowErrorToast(true);
+                  setTimeout(() => setShowErrorToast(false), 3000);
+                }
+
                 setShowTicketReportModal(false);
                 setTicketDateIssued('');
                 setTicketTimeIssued('');
