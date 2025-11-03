@@ -10,6 +10,13 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import styles from './page.module.css';
+import { CarIcon } from '../components/ui/icons/car-icon';
+import { HeartIcon } from '../components/ui/icons/heart-icon';
+import { MapPin } from '../components/map/MapPin';
+import { useUserParkingSessions } from '@/lib/hooks/useParkingSessionTable';
+import { useUserBookmarkedLocations } from '@/lib/hooks/useBookmarkedLocations';
+import { filterValidDataPoints } from '@/lib/utils/mapUtils';
+
 import {
   useDynamicDatapoints,
   getGeoJsonData,
@@ -27,6 +34,7 @@ const TicketSpyHeatMap: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [userId, setUserId] = useState<string | null>(null);
   const router = useRouter();
 
   // 1.) Supabase query for data
@@ -67,7 +75,14 @@ const TicketSpyHeatMap: React.FC = () => {
       const {
         data: { session },
       } = await supabase.auth.getSession();
-      setIsLoggedIn(!!session);
+      // obtain user id value
+      if (session?.user) {
+        setIsLoggedIn(true);
+        setUserId(session.user.id);
+      } else {
+        setIsLoggedIn(false);
+        setUserId(null);
+      }
     };
     checkAuth();
   }, []);
@@ -98,6 +113,48 @@ const TicketSpyHeatMap: React.FC = () => {
       setIsLoading(false);
     }
   };
+
+  {
+    /* MapPinsLayer — renders pins for parked cars + bookmarks */
+  }
+  function MapPinsLayer({ userId }: { userId: string }) {
+    // fetch raw data from supabase for that userid
+    const { data: bookmarkData } = useUserBookmarkedLocations(userId);
+    const { data: carData } = useUserParkingSessions(userId);
+
+    // convert bookmark records to pin poins
+    const bookmarkPoints = filterValidDataPoints(
+      (bookmarkData ?? []).map((row) => ({
+        latitude: Number(row.latitude),
+        longitude: Number(row.longitude),
+        type: 'heart',
+      }))
+    );
+
+    //convert parking session records to pin points
+    const carPoints = filterValidDataPoints(
+      (carData ?? []).map((row) => ({
+        latitude: Number(row.latitude),
+        longitude: Number(row.longitude),
+        type: 'car',
+      }))
+    );
+
+    const allPins = [...bookmarkPoints, ...carPoints];
+    // render each point as a MapPin with the corresponding icon
+    return (
+      <>
+        {allPins.map((point, i) => (
+          <MapPin
+            key={i}
+            latitude={point.latitude}
+            longitude={point.longitude}
+            icon={point.type === 'car' ? <CarIcon /> : <HeartIcon />}
+          />
+        ))}
+      </>
+    );
+  }
 
   return (
     <div className={styles.container}>
@@ -191,6 +248,8 @@ const TicketSpyHeatMap: React.FC = () => {
           <Source id="tickets" type="geojson" data={geoJsonData}>
             <Layer {...adjustableHeatmap} />
           </Source>
+          {/* Render ticket + car pins on top of heatmap if user is logged*/}
+          {userId && <MapPinsLayer userId={userId} />}
         </Map>
       </div>
 
