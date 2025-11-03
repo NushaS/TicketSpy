@@ -1,3 +1,4 @@
+import styles from '../auth.module.css';
 import { LoginForm } from '@/components/login-form';
 
 export default function Page() {

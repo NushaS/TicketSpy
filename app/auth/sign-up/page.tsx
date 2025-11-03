@@ -1,3 +1,4 @@
+import styles from '../auth.module.css';
 import { SignUpForm } from '@/components/sign-up-form';
 
 export default function Page() {
