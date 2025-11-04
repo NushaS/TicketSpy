@@ -454,3 +454,14 @@
     padding: 0;
   }
 }
+
+.authHeading {
+  font-family: 'Jersey 10', sans-serif; /* fallback */
+  font-style: normal;
+  font-weight: 400;
+  font-size: 30px;
+  line-height: 32px;
+  text-align: center;
+  color: #445B35;
+  margin-bottom: 1.5rem; /* space between heading and form */
+}
