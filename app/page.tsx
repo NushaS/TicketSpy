@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { Menu, Info, Check, X } from 'lucide-react';
 import Image from 'next/image';
 import logo from './logo.png';
-import Map, { Source, Layer } from 'react-map-gl/maplibre';
+import Map, { Source, Layer, Marker } from 'react-map-gl/maplibre';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -24,6 +24,7 @@ import {
   initialViewState,
   mapStyleURL,
 } from './heatmapConfig';
+import { useTicketTable } from '@/lib/hooks/useTicketTable';
 
 const TicketSpyHeatMap: React.FC = () => {
   const [showInstructions, setShowInstructions] = useState(false);
@@ -34,10 +35,21 @@ const TicketSpyHeatMap: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [pinLocation, setPinLocation] = useState<{ lng: number; lat: number } | null>(null);
+  const [showTicketReportModal, setShowTicketReportModal] = useState(false);
+  const [ticketDateIssued, setTicketDateIssued] = useState('');
+  const [ticketTimeIssued, setTicketTimeIssued] = useState('');
+  const [ticketViolationType, setTicketViolationType] = useState('');
+  const [reportLocation, setReportLocation] = useState<{ lng: number; lat: number } | null>(null);
+  const [username, setUsername] = useState<string | null>(null);
+  const [showSuccessToast, setShowSuccessToast] = useState(false);
+  const [showErrorToast, setShowErrorToast] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
   const [userId, setUserId] = useState<string | null>(null);
   const router = useRouter();
 
   // 1.) Supabase query for data
+  const { data: ticketData, refetch: refetchTickets } = useTicketTable();
   const testData = useDynamicDatapoints();
   const geoJsonData = getGeoJsonData(testData);
   const adjustableHeatmap = React.useMemo(() => {
@@ -75,6 +87,11 @@ const TicketSpyHeatMap: React.FC = () => {
       const {
         data: { session },
       } = await supabase.auth.getSession();
+      setIsLoggedIn(!!session);
+      // Set username from session if available
+      if (session?.user) {
+        setUsername(session.user.email || session.user.phone || 'Anonymous');
+      }
       // obtain user id value
       if (session?.user) {
         setIsLoggedIn(true);
@@ -158,6 +175,22 @@ const TicketSpyHeatMap: React.FC = () => {
 
   return (
     <div className={styles.container}>
+      {/* Success Toast */}
+      {showSuccessToast && (
+        <div className={styles.successToast}>
+          <Check size={20} />
+          <span>Ticket reported successfully!</span>
+        </div>
+      )}
+
+      {/* Error Toast */}
+      {showErrorToast && (
+        <div className={styles.errorToast}>
+          <X size={20} />
+          <span>{errorMessage}</span>
+        </div>
+      )}
+
       {/* Header */}
       <header className={styles.header}>
         <div className={styles.logoContainer}>
@@ -173,7 +206,10 @@ const TicketSpyHeatMap: React.FC = () => {
 
         <div className={styles.buttonGroup}>
           <button
-            onClick={() => setShowInstructions(!showInstructions)}
+            onClick={() => {
+              setShowInstructions(!showInstructions);
+              setPinLocation(null);
+            }}
             className={styles.instructionsButton}
           >
             <Info size={18} />
@@ -244,25 +280,61 @@ const TicketSpyHeatMap: React.FC = () => {
               // ignore if background layer not present or setPaintProperty fails
             }
           }}
+          onClick={(e) => {
+            setPinLocation({ lng: e.lngLat.lng, lat: e.lngLat.lat });
+            setShowInstructions(false);
+          }}
         >
           <Source id="tickets" type="geojson" data={geoJsonData}>
             <Layer {...adjustableHeatmap} />
           </Source>
+          {pinLocation && (
+            <Marker longitude={pinLocation.lng} latitude={pinLocation.lat} anchor="bottom">
+              <div className={styles.mapMarkerWrapper}>
+                <svg viewBox="0 0 24 24" className={styles.mapMarkerSvg}>
+                  <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" />
+                  <circle cx="12" cy="9" r="2.5" fill="#fff" />
+                </svg>
+              </div>
+            </Marker>
+          )}
           {/* Render ticket + car pins on top of heatmap if user is logged*/}
           {userId && <MapPinsLayer userId={userId} />}
         </Map>
       </div>
 
-      {/* Instructions Modal */}
-      {showInstructions && !isLoggedIn && (
+      {/* Instructions Modal (Logged In) */}
+      {showInstructions && (
         <div className={styles.modalOverlay}>
+          <div className={styles.modalContent}>
+            <h2 className={styles.modalTitle}>How to Use TicketSpy</h2>
+            <p className={styles.modalText}>EXAMPLE</p>
+            <button onClick={() => setShowInstructions(false)} className={styles.modalButton}>
+              Got it!
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Pin Location Popup Modal */}
+      {pinLocation && (
+        <div className={styles.pinPopupWrapper}>
           <div className={styles.unauthInstructionsContent}>
-            <button onClick={() => setShowInstructions(false)} className={styles.closeButton}>
-              <X size={24} color="#999" />
+            <button onClick={() => setPinLocation(null)} className={styles.closeButton}>
+              <X className={styles.mapIcon} />
             </button>
 
             <div className={styles.actionButtons}>
-              <button className={styles.reportTicketButton}>report a ticket</button>
+              <button
+                className={styles.reportTicketButton}
+                onClick={() => {
+                  setShowTicketReportModal(true);
+                  setReportLocation(pinLocation);
+                  setPinLocation(null);
+                }}
+              >
+                report a ticket
+              </button>
               <button className={styles.reportEnforcementButton}>
                 report parking enforcement nearby
               </button>
@@ -270,7 +342,7 @@ const TicketSpyHeatMap: React.FC = () => {
 
             <div className={styles.instructionsText}>
               <p>
-                to <strong>mark where you parked</strong>, get{' '}
+                To <strong>mark where you parked</strong>, get{' '}
                 <strong>notifications for tickets issued</strong> or{' '}
                 <strong>parking enforcement spotted</strong> near your important locations, and{' '}
                 <strong>bookmark your favorite parking spots:</strong>
@@ -284,7 +356,7 @@ const TicketSpyHeatMap: React.FC = () => {
               <span className={styles.orText}>or</span>
               <button
                 onClick={() => {
-                  setShowInstructions(false);
+                  setPinLocation(null);
                   setShowLoginModal(true);
                 }}
                 className={styles.logInBtn}
@@ -296,15 +368,119 @@ const TicketSpyHeatMap: React.FC = () => {
         </div>
       )}
 
-      {/* Instructions Modal (Logged In) */}
-      {showInstructions && isLoggedIn && (
+      {/* Ticket Report Modal */}
+      {showTicketReportModal && (
         <div className={styles.modalOverlay}>
-          <div className={styles.modalContent}>
-            <h2 className={styles.modalTitle}>How to Use TicketSpy</h2>
-            <p className={styles.modalText}>EXAMPLE</p>
-            <button onClick={() => setShowInstructions(false)} className={styles.modalButton}>
-              Got it!
+          <div className={styles.ticketReportModalContent}>
+            <button
+              onClick={() => {
+                setShowTicketReportModal(false);
+                setTicketDateIssued('');
+                setTicketTimeIssued('');
+                setTicketViolationType('');
+              }}
+              className={styles.ticketReportCloseButton}
+            >
+              <X size={24} />
             </button>
+
+            <h2 className={styles.ticketReportTitle}>Report a ticket:</h2>
+
+            <form
+              onSubmit={async (e) => {
+                e.preventDefault();
+
+                const ticketData = {
+                  latitude: reportLocation?.lat,
+                  longitude: reportLocation?.lng,
+                  ticket_report_date: ticketDateIssued,
+                  ticket_report_hour: ticketTimeIssued,
+                  username: username || 'Anonymous',
+                  violationType: ticketViolationType,
+                };
+
+                try {
+                  console.log('Submitting ticket data:', ticketData);
+
+                  const response = await fetch('/api/post-ticket', {
+                    method: 'POST',
+                    headers: {
+                      'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(ticketData),
+                  });
+
+                  console.log('Response status:', response.status);
+
+                  const result = await response.json();
+                  console.log('Response data:', result);
+
+                  if (response.ok) {
+                    console.log('Ticket submitted successfully:', result);
+                    // Refresh the heatmap data to show the new ticket
+                    refetchTickets();
+                    // Show success toast
+                    setShowSuccessToast(true);
+                    setTimeout(() => setShowSuccessToast(false), 3000);
+                  } else {
+                    console.error('Error submitting ticket:', result);
+                    setErrorMessage(result.error || 'Failed to submit ticket');
+                    setShowErrorToast(true);
+                    setTimeout(() => setShowErrorToast(false), 3000);
+                  }
+                } catch (error) {
+                  console.error('Network error:', error);
+                  setErrorMessage('Network error: Failed to submit ticket');
+                  setShowErrorToast(true);
+                  setTimeout(() => setShowErrorToast(false), 3000);
+                }
+
+                setShowTicketReportModal(false);
+                setTicketDateIssued('');
+                setTicketTimeIssued('');
+                setTicketViolationType('');
+                setReportLocation(null);
+              }}
+              className={styles.ticketReportForm}
+            >
+              <div className={styles.ticketReportFormGroup}>
+                <label className={styles.ticketReportLabel}>Date issued:</label>
+                <input
+                  type="date"
+                  className={styles.ticketReportInput}
+                  value={ticketDateIssued}
+                  onChange={(e) => setTicketDateIssued(e.target.value)}
+                  required
+                />
+              </div>
+
+              <div className={styles.ticketReportFormGroup}>
+                <label className={styles.ticketReportLabel}>Time issued:</label>
+                <input
+                  type="time"
+                  className={styles.ticketReportInput}
+                  value={ticketTimeIssued}
+                  onChange={(e) => setTicketTimeIssued(e.target.value)}
+                  required
+                />
+              </div>
+
+              <div className={styles.ticketReportFormGroup}>
+                <label className={styles.ticketReportLabel}>Violation type:</label>
+                <input
+                  type="text"
+                  className={styles.ticketReportInput}
+                  value={ticketViolationType}
+                  onChange={(e) => setTicketViolationType(e.target.value)}
+                  required
+                />
+              </div>
+
+              <button type="submit" className={styles.ticketReportSubmitButton}>
+                <Check size={20} />
+                <span>Submit ticket report</span>
+              </button>
+            </form>
           </div>
         </div>
       )}
@@ -314,7 +490,7 @@ const TicketSpyHeatMap: React.FC = () => {
         <div className={styles.modalOverlay}>
           <div className={styles.loginModalContent}>
             <button onClick={() => setShowLoginModal(false)} className={styles.closeButton}>
-              <X size={24} color="#999" />
+              <X className={styles.mapIcon} />
             </button>
 
             <h2 className={styles.loginTitle}>log in</h2>

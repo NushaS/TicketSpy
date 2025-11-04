@@ -166,6 +166,57 @@
   background-color: rgb(243, 244, 246);
 }
 
+/* Success Toast */
+.successToast {
+  position: fixed;
+  top: 6rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  background-color: #10b981;
+  color: white;
+  border-radius: 8px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  font-size: 0.95rem;
+  font-weight: 500;
+  animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+/* Error Toast */
+.errorToast {
+  position: fixed;
+  top: 6rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  background-color: #ef4444;
+  color: white;
+  border-radius: 8px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  font-size: 0.95rem;
+  font-weight: 500;
+  animation: slideDown 0.3s ease-out;
+}
+
 /* Login Modal */
 .loginModalContent {
   background-color: #f5f1e8;
@@ -269,6 +320,119 @@
   cursor: not-allowed;
 }
 
+/* Ticket Report Modal */
+.ticketReportModalContent {
+  background-color: #f5f1e8;
+  border-radius: 1rem;
+  padding: 2.5rem 2rem;
+  max-width: 550px;
+  width: 90%;
+  margin: 0 1rem;
+  position: relative;
+}
+
+.ticketReportCloseButton {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.25rem;
+  display: flex;
+  align-items: center;
+  color: #999;
+}
+
+.ticketReportCloseButton:hover {
+  color: #666;
+}
+
+.ticketReportTitle {
+  font-size: 1.75rem;
+  font-weight: 500;
+  color: #333;
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.ticketReportForm {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.ticketReportFormGroup {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.ticketReportLabel {
+  font-size: 1rem;
+  color: #333;
+  min-width: 130px;
+  text-align: left;
+}
+
+.ticketReportInput {
+  flex: 1;
+  padding: 0.625rem 1rem;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 1rem;
+  background-color: white;
+  transition: border-color 0.2s;
+}
+
+.ticketReportInput:focus {
+  outline: none;
+  border-color: #6b856b;
+}
+
+.ticketReportSubmitButton {
+  margin-top: 1rem;
+  padding: 0.875rem 2rem;
+  background-color: #6b856b;
+  color: white;
+  border: none;
+  border-radius: 50px;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  justify-content: center;
+  align-self: center;
+  transition: background-color 0.2s;
+}
+
+.ticketReportSubmitButton:hover {
+  background-color: #5a7259;
+}
+
+/* Responsive adjustments for ticket report modal */
+@media (max-width: 640px) {
+  .ticketReportFormGroup {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .ticketReportLabel {
+    min-width: auto;
+  }
+
+  .ticketReportInput {
+    width: 100%;
+  }
+
+  .ticketReportTitle {
+    font-size: 1.5rem;
+  }
+}
+
 /* Responsive adjustments for login modal */
 @media (max-width: 640px) {
   .loginFormGroup {
@@ -336,7 +500,7 @@
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-.reportTicketButton:hover{
+.reportTicketButton:hover {
   background-color: rgb(76, 64, 71);
 }
 .reportEnforcementButton:hover {
@@ -380,7 +544,7 @@
 }
 
 .createAccountBtn:hover {
-  background-color: #8f5f5f;
+  background-color: rgb(111, 132, 104);
 }
 
 .orText {
@@ -405,6 +569,33 @@
   background-color: #5a7259;
 }
 
+/* Pin Location Popup Wrapper */
+.pinPopupWrapper {
+  position: fixed;
+  bottom: 0px;
+  left: 58%;
+  transform: translateX(-50%);
+  z-index: 2000;
+  max-width: 90%;
+  width: 800px;
+}
+
+.mapMarkerWrapper {
+  width: 30;
+  height: 40;
+  cursor: 'pointer';
+}
+/* Map Marker SVG */
+.mapMarkerSvg {
+  fill: #e63946;
+  stroke: #000;
+  stroke-width: 1.5;
+}
+.mapIcon {
+  size: 24;
+  color: '#999';
+}
+
 /* Responsive adjustments for unauth instructions */
 @media (max-width: 640px) {
   .actionButtons {
@@ -423,11 +614,11 @@
     justify-content: center;
     gap: 1rem;
     flex-wrap: wrap;
-  
+
     width: fit-content;
     margin-inline: auto;
   }
-  
+
   .orText {
     display: inline-flex;
     align-items: center;
@@ -435,7 +626,7 @@
     color: #666;
     font-weight: 500;
   }
-  
+
   /* Make sure the modal stacks content centered */
   .unauthInstructionsContent {
     display: flex;
