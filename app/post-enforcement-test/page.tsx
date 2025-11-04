@@ -29,7 +29,7 @@ export default function TestEnforcementPage() {
     setResult(null);
 
     try {
-      const res = await fetch('/api/report-enforcement', {
+      const res = await fetch('/api/post-enforcement', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(mockEnforcement),
