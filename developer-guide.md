@@ -1,25 +1,27 @@
 # Developer guide
 
 ## Source code
+
 To obtain the source code, the developer needs to clone the repository locally. There is only one repository for TicketSpy. To make changes, create a new branch, and then create a pull request to the dev branch. Then, once approved, created another pull request to the main branch.
 
 ## Layout explained
+
 '''
 ticketspy/
 ├── app/
-│   ├── auth/                # next.js auto built the auth. Auth for login
-│   ├── protected/       
-│   ├── instruments/
-│   ├── test-query/
-│   └── welcome/             # include __tests__
-├── components/              # reusable components
-│   ├── tutorial/
-│   └── ui/
-├── lib/                     # Supabase client & hooks
-│   ├── hooks/
-│   └── supabase/
-├── reports/                 # Our weekly tuesday reports
-├── README.md 		# README.md
+│ ├── auth/ # next.js auto built the auth. Auth for login
+│ ├── protected/  
+│ ├── instruments/
+│ ├── test-query/
+│ └── welcome/ # include **tests**
+├── components/ # reusable components
+│ ├── tutorial/
+│ └── ui/
+├── lib/ # Supabase client & hooks
+│ ├── hooks/
+│ └── supabase/
+├── reports/ # Our weekly tuesday reports
+├── README.md # README.md
 ├── package.json
 ├── package-lock.json
 ├── tsconfig.json
@@ -36,7 +38,9 @@ Documentation: contains the README.md for our project. Also contains our weekly 
 Data files: N/A
 
 ## How to Build the Software
+
 Follow these steps to build and run the project locally:
+
 1. **Clone the repository**
    ```bash
    git clone https://github.com/<your-username>/TicketSpy.git
@@ -64,7 +68,6 @@ Follow these steps to build and run the project locally:
 6. **View the application**
    Once the build completes successfully, open the URL displayed in your terminal (usually [http://localhost:3000](http://localhost:3000)) to view the website.
 
-
 ## How to Test the Software
 
 Follow these steps to run and verify the system’s test cases:
@@ -73,15 +76,16 @@ Follow these steps to run and verify the system’s test cases:
    - Tests are automatically executed whenever you:
      - Push new code to the repository
      - Create or update a pull request
-     - Make a new commit  
+     - Make a new commit
    - The automated workflow will:
-     - Build the project  
-     - Run all test suites  
-     - Run the linter (`eslint`)  
-     - Install all necessary dependencies  
+     - Build the project
+     - Run all test suites
+     - Run the linter (`eslint`)
+     - Install all necessary dependencies
 
 2. **Run the linter manually**
    If you want to check for linting or formatting issues before committing:
+
    ```bash
    npm run lint
    ```
@@ -92,64 +96,72 @@ Follow these steps to run and verify the system’s test cases:
    npm run dev
    ```
 
-
 ## How to Add New Tests
 
 Are there any naming conventions/patterns to follow when naming test files? Is there a particular test harness to use?
 
 ### Adding New Tests
+
 Our script `npm run test` (configured in `package.json`) will run **Jest**.  
 Jest will search under the `_tests_` folder by default, as well as any file that matches `*.test.js`, `*.test.ts`, or `*.test.tsx` formats.
 
 To add a new test:
-1. Navigate to the page or component that you want to test.  
-2. Create a `__tests__` folder inside the same directory.  
-3. Add a file named `yourFileName.test.tsx` inside that folder.  
+
+1. Navigate to the page or component that you want to test.
+2. Create a `__tests__` folder inside the same directory.
+3. Add a file named `yourFileName.test.tsx` inside that folder.
 
 For example, see the `app/welcome/_tests_` folder.
 
 ### Naming Conventions/Patterns
+
 - Test file names should reflect the file or component being tested:
+
   ```
   componentName.test.tsx
   ```
+
   **Example:** If the component is `page.tsx`, name the test `page.test.tsx`.
 
 - Test descriptions inside the test file should communicate expected behavior.
 
 - Tests should follow a behavior-driven structure:
-  - **Arrange:** Set up the component / mocks  
-  - **Act:** Perform the interaction  
-  - **Assert:** Verify the expected result  
+  - **Arrange:** Set up the component / mocks
+  - **Act:** Perform the interaction
+  - **Assert:** Verify the expected result
 
 - Keep each test focused on one behavior.
 
 ---
-
 
 ## How to Build a Release of the Software
 
 Describe any tasks that are not automated. For example, should a developer update a version number (in code and documentation) prior to invoking the build system? Are there any sanity checks a developer should perform after building a release?
 
 ### Update the Version Number
+
 We follow **Semantic Versioning** (`MAJOR.MINOR.PATCH`), for example: `1.2.0`.
 
 Before building a release:
-1. Update the version in `package.json`.  
-2. If the version number appears in documentation (e.g., `README` or `CHANGELOG`), update it there as well.  
+
+1. Update the version in `package.json`.
+2. If the version number appears in documentation (e.g., `README` or `CHANGELOG`), update it there as well.
 
 ### Update the Changelog (if applicable)
+
 Create or update a `CHANGELOG.md` entry summarizing:
-- New features  
-- Bug fixes  
-- Breaking changes (if any)  
+
+- New features
+- Bug fixes
+- Breaking changes (if any)
 
 ### Build the Application
+
 ```bash
 npm install
 npm run build
 ```
 
 ### Run Sanity Checks
-Before releasing, verify that the build works as expected.
 
+Before releasing, verify that the build works as expected.
