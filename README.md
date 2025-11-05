@@ -10,6 +10,29 @@ TicketSpy seeks to turn real local driver experiences with parking tickets into 
 
 Our goal is to deliver a resouce that the local community can engage with in order to minimize the likelihood of being issued a parking ticket. In a city where ticket fine values and ticket issuance frequency are both on the rise, and where poorly marked parking spaces are not uncommon, providing drivers with a resource for avoiding preventable parking tickets is integral to decreasing confusion and ticket fines. This aligns with our ultimate goal of improving local driver confidence and satisfaction.
 
+### Currently Supported (or Partially Supported) Use Cases
+
+**1. Looking at heatmap to make informed parking decisions (Operational)**
+  - For users wanting to find a place to park without getting ticketed
+  - Currently, the heat map is displaying areas with tickets, so a user could look at the map to figure out a place with no/few recent parking tickets. It is defaulted to tickets within the past year right now.
+  - The front end for the heat map uses TanStack Query to access the backend and database.
+
+**2. Making reports (Partially-operational)**
+ - Reporting parking ticket
+     - For users trying to report their parking ticket for others to see
+     - Users are able to report a ticket on a location they click. When they do so, they are able to report the ticket time, date, and ticket type. Currently, they are only able to report a "default parking ticket" enum, but we will add more choices for parking tickets in the future
+     - The system components that are used include: The Supabase database, our api route "post-ticket", and the front-end web page to display the ticket coordinates on the heatmap
+  - Reporting enforcement sighting
+    - For users trying to report if they've recently seen parking enforcement.
+    - Reporting button is available next to the button for reporting a parking ticket, but is non-operational as of now.
+    - The system components that are used will include: The Supabase database, the api route "post-enforcement-report", and the front-end web page to display the enforcement report coordinates on the heatmap.
+  
+**3. Logging in to access additional features (Operational)**
+  - For users looking to personalize their TicketSpy by keeping track of specific locations.
+  - Currently, users can create an account and log in successfully with that account, which will give them access to bookmark and parking session pins and text notifications once those features become available. 
+  - The login and create account user interface handle user input and invoke requests from the frontend, user authentication and session management is handled in the backend component, and login credentials/profile data are stored in the database.
+
+
 ### Repository Layout
 
 ```
