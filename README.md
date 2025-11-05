@@ -61,24 +61,28 @@ ticketspy/
 
 ## Getting Started
 
-### Dependencies, Installing, Executing program
+### Running the system
 
 DEPENDENCIES
-
 1. Install node.js v22.20.0 in google
 2. npm install -g npm@10.9.3
 
 git clone our repo
 
-1. cd ticketspy
-2. add a .env.local file under TicketSpy/ticketspy for the Supabase credentials  
+1. (optional) Add a .env.local file under TicketSpy/ticketspy for the Supabase credentials  
    **_.env.local_**  
    NEXT_PUBLIC_SUPABASE_URL=YourSupabaseUrl  
    NEXT_PUBLIC_SUPABASE_PUBLISHABLE_OR_ANON_KEY=YourSupabaseApiKey
 3. npm install
 4. npm run dev
+5. Head to `http://localhost:3000` to see it in action!
 
-head to `http://localhost:3000/instruments` and see if it worked!
+To see how to build & test the system, follow our 'Developer Guide'
+- [Developer Guide](./developer-guide.md)
+
+To track our current bugs or report a new one, follow our 'User Guide'
+- [User Guide](./user-guide.md)
+
 
 ## Authors
 
@@ -96,7 +100,7 @@ Leonardo Paredes
 ## Testing
 
 added husky to do pre-push testing locally
-TESTing test
+
 ### Husky for pre-commit testing
 
 `.husky/pre-commit`
