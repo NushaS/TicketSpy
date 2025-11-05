@@ -52,11 +52,18 @@ const TicketSpyHeatMap: React.FC = () => {
   const testData = useDynamicDatapoints();
   const geoJsonData = getGeoJsonData(testData);
   const adjustableHeatmap = React.useMemo(() => {
-    // create a copy of heatmapLayer with adjusted opacity stops multiplied by the slider
     const mult = heatmapOpacityMultiplier;
     // avoid `any` by treating heatmapLayer as unknown and accessing paint as a Record
     const base = heatmapLayer as unknown as { paint?: Record<string, unknown> };
     const basePaint = base.paint ?? {};
+    // baseline stops (existing visual defaults at mult === 0)
+    const baseline0 = 0.48;
+    const baseline8 = 0.36;
+    const baseline15 = 0.2;
+    // lerp from base->1 then scale by mult so that:
+    // mult=0 => 0.0, mult=1 => 1.0, and intermediate values blend smoothly.
+    const lerpToOne = (baseVal: number, t: number) => baseVal * (1 - t) + 1 * t;
+    const computeStop = (baseVal: number, t: number) => t * lerpToOne(baseVal, t);
     const newPaint: Record<string, unknown> = {
       ...basePaint,
       'heatmap-opacity': [
@@ -64,11 +71,11 @@ const TicketSpyHeatMap: React.FC = () => {
         ['linear'],
         ['zoom'],
         0,
-        0.48 * mult,
+        computeStop(baseline0, mult),
         8,
-        0.36 * mult,
+        computeStop(baseline8, mult),
         15,
-        0.2 * mult,
+        computeStop(baseline15, mult),
       ],
     };
     const newLayer = {
@@ -229,8 +236,8 @@ const TicketSpyHeatMap: React.FC = () => {
         <div
           style={{
             position: 'absolute',
-            top: 84,
-            right: 16,
+            top: '5.5rem',
+            left: 16,
             background: 'rgba(255,255,255,0.9)',
             padding: '8px 10px',
             borderRadius: 8,

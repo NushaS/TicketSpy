@@ -70,21 +70,21 @@ export const heatmapLayer: LayerProps = {
       'rgba(230,247,255,0)',
       // very low density: faint light-blue tint
       0.05,
-      'rgba(173,216,230,0.22)',
+      'rgba(173,216,230,0.32)',
       // low-medium: soft steel blue
       0.2,
-      'rgba(70,130,180,0.38)',
+      'rgba(70,130,180,0.40)',
       // medium: stronger blue
       0.4,
       'rgba(0,99,255,0.56)',
       // high: yellow/orange (becomes visible and moves toward red)
       0.6,
-      'rgba(255,200,0,0.72)',
+      'rgba(255,200,0,0.85)',
       0.8,
-      'rgba(255,120,0,0.86)',
+      'rgba(255,120,0,0.92)',
       // highest density: red (less transparent but not fully black)
       1,
-      'rgba(178,24,43,0.95)',
+      'rgba(178,24,43,1.0)',
     ],
     // Adjust the heatmap radius by zoom level
     'heatmap-radius': ['interpolate', ['linear'], ['zoom'], 0, 2, 15, 20],
