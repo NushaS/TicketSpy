@@ -78,6 +78,7 @@ git clone our repo
 5. Head to `http://localhost:3000` to see it in action!
 
 To see how to build & test the system, follow our 'Developer Guide'
+To see our version control, follow our 'Developer Guide' as well
 - [Developer Guide](./developer-guide.md)
 
 To track our current bugs or report a new one, follow our 'User Guide'
