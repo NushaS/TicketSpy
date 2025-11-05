@@ -166,3 +166,25 @@ npm run build
 ### Run Sanity Checks
 
 Before releasing, verify that the build works as expected.
+
+## Our version control structure
+###"Git Feature workflow"
+We use git and a minimal 'Git Feature Workflow' to perform version control
+
+We have 2 main branches
+- main (stable, ready to run)
+- dev (to catch any integration and code merging errors)
+
+We then branch off 'dev' by using this naming convection
+- feature/... (ex. feature/supabase-auth)
+- chore/... (ex. chore/insert-developer-guide)
+- fix/... (ex. fix/post-ticket-validation)
+
+In our branch from dev (such as feature/supabase-auth), we make a change by doing...
+- git add . (or adding individual files)
+- git commit -m "Some descriptive message"
+- git push
+Note: on every commit, we use 'husky pre-commit' to automaticallly test, lint, and build our program
+
+Once our team fully agrees that a branch is no longer needed, we make sure to delete said branch to minimize merge conflicts
+- git branch -d feature/supabase-auth
