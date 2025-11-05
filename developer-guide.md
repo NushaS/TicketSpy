@@ -68,11 +68,13 @@ Follow these steps to build and run the project locally:
 6. **View the application**
    Once the build completes successfully, open the URL displayed in your terminal (usually [http://localhost:3000](http://localhost:3000)) to view the website.
 
-## How to Test the Software
+
+## How to Test the Software (CI/CD)
 
 Follow these steps to run and verify the system’s test cases:
 
-1. **Automated test execution**
+1. **Automated test execution (Continuous Integration)**
+   We use Husky for pre-commit code validation, and GitHub actions to ensure the remote repository has well-tested and linted code at all times
    - Tests are automatically executed whenever you:
      - Push new code to the repository
      - Create or update a pull request
@@ -83,14 +85,14 @@ Follow these steps to run and verify the system’s test cases:
      - Run the linter (`eslint`)
      - Install all necessary dependencies
 
-2. **Run the linter manually**
-   If you want to check for linting or formatting issues before committing:
-
+3. **Run the linter and tests manually**
+   If you want to check for linting or run unit tests (respectively):
    ```bash
    npm run lint
+   npm run test
    ```
 
-3. **Check for compile-time issues**
+4. **Check for compile-time issues**
    When running the development server, any build or compile errors will be displayed automatically:
    ```bash
    npm run dev
