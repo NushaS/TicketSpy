@@ -168,7 +168,7 @@ npm run build
 Before releasing, verify that the build works as expected.
 
 ## Our version control structure
-###"Git Feature workflow"
+### "Git Feature workflow"
 We use git and a minimal 'Git Feature Workflow' to perform version control
 
 We have 2 main branches
