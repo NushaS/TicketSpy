@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 // import the same CSS module used by original login page
-import styles from '@/app/auth/login/login.module.css';
+import styles from '@/app/auth/auth.module.css';
 
 export function LoginForm() {
   const [email, setEmail] = useState('');

@@ -23,7 +23,7 @@ export const CarIcon: React.FC<CarIconProps> = ({
     width={size}
     height={size} // original viewBox is square, so width = height
     viewBox="0 0 24 24"
-    fill="none"
+    fill="white"
     className={className}
   >
     <rect x="0.25" y="0.25" width="23.5" height="23.5" rx="2.75" stroke={color} strokeWidth="0.5" />

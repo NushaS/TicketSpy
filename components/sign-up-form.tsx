@@ -1,16 +1,13 @@
 'use client';
-
-import { cn } from '@/lib/utils';
+// import from supabase
 import { createClient } from '@/lib/supabase/client';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
+// import the same CSS module used by original login page
+import styles from '@/app/auth/auth.module.css';
 
-export function SignUpForm({ className, ...props }: React.ComponentPropsWithoutRef<'div'>) {
+export function SignUpForm() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [repeatPassword, setRepeatPassword] = useState('');
@@ -20,10 +17,12 @@ export function SignUpForm({ className, ...props }: React.ComponentPropsWithoutR
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
+    // create a supabase client
     const supabase = createClient();
     setIsLoading(true);
     setError(null);
 
+    // check if passwords match
     if (password !== repeatPassword) {
       setError('Passwords do not match');
       setIsLoading(false);
@@ -39,73 +38,74 @@ export function SignUpForm({ className, ...props }: React.ComponentPropsWithoutR
         },
       });
       if (error) throw error;
-      router.push('/auth/sign-up-success');
-    } catch (error: unknown) {
-      setError(error instanceof Error ? error.message : 'An error occurred');
+      router.push('/auth/sign-up-success'); // redirect after signup
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'An error occurred');
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <div className={cn('flex flex-col gap-6', className)} {...props}>
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-2xl">Sign up</CardTitle>
-          <CardDescription>Create a new account</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSignUp}>
-            <div className="flex flex-col gap-6">
-              <div className="grid gap-2">
-                <Label htmlFor="email">Email</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="m@example.com"
-                  required
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                />
-              </div>
-              <div className="grid gap-2">
-                <div className="flex items-center">
-                  <Label htmlFor="password">Password</Label>
-                </div>
-                <Input
-                  id="password"
-                  type="password"
-                  required
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                />
-              </div>
-              <div className="grid gap-2">
-                <div className="flex items-center">
-                  <Label htmlFor="repeat-password">Repeat Password</Label>
-                </div>
-                <Input
-                  id="repeat-password"
-                  type="password"
-                  required
-                  value={repeatPassword}
-                  onChange={(e) => setRepeatPassword(e.target.value)}
-                />
-              </div>
-              {error && <p className="text-sm text-red-500">{error}</p>}
-              <Button type="submit" className="w-full" disabled={isLoading}>
-                {isLoading ? 'Creating an account...' : 'Sign up'}
-              </Button>
-            </div>
-            <div className="mt-4 text-center text-sm">
-              Already have an account?{' '}
-              <Link href="/auth/login" className="underline underline-offset-4">
-                Login
-              </Link>
-            </div>
-          </form>
-        </CardContent>
-      </Card>
-    </div>
+    <form onSubmit={handleSignUp} className={styles.loginForm}>
+      <div className={styles.loginFormGroup}>
+        <label htmlFor="email" className={styles.loginLabel}>
+          email:
+        </label>
+        <input
+          id="email"
+          type="email"
+          className={styles.loginInput}
+          placeholder="you@example.com"
+          required
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+        />
+      </div>
+
+      <div className={styles.loginFormGroup}>
+        <label htmlFor="password" className={styles.loginLabel}>
+          password:
+        </label>
+        <input
+          id="password"
+          type="password"
+          className={styles.loginInput}
+          placeholder="••••••••"
+          required
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+        />
+      </div>
+
+      <div className={styles.loginFormGroup}>
+        <label htmlFor="repeat-password" className={styles.loginLabel}>
+          repeat password:
+        </label>
+        <input
+          id="repeat-password"
+          type="password"
+          className={styles.loginInput}
+          placeholder="••••••••"
+          required
+          value={repeatPassword}
+          onChange={(e) => setRepeatPassword(e.target.value)}
+        />
+      </div>
+
+      {error && <p className={styles.loginError}>{error}</p>}
+
+      <button type="submit" className={styles.submitButton} disabled={isLoading}>
+        <span>{isLoading ? 'creating account...' : 'submit'}</span>
+      </button>
+
+      {/* row for “login” link */}
+      <div style={{ textAlign: 'center', marginTop: '1rem', fontSize: '0.9rem' }}>
+        Already have an account?{' '}
+        <Link href="/auth/login" className="underline underline-offset-4">
+          Login
+        </Link>
+      </div>
+    </form>
   );
 }
