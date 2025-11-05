@@ -5,8 +5,7 @@
 To obtain the source code, the developer needs to clone the repository locally. There is only one repository for TicketSpy. To make changes, create a new branch, and then create a pull request to the dev branch. Then, once approved, created another pull request to the main branch.
 
 ## Layout explained
-
-'''
+```
 ticketspy/
 ├── app/
 │ ├── auth/ # next.js auto built the auth. Auth for login
@@ -29,7 +28,7 @@ ticketspy/
 ├── eslint.config.mjs
 ├── tailwind.config.ts
 └── postcss.config.mjs
-'''
+```
 Source files: app, components/, lib/, and config files such as tsconfig.ts, tailwindconfig.ts, etc
 The app source file contains all our pages, the components contains all our react components we made or were auto-made by Next.js template. The lib contains our Supabase logic and hooks. The rest of the files are just our config files.
 
