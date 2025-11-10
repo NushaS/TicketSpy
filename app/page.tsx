@@ -45,6 +45,7 @@ const TicketSpyHeatMap: React.FC = () => {
   const [showSuccessToast, setShowSuccessToast] = useState(false);
   const [showErrorToast, setShowErrorToast] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+  const [userId, setUserId] = useState<string | null>(null);
   const router = useRouter();
 
   // 1.) Supabase query for data
@@ -97,6 +98,14 @@ const TicketSpyHeatMap: React.FC = () => {
       // Set username from session if available
       if (session?.user) {
         setUsername(session.user.email || session.user.phone || 'Anonymous');
+      }
+      // obtain user id value
+      if (session?.user) {
+        setIsLoggedIn(true);
+        setUserId(session.user.id);
+      } else {
+        setIsLoggedIn(false);
+        setUserId(null);
       }
     };
     checkAuth();
@@ -296,6 +305,8 @@ const TicketSpyHeatMap: React.FC = () => {
               </div>
             </Marker>
           )}
+          {/* Render ticket + car pins on top of heatmap if user is logged*/}
+          {userId && <MapPinsLayer userId={userId} />}
         </Map>
       </div>
 
