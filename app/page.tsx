@@ -325,54 +325,89 @@ const TicketSpyHeatMap: React.FC = () => {
 
       {/* Pin Location Popup Modal */}
       {pinLocation && (
-        <div className={styles.pinPopupWrapper}>
-          <div className={styles.unauthInstructionsContent}>
-            <button onClick={() => setPinLocation(null)} className={styles.closeButton}>
-              <X className={styles.mapIcon} />
-            </button>
+        // for authenticated users
+        <>
+          {isLoggedIn ? (
+            <div className={styles.pinPopupWrapper}>
+              <div className={styles.authOptionsContent}>
+                <button onClick={() => setPinLocation(null)} className={styles.closeButton}>
+                  <X className={styles.mapIcon} />
+                </button>
 
-            <div className={styles.actionButtons}>
-              <button
-                className={styles.reportTicketButton}
-                onClick={() => {
-                  setShowTicketReportModal(true);
-                  setReportLocation(pinLocation);
-                  setPinLocation(null);
-                }}
-              >
-                report a ticket
-              </button>
-              <button className={styles.reportEnforcementButton}>
-                report parking enforcement nearby
-              </button>
-            </div>
+                <div className={styles.actionButtons}>
+                  <button
+                    className={styles.reportTicketButton}
+                    onClick={() => {
+                      setShowTicketReportModal(true);
+                      setReportLocation(pinLocation);
+                      setPinLocation(null);
+                    }}
+                  >
+                    report a ticket
+                  </button>
 
-            <div className={styles.instructionsText}>
-              <p>
-                To <strong>mark where you parked</strong>, get{' '}
-                <strong>notifications for tickets issued</strong> or{' '}
-                <strong>parking enforcement spotted</strong> near your important locations, and{' '}
-                <strong>bookmark your favorite parking spots:</strong>
-              </p>
-            </div>
+                  <button className={styles.reportEnforcementButton}>
+                    report parking enforcement nearby
+                  </button>
 
-            <div className={styles.authButtons}>
-              <Link href="/welcome">
-                <button className={styles.createAccountBtn}>create an account</button>
-              </Link>
-              <span className={styles.orText}>or</span>
-              <button
-                onClick={() => {
-                  setPinLocation(null);
-                  setShowLoginModal(true);
-                }}
-                className={styles.logInBtn}
-              >
-                log in
-              </button>
+                  <button className={styles.bookmarkButton}>bookmark this spot</button>
+
+                  <button className={styles.parkingSessionButton}>just parked here</button>
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
+          ) : (
+            // for unauthenticated users
+            <div className={styles.pinPopupWrapper}>
+              <div className={styles.unauthInstructionsContent}>
+                <button onClick={() => setPinLocation(null)} className={styles.closeButton}>
+                  <X className={styles.mapIcon} />
+                </button>
+
+                <div className={styles.actionButtons}>
+                  <button
+                    className={styles.reportTicketButton}
+                    onClick={() => {
+                      setShowTicketReportModal(true);
+                      setReportLocation(pinLocation);
+                      setPinLocation(null);
+                    }}
+                  >
+                    report a ticket
+                  </button>
+                  <button className={styles.reportEnforcementButton}>
+                    report parking enforcement nearby
+                  </button>
+                </div>
+
+                <div className={styles.instructionsText}>
+                  <p>
+                    To <strong>mark where you parked</strong>, get{' '}
+                    <strong>notifications for tickets issued</strong> or{' '}
+                    <strong>parking enforcement spotted</strong> near your important locations, and{' '}
+                    <strong>bookmark your favorite parking spots:</strong>
+                  </p>
+                </div>
+
+                <div className={styles.authButtons}>
+                  <Link href="/welcome">
+                    <button className={styles.createAccountBtn}>create an account</button>
+                  </Link>
+                  <span className={styles.orText}>or</span>
+                  <button
+                    onClick={() => {
+                      setPinLocation(null);
+                      setShowLoginModal(true);
+                    }}
+                    className={styles.logInBtn}
+                  >
+                    log in
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+        </>
       )}
 
       {/* Ticket Report Modal */}

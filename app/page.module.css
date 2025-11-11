@@ -454,6 +454,68 @@
   }
 }
 
+/* Authenticated Options Modal */
+.authOptionsContent {
+  background-color: #f5f1e8;
+  border-radius: 1rem;
+  padding: 2rem;
+  max-width: 550px;
+  width: 90%;
+  margin: 0 1rem;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  align-items: center;
+}
+
+.actionButtons {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.authOptionsContent .actionButtons {
+  width: 320px;
+}
+
+.authOptionsContent .actionButtons button {
+  width: 100%;
+}
+
+.bookmarkButton {
+  padding: 1rem 1.5rem;
+  background-color: #63705B;
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+.parkingSessionButton {
+  padding: 1rem 1.5rem;
+  background-color: #819A79;
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.bookmarkButton:hover {
+  background-color: #45574b;
+}
+.parkingSessionButton:hover {
+  background-color: #5e8067;
+}
+
 /* Unauthenticated Instructions Modal */
 .unauthInstructionsContent {
   background-color: #f5f1e8;
@@ -466,13 +528,6 @@
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
-}
-
-.actionButtons {
-  display: flex;
-  gap: 1rem;
-  justify-content: center;
-  flex-wrap: wrap;
 }
 
 .reportTicketButton {
