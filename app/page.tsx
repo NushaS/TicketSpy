@@ -48,8 +48,10 @@ const TicketSpyHeatMap: React.FC = () => {
   const [userId, setUserId] = useState<string | null>(null);
   const router = useRouter();
 
-  // 1.) Supabase query for data
-  const { data: ticketData, refetch: refetchTickets } = useTicketTable();
+  const { refetch: refetchTickets } = useTicketTable();
+  const { refetch: refetchParkingSessions } = useUserParkingSessions(userId || '');
+  const { refetch: refetchBookMarks } = useUserBookmarkedLocations(userId || '');
+
   const testData = useDynamicDatapoints();
   const geoJsonData = getGeoJsonData(testData);
   const adjustableHeatmap = React.useMemo(() => {
@@ -136,6 +138,80 @@ const TicketSpyHeatMap: React.FC = () => {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  // Handle bookmark location
+  const handleBookmarkLocation = async () => {
+    if (!pinLocation || !userId) return;
+
+    try {
+      const response = await fetch('/api/bookmark-location', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          user_id: userId,
+          latitude: pinLocation.lat,
+          longitude: pinLocation.lng,
+        }),
+      });
+
+      if (response.ok) {
+        refetchBookMarks();
+        setShowSuccessToast(true);
+        setTimeout(() => setShowSuccessToast(false), 3000);
+      } else {
+        const result = await response.json();
+        setErrorMessage(result.error || 'Failed to bookmark location');
+        setShowErrorToast(true);
+        setTimeout(() => setShowErrorToast(false), 3000);
+      }
+    } catch (error) {
+      console.error('Error bookmarking location:', error);
+      setErrorMessage('Network error: Failed to bookmark location');
+      setShowErrorToast(true);
+      setTimeout(() => setShowErrorToast(false), 3000);
+    }
+
+    setPinLocation(null);
+  };
+
+  // Handle parking session
+  const handleParkingSession = async () => {
+    if (!pinLocation || !userId) return;
+
+    try {
+      const response = await fetch('/api/new-parking-session', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          user_id: userId,
+          latitude: pinLocation.lat,
+          longitude: pinLocation.lng,
+        }),
+      });
+
+      if (response.ok) {
+        refetchParkingSessions();
+        setShowSuccessToast(true);
+        setTimeout(() => setShowSuccessToast(false), 3000);
+      } else {
+        const result = await response.json();
+        setErrorMessage(result.error || 'Failed to create parking session');
+        setShowErrorToast(true);
+        setTimeout(() => setShowErrorToast(false), 3000);
+      }
+    } catch (error) {
+      console.error('Error creating parking session:', error);
+      setErrorMessage('Network error: Failed to create parking session');
+      setShowErrorToast(true);
+      setTimeout(() => setShowErrorToast(false), 3000);
+    }
+
+    setPinLocation(null);
   };
 
   {
@@ -350,9 +426,13 @@ const TicketSpyHeatMap: React.FC = () => {
                     report parking enforcement nearby
                   </button>
 
-                  <button className={styles.bookmarkButton}>bookmark this spot</button>
+                  <button className={styles.bookmarkButton} onClick={handleBookmarkLocation}>
+                    bookmark this spot
+                  </button>
 
-                  <button className={styles.parkingSessionButton}>just parked here</button>
+                  <button className={styles.parkingSessionButton} onClick={handleParkingSession}>
+                    just parked here
+                  </button>
                 </div>
               </div>
             </div>
