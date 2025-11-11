@@ -90,6 +90,21 @@
   background-color: rgb(210, 124, 124);
 }
 
+.profileButtonGroup {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  color: #865858;
+  font-weight: 500;
+}
+
+
+.profileButtonGroup:hover {
+  color: #614040;
+}
+
 /* Filters button */
 .filtersButton {
   position: absolute;
