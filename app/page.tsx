@@ -48,8 +48,10 @@ const TicketSpyHeatMap: React.FC = () => {
   const [userId, setUserId] = useState<string | null>(null);
   const router = useRouter();
 
-  // 1.) Supabase query for data
-  const { data: ticketData, refetch: refetchTickets } = useTicketTable();
+  const { refetch: refetchTickets } = useTicketTable();
+  const { refetch: refetchParkingSessions } = useUserParkingSessions(userId || '');
+  const { refetch: refetchBookMarks } = useUserBookmarkedLocations(userId || '');
+
   const testData = useDynamicDatapoints();
   const geoJsonData = getGeoJsonData(testData);
   const adjustableHeatmap = React.useMemo(() => {
@@ -136,6 +138,80 @@ const TicketSpyHeatMap: React.FC = () => {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  // Handle bookmark location
+  const handleBookmarkLocation = async () => {
+    if (!pinLocation || !userId) return;
+
+    try {
+      const response = await fetch('/api/bookmark-location', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          user_id: userId,
+          latitude: pinLocation.lat,
+          longitude: pinLocation.lng,
+        }),
+      });
+
+      if (response.ok) {
+        refetchBookMarks();
+        setShowSuccessToast(true);
+        setTimeout(() => setShowSuccessToast(false), 3000);
+      } else {
+        const result = await response.json();
+        setErrorMessage(result.error || 'Failed to bookmark location');
+        setShowErrorToast(true);
+        setTimeout(() => setShowErrorToast(false), 3000);
+      }
+    } catch (error) {
+      console.error('Error bookmarking location:', error);
+      setErrorMessage('Network error: Failed to bookmark location');
+      setShowErrorToast(true);
+      setTimeout(() => setShowErrorToast(false), 3000);
+    }
+
+    setPinLocation(null);
+  };
+
+  // Handle parking session
+  const handleParkingSession = async () => {
+    if (!pinLocation || !userId) return;
+
+    try {
+      const response = await fetch('/api/new-parking-session', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          user_id: userId,
+          latitude: pinLocation.lat,
+          longitude: pinLocation.lng,
+        }),
+      });
+
+      if (response.ok) {
+        refetchParkingSessions();
+        setShowSuccessToast(true);
+        setTimeout(() => setShowSuccessToast(false), 3000);
+      } else {
+        const result = await response.json();
+        setErrorMessage(result.error || 'Failed to create parking session');
+        setShowErrorToast(true);
+        setTimeout(() => setShowErrorToast(false), 3000);
+      }
+    } catch (error) {
+      console.error('Error creating parking session:', error);
+      setErrorMessage('Network error: Failed to create parking session');
+      setShowErrorToast(true);
+      setTimeout(() => setShowErrorToast(false), 3000);
+    }
+
+    setPinLocation(null);
   };
 
   {
@@ -331,54 +407,93 @@ const TicketSpyHeatMap: React.FC = () => {
 
       {/* Pin Location Popup Modal */}
       {pinLocation && (
-        <div className={styles.pinPopupWrapper}>
-          <div className={styles.unauthInstructionsContent}>
-            <button onClick={() => setPinLocation(null)} className={styles.closeButton}>
-              <X className={styles.mapIcon} />
-            </button>
+        // for authenticated users
+        <>
+          {isLoggedIn ? (
+            <div className={styles.pinPopupWrapper}>
+              <div className={styles.authOptionsContent}>
+                <button onClick={() => setPinLocation(null)} className={styles.closeButton}>
+                  <X className={styles.mapIcon} />
+                </button>
 
-            <div className={styles.actionButtons}>
-              <button
-                className={styles.reportTicketButton}
-                onClick={() => {
-                  setShowTicketReportModal(true);
-                  setReportLocation(pinLocation);
-                  setPinLocation(null);
-                }}
-              >
-                report a ticket
-              </button>
-              <button className={styles.reportEnforcementButton}>
-                report parking enforcement nearby
-              </button>
-            </div>
+                <div className={styles.actionButtons}>
+                  <button
+                    className={styles.reportTicketButton}
+                    onClick={() => {
+                      setShowTicketReportModal(true);
+                      setReportLocation(pinLocation);
+                      setPinLocation(null);
+                    }}
+                  >
+                    report a ticket
+                  </button>
 
-            <div className={styles.instructionsText}>
-              <p>
-                to <strong>mark where you parked</strong>, get{' '}
-                <strong>notifications for tickets issued</strong> or{' '}
-                <strong>parking enforcement spotted</strong> near your important locations, and{' '}
-                <strong>bookmark your favorite parking spots:</strong>
-              </p>
-            </div>
+                  <button className={styles.reportEnforcementButton}>
+                    report parking enforcement nearby
+                  </button>
 
-            <div className={styles.authButtons}>
-              <Link href="/welcome">
-                <button className={styles.createAccountBtn}>create an account</button>
-              </Link>
-              <span className={styles.orText}>or</span>
-              <button
-                onClick={() => {
-                  setPinLocation(null);
-                  setShowLoginModal(true);
-                }}
-                className={styles.logInBtn}
-              >
-                log in
-              </button>
+                  <button className={styles.bookmarkButton} onClick={handleBookmarkLocation}>
+                    bookmark this spot
+                  </button>
+
+                  <button className={styles.parkingSessionButton} onClick={handleParkingSession}>
+                    just parked here
+                  </button>
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
+          ) : (
+            // for unauthenticated users
+            <div className={styles.pinPopupWrapper}>
+              <div className={styles.unauthInstructionsContent}>
+                <button onClick={() => setPinLocation(null)} className={styles.closeButton}>
+                  <X className={styles.mapIcon} />
+                </button>
+
+                <div className={styles.actionButtons}>
+                  <button
+                    className={styles.reportTicketButton}
+                    onClick={() => {
+                      setShowTicketReportModal(true);
+                      setReportLocation(pinLocation);
+                      setPinLocation(null);
+                    }}
+                  >
+                    report a ticket
+                  </button>
+                  <button className={styles.reportEnforcementButton}>
+                    report parking enforcement nearby
+                  </button>
+                </div>
+
+                <div className={styles.instructionsText}>
+                  <p>
+                    to <strong>mark where you parked</strong>, get{' '}
+                    <strong>notifications for tickets issued</strong> or{' '}
+                    <strong>parking enforcement spotted</strong> near your important locations, and{' '}
+                    <strong>bookmark your favorite parking spots:</strong>
+                  </p>
+                </div>
+
+                <div className={styles.authButtons}>
+                  <Link href="/welcome">
+                    <button className={styles.createAccountBtn}>create an account</button>
+                  </Link>
+                  <span className={styles.orText}>or</span>
+                  <button
+                    onClick={() => {
+                      setPinLocation(null);
+                      setShowLoginModal(true);
+                    }}
+                    className={styles.logInBtn}
+                  >
+                    log in
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+        </>
       )}
 
       {/* Ticket Report Modal */}
