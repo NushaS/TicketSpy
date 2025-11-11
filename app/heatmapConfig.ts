@@ -93,9 +93,9 @@ export const heatmapLayer: LayerProps = {
 // Map initial view state (Seattle area) TODO: use user's general location via ip
 export const initialViewState = {
   longitude: -122.3321,
-  latitude: 47.6062,
-  zoom: 11,
+  latitude: 47.6582,
+  zoom: 12,
 };
 
 // Map style URL
-export const mapStyleURL = 'https://basemaps.cartocdn.com/gl/positron-gl-style/style.json';
+export const mapStyleURL = 'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json';

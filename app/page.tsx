@@ -321,8 +321,8 @@ const TicketSpyHeatMap: React.FC = () => {
         <div
           style={{
             position: 'absolute',
-            top: '5.5rem',
-            left: 16,
+            top: '1.9rem',
+            left: 18,
             background: 'rgba(255,255,255,0.9)',
             padding: '8px 10px',
             borderRadius: 8,
@@ -335,8 +335,8 @@ const TicketSpyHeatMap: React.FC = () => {
             width: 180,
           }}
         >
-          <label style={{ fontSize: 13, color: '#222' }}>
-            Heatmap opacity: {Math.round(heatmapOpacityMultiplier * 100)}%
+          <label className={styles.sliderLabel}>
+            heatmap opacity: {Math.round(heatmapOpacityMultiplier * 100)}%
           </label>
           <input
             type="range"
@@ -345,7 +345,7 @@ const TicketSpyHeatMap: React.FC = () => {
             step={0.01}
             value={heatmapOpacityMultiplier}
             onChange={(e) => setHeatmapOpacityMultiplier(Number(e.target.value))}
-            aria-label="Heatmap opacity"
+            aria-label="heatmap opacity"
             className={styles.slider}
             style={{
               background: `linear-gradient(90deg, var(--accent, #7C5CFF) ${Math.round(
@@ -396,10 +396,10 @@ const TicketSpyHeatMap: React.FC = () => {
       {showInstructions && (
         <div className={styles.modalOverlay}>
           <div className={styles.modalContent}>
-            <h2 className={styles.modalTitle}>How to Use TicketSpy</h2>
-            <p className={styles.modalText}>EXAMPLE</p>
+            <h2 className={styles.modalTitle}>how to use ticketspy:</h2>
+            <p className={styles.modalText}>Ex</p>
             <button onClick={() => setShowInstructions(false)} className={styles.modalButton}>
-              Got it!
+              got it!
             </button>
           </div>
         </div>
@@ -468,7 +468,7 @@ const TicketSpyHeatMap: React.FC = () => {
 
                 <div className={styles.instructionsText}>
                   <p>
-                    To <strong>mark where you parked</strong>, get{' '}
+                    to <strong>mark where you parked</strong>, get{' '}
                     <strong>notifications for tickets issued</strong> or{' '}
                     <strong>parking enforcement spotted</strong> near your important locations, and{' '}
                     <strong>bookmark your favorite parking spots:</strong>
