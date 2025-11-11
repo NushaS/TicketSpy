@@ -24,7 +24,7 @@ export function LoginForm() {
     try {
       const { error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) throw error;
-      router.push('/protected'); // goes to /protected after login
+      router.push('/'); // goes back to map page after log in
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');
     } finally {
