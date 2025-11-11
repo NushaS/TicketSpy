@@ -566,6 +566,16 @@
 
 .authOptionsContent .actionButtons button {
   width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.5rem 1rem;
+}
+
+.authOptionsContent .actionButtons button svg {
+  height: 22px;
+  width: 20px;
 }
 
 .bookmarkButton {

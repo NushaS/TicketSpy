@@ -15,7 +15,7 @@ interface TicketIconProps {
 // Document icon
 export const TicketIcon: React.FC<TicketIconProps> = ({
   size = 22,
-  color = '#AD5C5C',
+  color = 'rgb(98, 83, 92)',
   className = '',
 }) => (
   <svg
