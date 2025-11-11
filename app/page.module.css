@@ -454,6 +454,68 @@
   }
 }
 
+/* Authenticated Options Modal */
+.authOptionsContent {
+  background-color: #f5f1e8;
+  border-radius: 1rem;
+  padding: 2rem;
+  max-width: 550px;
+  width: 90%;
+  margin: 0 1rem;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  align-items: center;
+}
+
+.actionButtons {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.authOptionsContent .actionButtons {
+  width: 320px;
+}
+
+.authOptionsContent .actionButtons button {
+  width: 100%;
+}
+
+.bookmarkButton {
+  padding: 1rem 1.5rem;
+  background-color: #63705b;
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+.parkingSessionButton {
+  padding: 1rem 1.5rem;
+  background-color: #819a79;
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.bookmarkButton:hover {
+  background-color: #45574b;
+}
+.parkingSessionButton:hover {
+  background-color: #5e8067;
+}
+
 /* Unauthenticated Instructions Modal */
 .unauthInstructionsContent {
   background-color: #f5f1e8;
@@ -468,27 +530,6 @@
   gap: 1.5rem;
 }
 
-/* Authenticated Instructions Modal */
-.authInstructionsContent {
-  background-color: #f5f1e8;
-  border-radius: 1rem;
-  padding: 2rem;
-  max-width: 550px;
-  width: 90%;
-  margin: 0 1rem;
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-}
-
-.actionButtons {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  justify-content: center;
-}
-
 .reportTicketButton {
   padding: 1rem 1.5rem;
   background-color: rgb(98, 83, 92);
@@ -501,7 +542,6 @@
   transition: background-color 0.2s;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
-
 .reportEnforcementButton {
   padding: 1rem 1.5rem;
   background-color: #957070;
@@ -515,46 +555,11 @@
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-.bookmarkButton {
-  padding: 1rem 1.5rem;
-  background-color: rgb(129, 154, 121);
-  color: white;
-  border: none;
-  border-radius: 12px;
-  font-size: 1rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: background-color 0.2s;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.parkingButton {
-  padding: 1rem 1.5rem;
-  background-color: rgb(190, 131, 125);
-  color: white;
-  border: none;
-  border-radius: 12px;
-  font-size: 1rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: background-color 0.2s;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
 .reportTicketButton:hover {
   background-color: rgb(76, 64, 71);
 }
-
 .reportEnforcementButton:hover {
   background-color: #8f5f5f;
-}
-
-.bookmarkButton:hover {
-  background-color: rgb(111, 132, 104);
-}
-
-.parkingButton:hover {
-  background-color: rgb(210, 124, 124);
 }
 
 .instructionsText {
@@ -635,14 +640,12 @@
   height: 40;
   cursor: 'pointer';
 }
-
 /* Map Marker SVG */
 .mapMarkerSvg {
   fill: #e63946;
   stroke: #000;
   stroke-width: 1.5;
 }
-
 .mapIcon {
   size: 24;
   color: '#999';
@@ -650,6 +653,16 @@
 
 /* Responsive adjustments for unauth instructions */
 @media (max-width: 640px) {
+  .actionButtons {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .reportTicketButton,
+  .reportEnforcementButton {
+    width: 100%;
+  }
+
   .authButtons {
     display: flex;
     align-items: center;
@@ -669,9 +682,8 @@
     font-weight: 500;
   }
 
-  /* Make sure to modal stacks content centered */
-  .unauthInstructionsContent,
-  .authInstructionsContent {
+  /* Make sure the modal stacks content centered */
+  .unauthInstructionsContent {
     display: flex;
     flex-direction: column;
     gap: 1.5rem;
