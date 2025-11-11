@@ -9,8 +9,21 @@
   align-items: center;
   justify-content: space-between;
   padding: 1rem;
-  background-color: rgba(255, 255, 255, 0.8);
+
+  /* slightly more opaque warm background */
+  background-color: #fffcfb;
+
+  /* soft glass blur (falls back to solid color for older browsers) */
   backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+
+  /* subtle separation from map tiles */
+  box-shadow: 0 6px 18px rgba(16, 24, 40, 0.06);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.55);
+
+  transition:
+    background-color 160ms ease,
+    box-shadow 160ms ease;
 }
 
 .logoContainer {
@@ -102,6 +115,66 @@
   box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
 }
 
+/* slider base */
+.slider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 12px;
+  border-radius: 9999px;
+  outline: none;
+  background: transparent; /* gradient set inline on the input element */
+  box-shadow: none;
+  padding: 0;
+  margin: 0;
+}
+
+/* WebKit: make track inherit the input background */
+.slider::-webkit-slider-runnable-track {
+  height: 12px;
+  border-radius: 9999px;
+  background: inherit; /* important: use the input's inline gradient */
+  box-shadow: 0 1px 3px rgba(16, 24, 40, 0.04);
+}
+
+/* WebKit thumb */
+.slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  margin-top: -3px; /* vertically center thumb on track (half thumb height minus half track) */
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: white;
+  border: 3px solid var(--accent, #7c5cff);
+  box-shadow: 0 2px 6px rgba(16, 24, 40, 0.12);
+  cursor: pointer;
+}
+
+/* Firefox: make track inherit background */
+.slider::-moz-range-track {
+  height: 12px;
+  border-radius: 9999px;
+  background: inherit; /* Firefox will use the element background if track inherits */
+  box-shadow: 0 1px 3px rgba(16, 24, 40, 0.04);
+}
+
+/* Firefox thumb */
+.slider::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: white;
+  border: 3px solid var(--accent, #7c5cff);
+  box-shadow: 0 2px 6px rgba(16, 24, 40, 0.12);
+  cursor: pointer;
+}
+
+/* focus ring */
+.slider:focus {
+  box-shadow: 0 0 0 6px rgba(255, 111, 97, 0.08); /* change to match --accent if desired */
+}
+
 /* Map container */
 .mapContainer {
   position: absolute;
@@ -159,6 +232,7 @@
 
 /* Container */
 .container {
+  --accent: rgba(129, 154, 121, 1); /* theme accent for slider/thumb etc */
   position: relative;
   width: 100%;
   height: 100vh;
@@ -456,7 +530,7 @@
 
 /* Unauthenticated Instructions Modal */
 .unauthInstructionsContent {
-  background-color: #f5f1e8;
+  background-color: rgba(250, 248, 241, 1);
   border-radius: 1rem;
   padding: 2rem;
   max-width: 550px;
@@ -587,9 +661,9 @@
 }
 /* Map Marker SVG */
 .mapMarkerSvg {
-  fill: #e63946;
-  stroke: #000;
-  stroke-width: 1.5;
+  fill: #bb335a;
+  stroke: #753636;
+  stroke-width: 1;
 }
 .mapIcon {
   size: 24;
