@@ -11,6 +11,7 @@ import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import styles from './page.module.css';
 import { CarIcon } from '../components/ui/icons/car-icon';
+import { ProfileIcon } from '../components/ui/icons/profile-icon';
 import { HeartIcon } from '../components/ui/icons/heart-icon';
 import { MapPin } from '../components/map/MapPin';
 import { useUserParkingSessions } from '@/lib/hooks/useParkingSessionTable';
@@ -298,14 +299,25 @@ const TicketSpyHeatMap: React.FC = () => {
             <Info size={18} />
             <span>instructions</span>
           </button>
-          {/*login button routes to login page*/}
-          <Link href="/auth/login" className={styles.loginButton}>
-            log in
-          </Link>
-          {/*login button routes to sign up page*/}
-          <Link href="/auth/sign-up">
-            <button className={styles.signupButton}>create account</button>
-          </Link>
+
+          {/* Check if user is logged in */}
+          {isLoggedIn ? (
+            <div className={styles.profileButtonGroup}>
+              <ProfileIcon size={46} />
+              <span>{username}</span>
+            </div>
+          ) : (
+            <>
+              {/*login button routes to login page*/}
+              <Link href="/auth/login" className={styles.loginButton}>
+                log in
+              </Link>
+              {/*login button routes to sign up page*/}
+              <Link href="/auth/sign-up">
+                <button className={styles.signupButton}>create account</button>
+              </Link>
+            </>
+          )}
         </div>
       </header>
 
