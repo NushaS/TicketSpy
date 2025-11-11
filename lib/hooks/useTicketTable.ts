@@ -1,3 +1,5 @@
+// this hook is not being used anywhere
+
 import { useQuery } from '@tanstack/react-query';
 import { createClient } from '@/lib/supabase/client';
 

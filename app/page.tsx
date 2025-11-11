@@ -29,7 +29,7 @@ import { useTicketTable } from '@/lib/hooks/useTicketTable';
 const TicketSpyHeatMap: React.FC = () => {
   const [showInstructions, setShowInstructions] = useState(false);
   const [showLoginModal, setShowLoginModal] = useState(false);
-  const [heatmapOpacityMultiplier, setHeatmapOpacityMultiplier] = useState(1);
+  const [heatmapOpacityMultiplier, setHeatmapOpacityMultiplier] = useState(0.9);
   const [phoneNumber, setPhoneNumber] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
@@ -222,7 +222,7 @@ const TicketSpyHeatMap: React.FC = () => {
     const { data: bookmarkData } = useUserBookmarkedLocations(userId);
     const { data: carData } = useUserParkingSessions(userId);
 
-    // convert bookmark records to pin poins
+    // convert bookmark records to pin points in heart shape
     const bookmarkPoints = filterValidDataPoints(
       (bookmarkData ?? []).map((row) => ({
         latitude: Number(row.latitude),
@@ -231,7 +231,7 @@ const TicketSpyHeatMap: React.FC = () => {
       }))
     );
 
-    //convert parking session records to pin points
+    //convert parking session record for given user to pin point in car shape
     const carPoints = filterValidDataPoints(
       (carData ?? []).map((row) => ({
         latitude: Number(row.latitude),
@@ -335,7 +335,7 @@ const TicketSpyHeatMap: React.FC = () => {
             width: 180,
           }}
         >
-          <label style={{ fontSize: 12, color: '#222' }}>
+          <label style={{ fontSize: 13, color: '#222' }}>
             Heatmap opacity: {Math.round(heatmapOpacityMultiplier * 100)}%
           </label>
           <input
@@ -346,6 +346,12 @@ const TicketSpyHeatMap: React.FC = () => {
             value={heatmapOpacityMultiplier}
             onChange={(e) => setHeatmapOpacityMultiplier(Number(e.target.value))}
             aria-label="Heatmap opacity"
+            className={styles.slider}
+            style={{
+              background: `linear-gradient(90deg, var(--accent, #7C5CFF) ${Math.round(
+                heatmapOpacityMultiplier * 100
+              )}%, #E6EEF3 ${Math.round(heatmapOpacityMultiplier * 100)}%)`,
+            }}
           />
         </div>
         <Map
