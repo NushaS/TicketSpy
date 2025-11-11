@@ -465,9 +465,11 @@ const TicketSpyHeatMap: React.FC = () => {
                       setPinLocation(null);
                     }}
                   >
-                    report a ticket
+                    <TicketIcon />
+                    <span>report a ticket</span>
                   </button>
                   <button className={styles.reportEnforcementButton}>
+                    <SightingIcon />
                     report parking enforcement nearby
                   </button>
                 </div>
