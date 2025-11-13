@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 // import the same CSS module used by original login page
-import styles from '@/app/auth/login/login.module.css';
+import styles from '@/app/auth/auth.module.css';
 
 export function LoginForm() {
   const [email, setEmail] = useState('');
@@ -24,7 +24,7 @@ export function LoginForm() {
     try {
       const { error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) throw error;
-      router.push('/protected'); // goes to /protected after login
+      router.push('/'); // goes back to map page after log in
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');
     } finally {

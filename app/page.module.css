@@ -9,8 +9,21 @@
   align-items: center;
   justify-content: space-between;
   padding: 1rem;
-  background-color: rgba(255, 255, 255, 0.8);
-  backdrop-filter: blur(8px);
+
+  /* slightly more opaque warm background */
+  background-color: #fffcfb;
+
+  /* soft glass blur (falls back to solid color for older browsers) */
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+
+  /* subtle separation from map tiles */
+  box-shadow: 0 6px 18px rgba(16, 24, 40, 0.06);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.55);
+
+  transition:
+    background-color 160ms ease,
+    box-shadow 160ms ease;
 }
 
 .logoContainer {
@@ -19,7 +32,7 @@
 }
 
 .logo {
-  height: 3rem;
+  height: 3.5rem;
   width: auto;
 }
 
@@ -87,8 +100,8 @@
   align-items: center;
   gap: 0.5rem;
   padding: 0.5rem 1rem;
-  background-color: rgb(132, 127, 132);
-  color: white;
+  background-color: #ffffff;
+  color: rgb(79, 66, 76);
   border-radius: 0.5rem;
   box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
   font-weight: 500;
@@ -98,8 +111,78 @@
 }
 
 .filtersButton:hover {
-  background-color: rgb(113, 103, 113);
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+  background-color: rgb(255, 251, 251);
+  box-shadow: 0 20px 25px -7px rgba(0, 0, 0, 0.1);
+}
+
+/* slider base */
+.slider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 12px;
+  border-radius: 9999px;
+  outline: none;
+  background: transparent; /* gradient set inline on the input element */
+  box-shadow: none;
+  padding: 0;
+  margin: 0;
+}
+
+.sliderLabel {
+  font-size: 13px;
+  color: #222;
+  font-weight: 500; /* same as .filtersButton */
+  font-family: inherit; /* inherit the page font so it matches globally */
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* WebKit: make track inherit the input background */
+.slider::-webkit-slider-runnable-track {
+  height: 12px;
+  border-radius: 9999px;
+  background: inherit; /* important: use the input's inline gradient */
+  box-shadow: 0 1px 3px rgba(16, 24, 40, 0.04);
+}
+
+/* WebKit thumb */
+.slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  margin-top: -3px; /* vertically center thumb on track (half thumb height minus half track) */
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: white;
+  border: 3px solid var(--accent, #7c5cff);
+  box-shadow: 0 2px 6px rgba(16, 24, 40, 0.12);
+  cursor: pointer;
+}
+
+/* Firefox: make track inherit background */
+.slider::-moz-range-track {
+  height: 12px;
+  border-radius: 9999px;
+  background: inherit; /* Firefox will use the element background if track inherits */
+  box-shadow: 0 1px 3px rgba(16, 24, 40, 0.04);
+}
+
+/* Firefox thumb */
+.slider::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: white;
+  border: 3px solid var(--accent, #7c5cff);
+  box-shadow: 0 2px 6px rgba(16, 24, 40, 0.12);
+  cursor: pointer;
+}
+
+/* focus ring */
+.slider:focus {
+  box-shadow: 0 0 0 6px rgba(255, 111, 97, 0.08); /* change to match --accent if desired */
 }
 
 /* Map container */
@@ -144,7 +227,7 @@
 .modalButton {
   width: 100%;
   padding: 0.5rem 1rem;
-  background-color: rgb(81, 97, 82);
+  background-color: rgb(96, 132, 98);
   color: white;
   border-radius: 0.5rem;
   font-weight: 500;
@@ -154,11 +237,12 @@
 }
 
 .modalButton:hover {
-  background-color: rgb(21, 128, 61);
+  background-color: rgb(59, 82, 61);
 }
 
 /* Container */
 .container {
+  --accent: rgba(129, 154, 121, 1); /* theme accent for slider/thumb etc */
   position: relative;
   width: 100%;
   height: 100vh;
@@ -177,7 +261,7 @@
   align-items: center;
   gap: 0.5rem;
   padding: 0.75rem 1.5rem;
-  background-color: #10b981;
+  background-color: rgba(129, 154, 121, 1);
   color: white;
   border-radius: 8px;
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
@@ -208,7 +292,7 @@
   align-items: center;
   gap: 0.5rem;
   padding: 0.75rem 1.5rem;
-  background-color: #ef4444;
+  background-color: #bb2e2e;
   color: white;
   border-radius: 8px;
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
@@ -287,7 +371,7 @@
 }
 
 .loginError {
-  color: #dc2626;
+  color: #a01f1f;
   font-size: 0.875rem;
   text-align: center;
   margin-top: -0.5rem;
@@ -322,7 +406,7 @@
 
 /* Ticket Report Modal */
 .ticketReportModalContent {
-  background-color: #f5f1e8;
+  background-color: #fffcfb;
   border-radius: 1rem;
   padding: 2.5rem 2rem;
   max-width: 550px;
@@ -454,9 +538,81 @@
   }
 }
 
+/* Authenticated Options Modal */
+.authOptionsContent {
+  background-color: #fffcfb;
+  border-radius: 1rem;
+  padding: 2rem;
+  max-width: 550px;
+  width: 90%;
+  margin: 0 1rem;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  align-items: center;
+}
+
+.actionButtons {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.authOptionsContent .actionButtons {
+  width: 320px;
+}
+
+.authOptionsContent .actionButtons button {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.5rem 1rem;
+}
+
+.actionButtons button svg {
+  height: 22px;
+  width: 20px;
+}
+
+.bookmarkButton {
+  padding: 1rem 1.5rem;
+  background-color: #63705b;
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+.parkingSessionButton {
+  padding: 1rem 1.5rem;
+  background-color: #819a79;
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.bookmarkButton:hover {
+  background-color: #45574b;
+}
+.parkingSessionButton:hover {
+  background-color: #5e8067;
+}
+
 /* Unauthenticated Instructions Modal */
 .unauthInstructionsContent {
-  background-color: #f5f1e8;
+  background-color: #fffcfb;
   border-radius: 1rem;
   padding: 2rem;
   max-width: 550px;
@@ -468,11 +624,12 @@
   gap: 1.5rem;
 }
 
-.actionButtons {
+.unauthInstructionsContent .actionButtons button {
   display: flex;
-  gap: 1rem;
   justify-content: center;
-  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.5rem 1rem;
 }
 
 .reportTicketButton {
@@ -569,11 +726,10 @@
   background-color: #5a7259;
 }
 
-/* Pin Location Popup Wrapper */
 .pinPopupWrapper {
   position: fixed;
   bottom: 0px;
-  left: 58%;
+  left: 57.5%;
   transform: translateX(-50%);
   z-index: 2000;
   max-width: 90%;
@@ -587,9 +743,9 @@
 }
 /* Map Marker SVG */
 .mapMarkerSvg {
-  fill: #e63946;
-  stroke: #000;
-  stroke-width: 1.5;
+  fill: #f0627c;
+  stroke: #753636;
+  stroke-width: 1;
 }
 .mapIcon {
   size: 24;

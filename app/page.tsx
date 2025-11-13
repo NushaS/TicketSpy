@@ -10,6 +10,15 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import styles from './page.module.css';
+import { CarIcon } from '../components/ui/icons/car-icon';
+import { HeartIcon } from '../components/ui/icons/heart-icon';
+import { TicketIcon } from '@/components/ui/icons/ticket-icon';
+import { SightingIcon } from '@/components/ui/icons/sighting-icon';
+import { MapPin } from '../components/map/MapPin';
+import { useUserParkingSessions } from '@/lib/hooks/useParkingSessionTable';
+import { useUserBookmarkedLocations } from '@/lib/hooks/useBookmarkedLocations';
+import { filterValidDataPoints } from '@/lib/utils/mapUtils';
+
 import {
   useDynamicDatapoints,
   getGeoJsonData,
@@ -22,7 +31,7 @@ import { useTicketTable } from '@/lib/hooks/useTicketTable';
 const TicketSpyHeatMap: React.FC = () => {
   const [showInstructions, setShowInstructions] = useState(false);
   const [showLoginModal, setShowLoginModal] = useState(false);
-  const [heatmapOpacityMultiplier, setHeatmapOpacityMultiplier] = useState(1);
+  const [heatmapOpacityMultiplier, setHeatmapOpacityMultiplier] = useState(0.9);
   const [phoneNumber, setPhoneNumber] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
@@ -38,18 +47,28 @@ const TicketSpyHeatMap: React.FC = () => {
   const [showSuccessToast, setShowSuccessToast] = useState(false);
   const [showErrorToast, setShowErrorToast] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+  const [userId, setUserId] = useState<string | null>(null);
   const router = useRouter();
 
-  // 1.) Supabase query for data
-  const { data: ticketData, refetch: refetchTickets } = useTicketTable();
+  const { refetch: refetchTickets } = useTicketTable();
+  const { refetch: refetchParkingSessions } = useUserParkingSessions(userId || '');
+  const { refetch: refetchBookMarks } = useUserBookmarkedLocations(userId || '');
+
   const testData = useDynamicDatapoints();
   const geoJsonData = getGeoJsonData(testData);
   const adjustableHeatmap = React.useMemo(() => {
-    // create a copy of heatmapLayer with adjusted opacity stops multiplied by the slider
     const mult = heatmapOpacityMultiplier;
     // avoid `any` by treating heatmapLayer as unknown and accessing paint as a Record
     const base = heatmapLayer as unknown as { paint?: Record<string, unknown> };
     const basePaint = base.paint ?? {};
+    // baseline stops (existing visual defaults at mult === 0)
+    const baseline0 = 0.48;
+    const baseline8 = 0.36;
+    const baseline15 = 0.2;
+    // lerp from base->1 then scale by mult so that:
+    // mult=0 => 0.0, mult=1 => 1.0, and intermediate values blend smoothly.
+    const lerpToOne = (baseVal: number, t: number) => baseVal * (1 - t) + 1 * t;
+    const computeStop = (baseVal: number, t: number) => t * lerpToOne(baseVal, t);
     const newPaint: Record<string, unknown> = {
       ...basePaint,
       'heatmap-opacity': [
@@ -57,11 +76,11 @@ const TicketSpyHeatMap: React.FC = () => {
         ['linear'],
         ['zoom'],
         0,
-        0.48 * mult,
+        computeStop(baseline0, mult),
         8,
-        0.36 * mult,
+        computeStop(baseline8, mult),
         15,
-        0.2 * mult,
+        computeStop(baseline15, mult),
       ],
     };
     const newLayer = {
@@ -83,6 +102,14 @@ const TicketSpyHeatMap: React.FC = () => {
       // Set username from session if available
       if (session?.user) {
         setUsername(session.user.email || session.user.phone || 'Anonymous');
+      }
+      // obtain user id value
+      if (session?.user) {
+        setIsLoggedIn(true);
+        setUserId(session.user.id);
+      } else {
+        setIsLoggedIn(false);
+        setUserId(null);
       }
     };
     checkAuth();
@@ -114,6 +141,122 @@ const TicketSpyHeatMap: React.FC = () => {
       setIsLoading(false);
     }
   };
+
+  // Handle bookmark location
+  const handleBookmarkLocation = async () => {
+    if (!pinLocation || !userId) return;
+
+    try {
+      const response = await fetch('/api/bookmark-location', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          user_id: userId,
+          latitude: pinLocation.lat,
+          longitude: pinLocation.lng,
+        }),
+      });
+
+      if (response.ok) {
+        refetchBookMarks();
+        setShowSuccessToast(true);
+        setTimeout(() => setShowSuccessToast(false), 3000);
+      } else {
+        const result = await response.json();
+        setErrorMessage(result.error || 'Failed to bookmark location');
+        setShowErrorToast(true);
+        setTimeout(() => setShowErrorToast(false), 3000);
+      }
+    } catch (error) {
+      console.error('Error bookmarking location:', error);
+      setErrorMessage('Network error: Failed to bookmark location');
+      setShowErrorToast(true);
+      setTimeout(() => setShowErrorToast(false), 3000);
+    }
+
+    setPinLocation(null);
+  };
+
+  // Handle parking session
+  const handleParkingSession = async () => {
+    if (!pinLocation || !userId) return;
+
+    try {
+      const response = await fetch('/api/new-parking-session', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          user_id: userId,
+          latitude: pinLocation.lat,
+          longitude: pinLocation.lng,
+        }),
+      });
+
+      if (response.ok) {
+        refetchParkingSessions();
+        setShowSuccessToast(true);
+        setTimeout(() => setShowSuccessToast(false), 3000);
+      } else {
+        const result = await response.json();
+        setErrorMessage(result.error || 'Failed to create parking session');
+        setShowErrorToast(true);
+        setTimeout(() => setShowErrorToast(false), 3000);
+      }
+    } catch (error) {
+      console.error('Error creating parking session:', error);
+      setErrorMessage('Network error: Failed to create parking session');
+      setShowErrorToast(true);
+      setTimeout(() => setShowErrorToast(false), 3000);
+    }
+
+    setPinLocation(null);
+  };
+
+  {
+    /* MapPinsLayer — renders pins for parked cars + bookmarks */
+  }
+  function MapPinsLayer({ userId }: { userId: string }) {
+    // fetch raw data from supabase for that userid
+    const { data: bookmarkData } = useUserBookmarkedLocations(userId);
+    const { data: carData } = useUserParkingSessions(userId);
+
+    // convert bookmark records to pin points in heart shape
+    const bookmarkPoints = filterValidDataPoints(
+      (bookmarkData ?? []).map((row) => ({
+        latitude: Number(row.latitude),
+        longitude: Number(row.longitude),
+        type: 'heart',
+      }))
+    );
+
+    //convert parking session record for given user to pin point in car shape
+    const carPoints = filterValidDataPoints(
+      (carData ?? []).map((row) => ({
+        latitude: Number(row.latitude),
+        longitude: Number(row.longitude),
+        type: 'car',
+      }))
+    );
+
+    const allPins = [...bookmarkPoints, ...carPoints];
+    // render each point as a MapPin with the corresponding icon
+    return (
+      <>
+        {allPins.map((point, i) => (
+          <MapPin
+            key={i}
+            latitude={point.latitude}
+            longitude={point.longitude}
+            icon={point.type === 'car' ? <CarIcon /> : <HeartIcon />}
+          />
+        ))}
+      </>
+    );
+  }
 
   return (
     <div className={styles.container}>
@@ -180,8 +323,8 @@ const TicketSpyHeatMap: React.FC = () => {
         <div
           style={{
             position: 'absolute',
-            top: 84,
-            right: 16,
+            top: '1.9rem',
+            left: 18,
             background: 'rgba(255,255,255,0.9)',
             padding: '8px 10px',
             borderRadius: 8,
@@ -194,8 +337,8 @@ const TicketSpyHeatMap: React.FC = () => {
             width: 180,
           }}
         >
-          <label style={{ fontSize: 12, color: '#222' }}>
-            Heatmap opacity: {Math.round(heatmapOpacityMultiplier * 100)}%
+          <label className={styles.sliderLabel}>
+            heatmap opacity: {Math.round(heatmapOpacityMultiplier * 100)}%
           </label>
           <input
             type="range"
@@ -204,7 +347,13 @@ const TicketSpyHeatMap: React.FC = () => {
             step={0.01}
             value={heatmapOpacityMultiplier}
             onChange={(e) => setHeatmapOpacityMultiplier(Number(e.target.value))}
-            aria-label="Heatmap opacity"
+            aria-label="heatmap opacity"
+            className={styles.slider}
+            style={{
+              background: `linear-gradient(90deg, var(--accent, #7C5CFF) ${Math.round(
+                heatmapOpacityMultiplier * 100
+              )}%, #E6EEF3 ${Math.round(heatmapOpacityMultiplier * 100)}%)`,
+            }}
           />
         </div>
         <Map
@@ -240,6 +389,8 @@ const TicketSpyHeatMap: React.FC = () => {
               </div>
             </Marker>
           )}
+          {/* Render ticket + car pins on top of heatmap if user is logged*/}
+          {userId && <MapPinsLayer userId={userId} />}
         </Map>
       </div>
 
@@ -247,10 +398,10 @@ const TicketSpyHeatMap: React.FC = () => {
       {showInstructions && (
         <div className={styles.modalOverlay}>
           <div className={styles.modalContent}>
-            <h2 className={styles.modalTitle}>How to Use TicketSpy</h2>
-            <p className={styles.modalText}>EXAMPLE</p>
+            <h2 className={styles.modalTitle}>how to use ticketspy:</h2>
+            <p className={styles.modalText}>Ex</p>
             <button onClick={() => setShowInstructions(false)} className={styles.modalButton}>
-              Got it!
+              got it!
             </button>
           </div>
         </div>
@@ -258,54 +409,99 @@ const TicketSpyHeatMap: React.FC = () => {
 
       {/* Pin Location Popup Modal */}
       {pinLocation && (
-        <div className={styles.pinPopupWrapper}>
-          <div className={styles.unauthInstructionsContent}>
-            <button onClick={() => setPinLocation(null)} className={styles.closeButton}>
-              <X className={styles.mapIcon} />
-            </button>
+        // for authenticated users
+        <>
+          {isLoggedIn ? (
+            <div className={styles.pinPopupWrapper}>
+              <div className={styles.authOptionsContent}>
+                <button onClick={() => setPinLocation(null)} className={styles.closeButton}>
+                  <X className={styles.mapIcon} />
+                </button>
 
-            <div className={styles.actionButtons}>
-              <button
-                className={styles.reportTicketButton}
-                onClick={() => {
-                  setShowTicketReportModal(true);
-                  setReportLocation(pinLocation);
-                  setPinLocation(null);
-                }}
-              >
-                report a ticket
-              </button>
-              <button className={styles.reportEnforcementButton}>
-                report parking enforcement nearby
-              </button>
-            </div>
+                <div className={styles.actionButtons}>
+                  <button
+                    className={styles.reportTicketButton}
+                    onClick={() => {
+                      setShowTicketReportModal(true);
+                      setReportLocation(pinLocation);
+                      setPinLocation(null);
+                    }}
+                  >
+                    <TicketIcon />
+                    <span>report a ticket</span>
+                  </button>
 
-            <div className={styles.instructionsText}>
-              <p>
-                To <strong>mark where you parked</strong>, get{' '}
-                <strong>notifications for tickets issued</strong> or{' '}
-                <strong>parking enforcement spotted</strong> near your important locations, and{' '}
-                <strong>bookmark your favorite parking spots:</strong>
-              </p>
-            </div>
+                  <button className={styles.reportEnforcementButton}>
+                    <SightingIcon />
+                    report parking enforcement nearby
+                  </button>
 
-            <div className={styles.authButtons}>
-              <Link href="/welcome">
-                <button className={styles.createAccountBtn}>create an account</button>
-              </Link>
-              <span className={styles.orText}>or</span>
-              <button
-                onClick={() => {
-                  setPinLocation(null);
-                  setShowLoginModal(true);
-                }}
-                className={styles.logInBtn}
-              >
-                log in
-              </button>
+                  <button className={styles.bookmarkButton} onClick={handleBookmarkLocation}>
+                    <HeartIcon color="white" />
+                    <span>bookmark this spot</span>
+                  </button>
+
+                  <button className={styles.parkingSessionButton} onClick={handleParkingSession}>
+                    <CarIcon />
+                    <span>just parked here</span>
+                  </button>
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
+          ) : (
+            // for unauthenticated users
+            <div className={styles.pinPopupWrapper}>
+              <div className={styles.unauthInstructionsContent}>
+                <button onClick={() => setPinLocation(null)} className={styles.closeButton}>
+                  <X className={styles.mapIcon} />
+                </button>
+
+                <div className={styles.actionButtons}>
+                  <button
+                    className={styles.reportTicketButton}
+                    onClick={() => {
+                      setShowTicketReportModal(true);
+                      setReportLocation(pinLocation);
+                      setPinLocation(null);
+                    }}
+                  >
+                    <TicketIcon />
+                    <span>report a ticket</span>
+                  </button>
+                  <button className={styles.reportEnforcementButton}>
+                    <SightingIcon />
+                    report parking enforcement nearby
+                  </button>
+                </div>
+
+                <div className={styles.instructionsText}>
+                  <p>
+                    to <strong>mark where you parked</strong>, get{' '}
+                    <strong>notifications for tickets issued</strong> or{' '}
+                    <strong>parking enforcement spotted</strong> near your important locations, and{' '}
+                    <strong>bookmark your favorite parking spots:</strong>
+                  </p>
+                </div>
+
+                <div className={styles.authButtons}>
+                  <Link href="/welcome">
+                    <button className={styles.createAccountBtn}>create an account</button>
+                  </Link>
+                  <span className={styles.orText}>or</span>
+                  <button
+                    onClick={() => {
+                      setPinLocation(null);
+                      setShowLoginModal(true);
+                    }}
+                    className={styles.logInBtn}
+                  >
+                    log in
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+        </>
       )}
 
       {/* Ticket Report Modal */}
