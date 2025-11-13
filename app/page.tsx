@@ -112,13 +112,18 @@ const TicketSpyHeatMap: React.FC = () => {
       } = await supabase.auth.getSession();
       setIsLoggedIn(!!session);
       // Set username from session if available
-      if (session?.user) {
-        setUsername(session.user.email || session.user.phone || 'Anonymous');
-      }
-      // obtain user id value
-      if (session?.user) {
+      const user = session?.user;
+      if (user) {
         setIsLoggedIn(true);
-        setUserId(session.user.id);
+        setUserId(user.id);
+
+        const { data } = await supabase
+          .from('users')
+          .select('display_name')
+          .eq('user_id', user.id)
+          .single();
+
+        setUsername(data?.display_name || user.email || user.phone || 'Anonymous');
       } else {
         setIsLoggedIn(false);
         setUserId(null);
