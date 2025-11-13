@@ -13,18 +13,15 @@ import styles from './page.module.css';
 import { CarIcon } from '../components/ui/icons/car-icon';
 import { ProfileIcon } from '../components/ui/icons/profile-icon';
 import { HeartIcon } from '../components/ui/icons/heart-icon';
+import { TicketIcon } from '@/components/ui/icons/ticket-icon';
+import { SightingIcon } from '@/components/ui/icons/sighting-icon';
 import { MapPin } from '../components/map/MapPin';
+import FilterPanel from '../components/FilterPanel';
 import { useUserParkingSessions } from '@/lib/hooks/useParkingSessionTable';
 import { useUserBookmarkedLocations } from '@/lib/hooks/useBookmarkedLocations';
 import { filterValidDataPoints } from '@/lib/utils/mapUtils';
-
-import {
-  useDynamicDatapoints,
-  getGeoJsonData,
-  heatmapLayer,
-  initialViewState,
-  mapStyleURL,
-} from './heatmapConfig';
+import { filterTickets, Filters } from '@/lib/utils/filterTickets';
+import { getGeoJsonData, heatmapLayer, initialViewState, mapStyleURL } from './heatmapConfig';
 import { useTicketTable } from '@/lib/hooks/useTicketTable';
 
 const TicketSpyHeatMap: React.FC = () => {
@@ -49,12 +46,28 @@ const TicketSpyHeatMap: React.FC = () => {
   const [userId, setUserId] = useState<string | null>(null);
   const router = useRouter();
 
-  const { refetch: refetchTickets } = useTicketTable();
+  // filters state (client-side representation)
+  const [filters, setFilters] = useState<Filters>({
+    timeRange: { amount: 3, unit: 'weeks' },
+    weekdays: { monThu: true, friSun: true },
+    timesOfDay: { morning: true, afternoon: true, night: true },
+  });
+
+  // Pass only the server-applicable portion (timeRange) to the hook so Supabase
+  // performs a date cutoff when possible to reduce payload size.
+  const serverFilters: Pick<Filters, 'timeRange'> = { timeRange: filters.timeRange };
+
+  const { data: ticketRows = [], refetch: refetchTickets } = useTicketTable(serverFilters as any);
   const { refetch: refetchParkingSessions } = useUserParkingSessions(userId || '');
   const { refetch: refetchBookMarks } = useUserBookmarkedLocations(userId || '');
 
-  const testData = useDynamicDatapoints();
-  const geoJsonData = getGeoJsonData(testData);
+  // apply remaining filters client-side (weekday / time-of-day) against rows returned
+  // from the server-side query above
+  const filteredDataPoints = React.useMemo(
+    () => filterTickets(ticketRows as any, filters),
+    [ticketRows, filters]
+  );
+  const geoJsonData = React.useMemo(() => getGeoJsonData(filteredDataPoints), [filteredDataPoints]);
   const adjustableHeatmap = React.useMemo(() => {
     const mult = heatmapOpacityMultiplier;
     // avoid `any` by treating heatmapLayer as unknown and accessing paint as a Record
@@ -113,6 +126,15 @@ const TicketSpyHeatMap: React.FC = () => {
     };
     checkAuth();
   }, []);
+
+  // Filters panel visibility
+  const [showFilters, setShowFilters] = useState(false);
+
+  // lazy import of FilterPanel component to keep top of file clean
+  // (component file lives under components/FilterPanel.tsx)
+  // import at top of render to avoid affecting server bundle
+  // (we're in a client component so it's fine to import normally)
+  // -- actual import placed below in the render area
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -322,10 +344,27 @@ const TicketSpyHeatMap: React.FC = () => {
       </header>
 
       {/* Filters Button */}
-      <button className={styles.filtersButton}>
+      <button
+        className={styles.filtersButton}
+        onClick={() => {
+          setShowFilters(true);
+        }}
+        aria-expanded={showFilters}
+        aria-controls="filters-panel"
+      >
         <Menu size={20} />
         <span>filters</span>
       </button>
+
+      {/* Filter side panel */}
+      <FilterPanel
+        visible={showFilters}
+        onClose={() => setShowFilters(false)}
+        initialFilters={filters}
+        onApply={(f) => {
+          setFilters(f);
+        }}
+      />
 
       {/* MapLibre Map */}
       <div className={styles.mapContainer}>
@@ -437,19 +476,23 @@ const TicketSpyHeatMap: React.FC = () => {
                       setPinLocation(null);
                     }}
                   >
-                    report a ticket
+                    <TicketIcon />
+                    <span>report a ticket</span>
                   </button>
 
                   <button className={styles.reportEnforcementButton}>
+                    <SightingIcon />
                     report parking enforcement nearby
                   </button>
 
                   <button className={styles.bookmarkButton} onClick={handleBookmarkLocation}>
-                    bookmark this spot
+                    <HeartIcon color="white" />
+                    <span>bookmark this spot</span>
                   </button>
 
                   <button className={styles.parkingSessionButton} onClick={handleParkingSession}>
-                    just parked here
+                    <CarIcon />
+                    <span>just parked here</span>
                   </button>
                 </div>
               </div>
@@ -471,9 +514,11 @@ const TicketSpyHeatMap: React.FC = () => {
                       setPinLocation(null);
                     }}
                   >
-                    report a ticket
+                    <TicketIcon />
+                    <span>report a ticket</span>
                   </button>
                   <button className={styles.reportEnforcementButton}>
+                    <SightingIcon />
                     report parking enforcement nearby
                   </button>
                 </div>
