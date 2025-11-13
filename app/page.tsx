@@ -25,6 +25,7 @@ import {
   mapStyleURL,
 } from './heatmapConfig';
 import { useTicketTable } from '@/lib/hooks/useTicketTable';
+import { useEnforcementSightingTable } from '@/lib/hooks/useEnforcementSightingTable';
 
 const TicketSpyHeatMap: React.FC = () => {
   const [showInstructions, setShowInstructions] = useState(false);
@@ -45,11 +46,20 @@ const TicketSpyHeatMap: React.FC = () => {
   const [showSuccessToast, setShowSuccessToast] = useState(false);
   const [showErrorToast, setShowErrorToast] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+  const [showEnforcementSuccessToast, setShowEnforcementSuccessToast] = useState(false);
+  const [showEnforcementErrorToast, setShowEnforcementErrorToast] = useState(false);
+  const [enforcementErrorMessage, setEnforcementErrorMessage] = useState('');
   const [userId, setUserId] = useState<string | null>(null);
+  const [showEnforcementConfirm, setShowEnforcementConfirm] = useState(false);
+  const [enforcementLocation, setEnforcementLocation] = useState<{
+    lng: number;
+    lat: number;
+  } | null>(null);
   const router = useRouter();
 
   // 1.) Supabase query for data
   const { data: ticketData, refetch: refetchTickets } = useTicketTable();
+  const { refetch: refetchEnforcement } = useEnforcementSightingTable();
   const testData = useDynamicDatapoints();
   const geoJsonData = getGeoJsonData(testData);
   const adjustableHeatmap = React.useMemo(() => {
@@ -342,7 +352,15 @@ const TicketSpyHeatMap: React.FC = () => {
               >
                 report a ticket
               </button>
-              <button className={styles.reportEnforcementButton}>
+              <button
+                className={styles.reportEnforcementButton}
+                onClick={() => {
+                  // set enforcement location and show a simple confirmation modal
+                  setEnforcementLocation(pinLocation);
+                  setShowEnforcementConfirm(true);
+                  setPinLocation(null);
+                }}
+              >
                 report parking enforcement nearby
               </button>
             </div>
@@ -488,6 +506,179 @@ const TicketSpyHeatMap: React.FC = () => {
                 <span>Submit ticket report</span>
               </button>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Enforcement Confirmation Modal */}
+      {showEnforcementConfirm && enforcementLocation && (
+        <div className={styles.modalOverlay}>
+          <div className={styles.ticketReportModalContent}>
+            <button
+              onClick={() => {
+                setShowEnforcementConfirm(false);
+                setEnforcementLocation(null);
+              }}
+              className={styles.ticketReportCloseButton}
+            >
+              <X size={24} />
+            </button>
+
+            <h2 className={styles.ticketReportTitle}>Report enforcement sighting</h2>
+
+            <p style={{ marginTop: 8 }}>
+              Are you sure you want to report a parking enforcement officer at (
+              {enforcementLocation.lat.toFixed(5)}, {enforcementLocation.lng.toFixed(5)})?
+            </p>
+
+            <div style={{ display: 'flex', gap: 12, marginTop: 18 }}>
+              <button
+                className={styles.ticketReportSubmitButton}
+                onClick={async () => {
+                  // submit enforcement report
+                  try {
+                    const body = {
+                      latitude: enforcementLocation.lat,
+                      longitude: enforcementLocation.lng,
+                      user_id: userId,
+                    };
+
+                    const res = await fetch('/api/post-enforcement', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify(body),
+                    });
+
+                    const result = await res.json().catch(() => ({}));
+
+                    if (res.ok) {
+                      // refetch enforcement sightings so UI can update
+                      try {
+                        await refetchEnforcement();
+                      } catch (err) {
+                        // ignore refetch errors
+                      }
+
+                      setShowEnforcementConfirm(false);
+                      setEnforcementLocation(null);
+                      setShowEnforcementSuccessToast(true);
+                      setTimeout(() => setShowEnforcementSuccessToast(false), 3000);
+                    } else {
+                      console.error('Error posting enforcement:', result);
+                      setEnforcementErrorMessage(
+                        result.error || 'Failed to submit enforcement report'
+                      );
+                      setShowEnforcementErrorToast(true);
+                      setTimeout(() => setShowEnforcementErrorToast(false), 3000);
+                    }
+                  } catch (error) {
+                    console.error('Network error posting enforcement:', error);
+                    setEnforcementErrorMessage(
+                      'Network error: Failed to submit enforcement report'
+                    );
+                    setShowEnforcementErrorToast(true);
+                    setTimeout(() => setShowEnforcementErrorToast(false), 3000);
+                  }
+                }}
+              >
+                <Check size={18} />
+                <span style={{ marginLeft: 8 }}>Yes, report</span>
+              </button>
+
+              <button
+                onClick={() => {
+                  setShowEnforcementConfirm(false);
+                  setEnforcementLocation(null);
+                }}
+                className={styles.ticketReportCloseButton}
+                style={{ alignSelf: 'center' }}
+              >
+                No
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Enforcement toasts */}
+      {showEnforcementSuccessToast && (
+        <div className={styles.successToast}>
+          <Check size={20} />
+          <span>Enforcement reported successfully!</span>
+        </div>
+      )}
+
+      {showEnforcementErrorToast && (
+        <div className={styles.errorToast}>
+          <X size={20} />
+          <span>{enforcementErrorMessage}</span>
+        </div>
+      )}
+
+      {/* Enforcement Confirm Modal (centered) */}
+      {showEnforcementConfirm && enforcementLocation && (
+        <div className={styles.modalOverlay}>
+          <div className={styles.enforcementConfirmContent}>
+            <h2 className={styles.enforcementConfirmTitle}>
+              Confirm parking enforcement officer sighting?
+            </h2>
+
+            <div className={styles.enforcementButtons}>
+              <button
+                className={styles.enforcementNoButton}
+                onClick={() => {
+                  setShowEnforcementConfirm(false);
+                  setEnforcementLocation(null);
+                }}
+              >
+                <span style={{ marginRight: 8 }}>✖</span>
+                no
+              </button>
+
+              <button
+                className={styles.enforcementYesButton}
+                onClick={async () => {
+                  try {
+                    const body = {
+                      latitude: enforcementLocation.lat,
+                      longitude: enforcementLocation.lng,
+                      user_id: userId ?? null,
+                    };
+
+                    const res = await fetch('/api/post-enforcement', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify(body),
+                    });
+
+                    const data = await res.json().catch(() => ({}));
+
+                    if (res.ok) {
+                      // refetch enforcement sightings if possible
+                      try {
+                        await refetchEnforcement?.();
+                      } catch (e) {
+                        // ignore
+                      }
+                      setShowEnforcementConfirm(false);
+                      setEnforcementLocation(null);
+                      setShowEnforcementSuccessToast(true);
+                      setTimeout(() => setShowEnforcementSuccessToast(false), 3000);
+                    } else {
+                      setEnforcementErrorMessage(data?.error || 'Failed to report enforcement');
+                      setShowEnforcementErrorToast(true);
+                      setTimeout(() => setShowEnforcementErrorToast(false), 3000);
+                    }
+                  } catch (err) {
+                    setEnforcementErrorMessage('Network error: Failed to report enforcement');
+                    setShowEnforcementErrorToast(true);
+                    setTimeout(() => setShowEnforcementErrorToast(false), 3000);
+                  }
+                }}
+              >
+                ✓ yes!
+              </button>
+            </div>
           </div>
         </div>
       )}
