@@ -566,6 +566,16 @@
 
 .authOptionsContent .actionButtons button {
   width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.5rem 1rem;
+}
+
+.actionButtons button svg {
+  height: 22px;
+  width: 20px;
 }
 
 .bookmarkButton {
@@ -612,6 +622,14 @@
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
+}
+
+.unauthInstructionsContent .actionButtons button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.5rem 1rem;
 }
 
 .reportTicketButton {

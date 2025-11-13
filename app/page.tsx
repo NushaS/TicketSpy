@@ -12,6 +12,8 @@ import { createClient } from '@/lib/supabase/client';
 import styles from './page.module.css';
 import { CarIcon } from '../components/ui/icons/car-icon';
 import { HeartIcon } from '../components/ui/icons/heart-icon';
+import { TicketIcon } from '@/components/ui/icons/ticket-icon';
+import { SightingIcon } from '@/components/ui/icons/sighting-icon';
 import { MapPin } from '../components/map/MapPin';
 import { useUserParkingSessions } from '@/lib/hooks/useParkingSessionTable';
 import { useUserBookmarkedLocations } from '@/lib/hooks/useBookmarkedLocations';
@@ -425,19 +427,23 @@ const TicketSpyHeatMap: React.FC = () => {
                       setPinLocation(null);
                     }}
                   >
-                    report a ticket
+                    <TicketIcon />
+                    <span>report a ticket</span>
                   </button>
 
                   <button className={styles.reportEnforcementButton}>
+                    <SightingIcon />
                     report parking enforcement nearby
                   </button>
 
                   <button className={styles.bookmarkButton} onClick={handleBookmarkLocation}>
-                    bookmark this spot
+                    <HeartIcon color="white" />
+                    <span>bookmark this spot</span>
                   </button>
 
                   <button className={styles.parkingSessionButton} onClick={handleParkingSession}>
-                    just parked here
+                    <CarIcon />
+                    <span>just parked here</span>
                   </button>
                 </div>
               </div>
@@ -459,9 +465,11 @@ const TicketSpyHeatMap: React.FC = () => {
                       setPinLocation(null);
                     }}
                   >
-                    report a ticket
+                    <TicketIcon />
+                    <span>report a ticket</span>
                   </button>
                   <button className={styles.reportEnforcementButton}>
+                    <SightingIcon />
                     report parking enforcement nearby
                   </button>
                 </div>
