@@ -33,7 +33,7 @@ export async function POST(req: Request) {
       user_id: null, // anonymous for now
       enforcement_report_time: observedAt
         ? new Date(observedAt).toISOString() // timestamptz is fine with ISO
-        : null
+        : null,
     })
     .select('*')
     .single();
