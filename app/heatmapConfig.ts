@@ -53,44 +53,38 @@ export const heatmapLayer: LayerProps = {
   type: 'heatmap',
   source: 'tickets',
   paint: {
-    // Increase weight as intensity increases
+    // keep weight driven by an 'intensity' property if available
     'heatmap-weight': ['get', 'intensity'],
-    // Increase intensity as zoom level increases (boosted so dense areas darken more)
-    'heatmap-intensity': ['interpolate', ['linear'], ['zoom'], 0, 1, 15, 4],
-    // Classic heatmap ramp: transparent at 0 (so background shows through),
-    // then light-blue -> darker blue -> cyan -> yellow/orange -> red.
-    // Higher density stops are more opaque/darker so areas with lots of data
-    // read as stronger/darker colors.
+
+    // slightly stronger intensity scaling with zoom so clusters darken more at high zoom
+    'heatmap-intensity': ['interpolate', ['linear'], ['zoom'], 0, 0.8, 12, 1.6, 18, 2.4],
+
+    // color ramp: transparent -> cool desaturated blue -> warm pink -> vivid red
     'heatmap-color': [
       'interpolate',
       ['linear'],
       ['heatmap-density'],
-      // 0 is transparent so the background (light blue) shows where there's no data
       0,
-      'rgba(230,247,255,0)',
-      // very low density: faint light-blue tint
-      0.05,
-      'rgba(173,216,230,0.22)',
-      // low-medium: soft steel blue
-      0.2,
-      'rgba(70,130,180,0.38)',
-      // medium: stronger blue
-      0.4,
-      'rgba(0,99,255,0.56)',
-      // high: yellow/orange (becomes visible and moves toward red)
-      0.6,
-      'rgba(255,200,0,0.72)',
-      0.8,
-      'rgba(255,120,0,0.86)',
-      // highest density: red (less transparent but not fully black)
+      'rgba(255,255,255,0)', // transparent at zero
+      0.06,
+      'rgba(210,235,255,0.22)', // faint cool hint
+      0.18,
+      'rgba(180,205,255,0.30)', // airy blue
+      0.35,
+      'rgba(246,178,190,0.58)', // slightly pinker mid
+      0.55,
+      'rgba(249,125,140,0.82)', // warm pink
+      0.85,
+      'rgba(220,70,50,0.88)', // vivid orange-red
       1,
-      'rgba(178,24,43,0.95)',
+      'rgba(140,18,36,0.96)', // deep red at max density
     ],
-    // Adjust the heatmap radius by zoom level
-    'heatmap-radius': ['interpolate', ['linear'], ['zoom'], 0, 2, 15, 20],
-    // Baseline opacity increased moderately so colors are less transparent at 100%.
-    // Slider still multiplies these values in the UI.
-    'heatmap-opacity': ['interpolate', ['linear'], ['zoom'], 0, 0.6, 8, 0.5, 15, 0.35],
+
+    // radius tuned for smooth blending but still localized
+    'heatmap-radius': ['interpolate', ['linear'], ['zoom'], 0, 6, 12, 22, 18, 36],
+
+    // overall opacity curve (UI slider will multiply on top of this)
+    'heatmap-opacity': ['interpolate', ['linear'], ['zoom'], 0, 0.55, 8, 0.48, 15, 0.38],
   },
 };
 
@@ -99,9 +93,9 @@ export const heatmapLayer: LayerProps = {
 // Map initial view state (Seattle area) TODO: use user's general location via ip
 export const initialViewState = {
   longitude: -122.3321,
-  latitude: 47.6062,
-  zoom: 11,
+  latitude: 47.6582,
+  zoom: 12,
 };
 
 // Map style URL
-export const mapStyleURL = 'https://basemaps.cartocdn.com/gl/positron-gl-style/style.json';
+export const mapStyleURL = 'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json';

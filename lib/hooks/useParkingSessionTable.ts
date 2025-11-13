@@ -6,6 +6,7 @@
 
 import { useQuery } from '@tanstack/react-query';
 import { createClient } from '@/lib/supabase/client';
+import { z } from 'zod';
 
 /*
   Fetch parking sessions for a single user.
@@ -14,16 +15,6 @@ async function fetchUserParkingSessions(userId: string) {
   const supabase = createClient();
   const { data, error } = await supabase.from('parking_sessions').select('*').eq('user_id', userId);
 
-  if (error) throw new Error(error.message);
-  return data;
-}
-
-/*
-  Fetch all parking sessions
-*/
-async function fetchAllParkingSessions() {
-  const supabase = createClient();
-  const { data, error } = await supabase.from('parking_sessions').select('*');
   if (error) throw new Error(error.message);
   return data;
 }
@@ -37,8 +28,30 @@ export function useUserParkingSessions(userId?: string) {
   });
 }
 
+/////////////////
+// 1. fetch/use all ParkingSessions
+/////////////////
+// Zod schema
+export const ParkingSessionSchema = z.object({
+  parking_session_id: z.uuid(),
+  user_id: z.uuid(),
+  latitude: z.number(),
+  longitude: z.number(),
+});
+
+// Zod created type from schema
+export type ParkingSession = z.infer<typeof ParkingSessionSchema>;
+
+async function fetchAllParkingSessions(): Promise<ParkingSession[]> {
+  const supabase = createClient();
+  const { data, error } = await supabase.from('parking_sessions').select('*');
+  if (error) throw new Error(error.message);
+
+  return z.array(ParkingSessionSchema).parse(data);
+}
+
 export function useAllParkingSessions() {
-  return useQuery({
+  return useQuery<ParkingSession[]>({
     queryKey: ['parking_sessions_all'],
     queryFn: fetchAllParkingSessions,
     staleTime: 1000 * 60,

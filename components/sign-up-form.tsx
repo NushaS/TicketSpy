@@ -14,6 +14,7 @@ export function SignUpForm() {
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
+  const [displayName, setDisplayName] = useState('');
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -35,6 +36,7 @@ export function SignUpForm() {
         password,
         options: {
           emailRedirectTo: `${window.location.origin}/protected`,
+          data: { display_name: displayName },
         },
       });
       if (error) throw error;
@@ -48,6 +50,21 @@ export function SignUpForm() {
 
   return (
     <form onSubmit={handleSignUp} className={styles.loginForm}>
+      <div className={styles.loginFormGroup}>
+        <label htmlFor="displayName" className={styles.loginLabel}>
+          display name:
+        </label>
+        <input
+          id="displayName"
+          type="text"
+          className={styles.loginInput}
+          placeholder="Your name here"
+          required
+          value={displayName}
+          onChange={(e) => setDisplayName(e.target.value)}
+        />
+      </div>
+
       <div className={styles.loginFormGroup}>
         <label htmlFor="email" className={styles.loginLabel}>
           email:
