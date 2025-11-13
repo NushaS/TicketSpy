@@ -50,7 +50,7 @@
   background-color: rgb(129, 154, 121);
   color: white;
   border-radius: 9999px;
-  font-weight: 700;
+  font-weight: 500;
   transition: background-color 0.2s;
   border: none;
   cursor: pointer;
@@ -65,7 +65,7 @@
   background-color: rgb(98, 83, 92);
   color: white;
   border-radius: 9999px;
-  font-weight: 700;
+  font-weight: 500;
   transition: background-color 0.2s;
   border: none;
   cursor: pointer;
@@ -80,7 +80,7 @@
   background-color: rgb(190, 131, 125);
   color: white;
   border-radius: 9999px;
-  font-weight: 700;
+  font-weight: 500;
   transition: background-color 0.2s;
   border: none;
   cursor: pointer;
