@@ -13,7 +13,8 @@ TicketSpy helps drivers make informed parking decisions and avoid parking ticket
 ## Accessing TicketSpy
 
 TicketSpy is a web-hosted application and has no prerequisites or necessary installations.  
-Users can visit TicketSpy at `url-to-be-added-once-deployed`.
+
+Users can visit TicketSpy at https://ticketspy.vercel.app/.
 
 ## Using TicketSpy
 
