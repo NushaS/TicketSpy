@@ -12,25 +12,22 @@ import { createClient } from '@/lib/supabase/client';
 import styles from './page.module.css';
 import { CarIcon } from '../components/ui/icons/car-icon';
 import { HeartIcon } from '../components/ui/icons/heart-icon';
+import { TicketIcon } from '@/components/ui/icons/ticket-icon';
+import { SightingIcon } from '@/components/ui/icons/sighting-icon';
 import { MapPin } from '../components/map/MapPin';
+import FilterPanel from '../components/FilterPanel';
 import { useUserParkingSessions } from '@/lib/hooks/useParkingSessionTable';
 import { useUserBookmarkedLocations } from '@/lib/hooks/useBookmarkedLocations';
 import { filterValidDataPoints } from '@/lib/utils/mapUtils';
-
-import {
-  useDynamicDatapoints,
-  getGeoJsonData,
-  heatmapLayer,
-  initialViewState,
-  mapStyleURL,
-} from './heatmapConfig';
+import { filterTickets, Filters } from '@/lib/utils/filterTickets';
+import { getGeoJsonData, heatmapLayer, initialViewState, mapStyleURL } from './heatmapConfig';
 import { useTicketTable } from '@/lib/hooks/useTicketTable';
 import { useEnforcementSightingTable } from '@/lib/hooks/useEnforcementSightingTable';
 
 const TicketSpyHeatMap: React.FC = () => {
   const [showInstructions, setShowInstructions] = useState(false);
   const [showLoginModal, setShowLoginModal] = useState(false);
-  const [heatmapOpacityMultiplier, setHeatmapOpacityMultiplier] = useState(1);
+  const [heatmapOpacityMultiplier, setHeatmapOpacityMultiplier] = useState(0.9);
   const [phoneNumber, setPhoneNumber] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
@@ -57,11 +54,28 @@ const TicketSpyHeatMap: React.FC = () => {
   } | null>(null);
   const router = useRouter();
 
-  // 1.) Supabase query for data
-  const { data: ticketData, refetch: refetchTickets } = useTicketTable();
-  const { refetch: refetchEnforcement } = useEnforcementSightingTable();
-  const testData = useDynamicDatapoints();
-  const geoJsonData = getGeoJsonData(testData);
+  // filters state (client-side representation)
+  const [filters, setFilters] = useState<Filters>({
+    timeRange: { amount: 3, unit: 'weeks' },
+    weekdays: { monThu: true, friSun: true },
+    timesOfDay: { morning: true, afternoon: true, night: true },
+  });
+
+  // Pass only the server-applicable portion (timeRange) to the hook so Supabase
+  // performs a date cutoff when possible to reduce payload size.
+  const serverFilters: Pick<Filters, 'timeRange'> = { timeRange: filters.timeRange };
+
+  const { data: ticketRows = [], refetch: refetchTickets } = useTicketTable(serverFilters as any);
+  const { refetch: refetchParkingSessions } = useUserParkingSessions(userId || '');
+  const { refetch: refetchBookMarks } = useUserBookmarkedLocations(userId || '');
+
+  // apply remaining filters client-side (weekday / time-of-day) against rows returned
+  // from the server-side query above
+  const filteredDataPoints = React.useMemo(
+    () => filterTickets(ticketRows as any, filters),
+    [ticketRows, filters]
+  );
+  const geoJsonData = React.useMemo(() => getGeoJsonData(filteredDataPoints), [filteredDataPoints]);
   const adjustableHeatmap = React.useMemo(() => {
     const mult = heatmapOpacityMultiplier;
     // avoid `any` by treating heatmapLayer as unknown and accessing paint as a Record
@@ -121,6 +135,15 @@ const TicketSpyHeatMap: React.FC = () => {
     checkAuth();
   }, []);
 
+  // Filters panel visibility
+  const [showFilters, setShowFilters] = useState(false);
+
+  // lazy import of FilterPanel component to keep top of file clean
+  // (component file lives under components/FilterPanel.tsx)
+  // import at top of render to avoid affecting server bundle
+  // (we're in a client component so it's fine to import normally)
+  // -- actual import placed below in the render area
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     const supabase = createClient();
@@ -148,6 +171,80 @@ const TicketSpyHeatMap: React.FC = () => {
     }
   };
 
+  // Handle bookmark location
+  const handleBookmarkLocation = async () => {
+    if (!pinLocation || !userId) return;
+
+    try {
+      const response = await fetch('/api/bookmark-location', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          user_id: userId,
+          latitude: pinLocation.lat,
+          longitude: pinLocation.lng,
+        }),
+      });
+
+      if (response.ok) {
+        refetchBookMarks();
+        setShowSuccessToast(true);
+        setTimeout(() => setShowSuccessToast(false), 3000);
+      } else {
+        const result = await response.json();
+        setErrorMessage(result.error || 'Failed to bookmark location');
+        setShowErrorToast(true);
+        setTimeout(() => setShowErrorToast(false), 3000);
+      }
+    } catch (error) {
+      console.error('Error bookmarking location:', error);
+      setErrorMessage('Network error: Failed to bookmark location');
+      setShowErrorToast(true);
+      setTimeout(() => setShowErrorToast(false), 3000);
+    }
+
+    setPinLocation(null);
+  };
+
+  // Handle parking session
+  const handleParkingSession = async () => {
+    if (!pinLocation || !userId) return;
+
+    try {
+      const response = await fetch('/api/new-parking-session', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          user_id: userId,
+          latitude: pinLocation.lat,
+          longitude: pinLocation.lng,
+        }),
+      });
+
+      if (response.ok) {
+        refetchParkingSessions();
+        setShowSuccessToast(true);
+        setTimeout(() => setShowSuccessToast(false), 3000);
+      } else {
+        const result = await response.json();
+        setErrorMessage(result.error || 'Failed to create parking session');
+        setShowErrorToast(true);
+        setTimeout(() => setShowErrorToast(false), 3000);
+      }
+    } catch (error) {
+      console.error('Error creating parking session:', error);
+      setErrorMessage('Network error: Failed to create parking session');
+      setShowErrorToast(true);
+      setTimeout(() => setShowErrorToast(false), 3000);
+    }
+
+    setPinLocation(null);
+  };
+
   {
     /* MapPinsLayer — renders pins for parked cars + bookmarks */
   }
@@ -156,7 +253,7 @@ const TicketSpyHeatMap: React.FC = () => {
     const { data: bookmarkData } = useUserBookmarkedLocations(userId);
     const { data: carData } = useUserParkingSessions(userId);
 
-    // convert bookmark records to pin poins
+    // convert bookmark records to pin points in heart shape
     const bookmarkPoints = filterValidDataPoints(
       (bookmarkData ?? []).map((row) => ({
         latitude: Number(row.latitude),
@@ -165,7 +262,7 @@ const TicketSpyHeatMap: React.FC = () => {
       }))
     );
 
-    //convert parking session records to pin points
+    //convert parking session record for given user to pin point in car shape
     const carPoints = filterValidDataPoints(
       (carData ?? []).map((row) => ({
         latitude: Number(row.latitude),
@@ -244,10 +341,27 @@ const TicketSpyHeatMap: React.FC = () => {
       </header>
 
       {/* Filters Button */}
-      <button className={styles.filtersButton}>
+      <button
+        className={styles.filtersButton}
+        onClick={() => {
+          setShowFilters(true);
+        }}
+        aria-expanded={showFilters}
+        aria-controls="filters-panel"
+      >
         <Menu size={20} />
         <span>filters</span>
       </button>
+
+      {/* Filter side panel */}
+      <FilterPanel
+        visible={showFilters}
+        onClose={() => setShowFilters(false)}
+        initialFilters={filters}
+        onApply={(f) => {
+          setFilters(f);
+        }}
+      />
 
       {/* MapLibre Map */}
       <div className={styles.mapContainer}>
@@ -255,8 +369,8 @@ const TicketSpyHeatMap: React.FC = () => {
         <div
           style={{
             position: 'absolute',
-            top: '5.5rem',
-            left: 16,
+            top: '1.9rem',
+            left: 18,
             background: 'rgba(255,255,255,0.9)',
             padding: '8px 10px',
             borderRadius: 8,
@@ -269,8 +383,8 @@ const TicketSpyHeatMap: React.FC = () => {
             width: 180,
           }}
         >
-          <label style={{ fontSize: 12, color: '#222' }}>
-            Heatmap opacity: {Math.round(heatmapOpacityMultiplier * 100)}%
+          <label className={styles.sliderLabel}>
+            heatmap opacity: {Math.round(heatmapOpacityMultiplier * 100)}%
           </label>
           <input
             type="range"
@@ -279,7 +393,13 @@ const TicketSpyHeatMap: React.FC = () => {
             step={0.01}
             value={heatmapOpacityMultiplier}
             onChange={(e) => setHeatmapOpacityMultiplier(Number(e.target.value))}
-            aria-label="Heatmap opacity"
+            aria-label="heatmap opacity"
+            className={styles.slider}
+            style={{
+              background: `linear-gradient(90deg, var(--accent, #7C5CFF) ${Math.round(
+                heatmapOpacityMultiplier * 100
+              )}%, #E6EEF3 ${Math.round(heatmapOpacityMultiplier * 100)}%)`,
+            }}
           />
         </div>
         <Map
@@ -324,10 +444,10 @@ const TicketSpyHeatMap: React.FC = () => {
       {showInstructions && (
         <div className={styles.modalOverlay}>
           <div className={styles.modalContent}>
-            <h2 className={styles.modalTitle}>How to Use TicketSpy</h2>
-            <p className={styles.modalText}>EXAMPLE</p>
+            <h2 className={styles.modalTitle}>how to use ticketspy:</h2>
+            <p className={styles.modalText}>Ex</p>
             <button onClick={() => setShowInstructions(false)} className={styles.modalButton}>
-              Got it!
+              got it!
             </button>
           </div>
         </div>
@@ -335,62 +455,99 @@ const TicketSpyHeatMap: React.FC = () => {
 
       {/* Pin Location Popup Modal */}
       {pinLocation && (
-        <div className={styles.pinPopupWrapper}>
-          <div className={styles.unauthInstructionsContent}>
-            <button onClick={() => setPinLocation(null)} className={styles.closeButton}>
-              <X className={styles.mapIcon} />
-            </button>
+        // for authenticated users
+        <>
+          {isLoggedIn ? (
+            <div className={styles.pinPopupWrapper}>
+              <div className={styles.authOptionsContent}>
+                <button onClick={() => setPinLocation(null)} className={styles.closeButton}>
+                  <X className={styles.mapIcon} />
+                </button>
 
-            <div className={styles.actionButtons}>
-              <button
-                className={styles.reportTicketButton}
-                onClick={() => {
-                  setShowTicketReportModal(true);
-                  setReportLocation(pinLocation);
-                  setPinLocation(null);
-                }}
-              >
-                report a ticket
-              </button>
-              <button
-                className={styles.reportEnforcementButton}
-                onClick={() => {
-                  // set enforcement location and show a simple confirmation modal
-                  setEnforcementLocation(pinLocation);
-                  setShowEnforcementConfirm(true);
-                  setPinLocation(null);
-                }}
-              >
-                report parking enforcement nearby
-              </button>
-            </div>
+                <div className={styles.actionButtons}>
+                  <button
+                    className={styles.reportTicketButton}
+                    onClick={() => {
+                      setShowTicketReportModal(true);
+                      setReportLocation(pinLocation);
+                      setPinLocation(null);
+                    }}
+                  >
+                    <TicketIcon />
+                    <span>report a ticket</span>
+                  </button>
 
-            <div className={styles.instructionsText}>
-              <p>
-                To <strong>mark where you parked</strong>, get{' '}
-                <strong>notifications for tickets issued</strong> or{' '}
-                <strong>parking enforcement spotted</strong> near your important locations, and{' '}
-                <strong>bookmark your favorite parking spots:</strong>
-              </p>
-            </div>
+                  <button className={styles.reportEnforcementButton}>
+                    <SightingIcon />
+                    report parking enforcement nearby
+                  </button>
 
-            <div className={styles.authButtons}>
-              <Link href="/welcome">
-                <button className={styles.createAccountBtn}>create an account</button>
-              </Link>
-              <span className={styles.orText}>or</span>
-              <button
-                onClick={() => {
-                  setPinLocation(null);
-                  setShowLoginModal(true);
-                }}
-                className={styles.logInBtn}
-              >
-                log in
-              </button>
+                  <button className={styles.bookmarkButton} onClick={handleBookmarkLocation}>
+                    <HeartIcon color="white" />
+                    <span>bookmark this spot</span>
+                  </button>
+
+                  <button className={styles.parkingSessionButton} onClick={handleParkingSession}>
+                    <CarIcon />
+                    <span>just parked here</span>
+                  </button>
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
+          ) : (
+            // for unauthenticated users
+            <div className={styles.pinPopupWrapper}>
+              <div className={styles.unauthInstructionsContent}>
+                <button onClick={() => setPinLocation(null)} className={styles.closeButton}>
+                  <X className={styles.mapIcon} />
+                </button>
+
+                <div className={styles.actionButtons}>
+                  <button
+                    className={styles.reportTicketButton}
+                    onClick={() => {
+                      setShowTicketReportModal(true);
+                      setReportLocation(pinLocation);
+                      setPinLocation(null);
+                    }}
+                  >
+                    <TicketIcon />
+                    <span>report a ticket</span>
+                  </button>
+                  <button className={styles.reportEnforcementButton}>
+                    <SightingIcon />
+                    report parking enforcement nearby
+                  </button>
+                </div>
+
+                <div className={styles.instructionsText}>
+                  <p>
+                    to <strong>mark where you parked</strong>, get{' '}
+                    <strong>notifications for tickets issued</strong> or{' '}
+                    <strong>parking enforcement spotted</strong> near your important locations, and{' '}
+                    <strong>bookmark your favorite parking spots:</strong>
+                  </p>
+                </div>
+
+                <div className={styles.authButtons}>
+                  <Link href="/welcome">
+                    <button className={styles.createAccountBtn}>create an account</button>
+                  </Link>
+                  <span className={styles.orText}>or</span>
+                  <button
+                    onClick={() => {
+                      setPinLocation(null);
+                      setShowLoginModal(true);
+                    }}
+                    className={styles.logInBtn}
+                  >
+                    log in
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+        </>
       )}
 
       {/* Ticket Report Modal */}
