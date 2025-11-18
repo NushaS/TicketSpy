@@ -92,7 +92,7 @@ DEPENDENCIES
 
 git clone our repo
 
-1. (optional) Add a .env.local file under TicketSpy/ticketspy for the Supabase credentials  
+1. (optional if you don't want to see existing data) Add a .env.local file under TicketSpy/ticketspy for the Supabase credentials  
    **_.env.local_**  
    NEXT_PUBLIC_SUPABASE_URL=YourSupabaseUrl  
    NEXT_PUBLIC_SUPABASE_PUBLISHABLE_OR_ANON_KEY=YourSupabaseApiKey
