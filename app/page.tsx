@@ -256,6 +256,7 @@ const TicketSpyHeatMap: React.FC = () => {
         latitude: Number(row.latitude),
         longitude: Number(row.longitude),
         type: 'heart',
+        id: row.bookmark_id,
       }))
     );
 
@@ -265,6 +266,7 @@ const TicketSpyHeatMap: React.FC = () => {
         latitude: Number(row.latitude),
         longitude: Number(row.longitude),
         type: 'car',
+        id: row.parking_session_id,
       }))
     );
 
@@ -278,6 +280,14 @@ const TicketSpyHeatMap: React.FC = () => {
             latitude={point.latitude}
             longitude={point.longitude}
             icon={point.type === 'car' ? <CarIcon /> : <HeartIcon />}
+            type={point.type}
+            id={point.id}
+            userId={userId}
+            onDelete={() => {
+              // Refetch both bookmarks and parking sessions when any item is deleted
+              refetchBookMarks();
+              refetchParkingSessions();
+            }}
           />
         ))}
       </>
