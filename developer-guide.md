@@ -53,8 +53,11 @@ Follow these steps to build and run the project locally:
    Create a file named `.env.local` in the project root.  
    Add your Supabase credentials and project-specific configuration values, for example:
    ```bash
-    NEXT_PUBLIC_SUPABASE_URL=https://zknbtqijbtbkonysrtjr.supabase.co
-    NEXT_PUBLIC_SUPABASE_PUBLISHABLE_OR_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InprbmJ0cWlqYnRia29ueXNydGpyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjAwNDI4MTYsImV4cCI6MjA3NTYxODgxNn0.LjEZQWSYmqsWKptDFaG2WyETQzfld0APEeHdlrI5Tco
+   - NEXT_PUBLIC_SUPABASE_URL=https://zknbtqijbtbkonysrtjr.supabase.co
+- NEXT_PUBLIC_SUPABASE_PUBLISHABLE_OR_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InprbmJ0cWlqYnRia29ueXNydGpyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjAwNDI4MTYsImV4cCI6MjA3NTYxODgxNn0.LjEZQWSYmqsWKptDFaG2WyETQzfld0APEeHdlrI5Tco
+- SUPABASE_SERVICE_ROLE_KEY=YourSupabaseServiceRoleKey
+- If you are a UW student, you can access all our API keys (including SupabaseServiceRoleKey)
+- https://docs.google.com/document/d/1XV_wcLVr5xJQiNSPcsQuTWJQUjbESwpbuEIlXwFTbkE/edit?usp=sharing
    ```
 4. **Install dependencies**
    ```bash
