@@ -96,6 +96,9 @@ git clone our repo
    **_.env.local_**  
    NEXT_PUBLIC_SUPABASE_URL=YourSupabaseUrl  
    NEXT_PUBLIC_SUPABASE_PUBLISHABLE_OR_ANON_KEY=YourSupabaseApiKey
+   SUPABASE_SERVICE_ROLE_KEY=YourServiceRoleKey
+   If you are a UW student, you can access our API keys here!
+   https://docs.google.com/document/d/1XV_wcLVr5xJQiNSPcsQuTWJQUjbESwpbuEIlXwFTbkE/edit?usp=sharing
 3. npm install
 4. npm run dev
 5. Head to `http://localhost:3000` to see it in action!
