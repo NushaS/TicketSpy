@@ -13,7 +13,7 @@ import styles from './page.module.css';
 import { CarIcon, CarIcon2 } from '../components/ui/icons/car-icon';
 import { ProfileIcon } from '../components/ui/icons/profile-icon';
 import { HeartIcon } from '../components/ui/icons/heart-icon';
-import { TicketIcon, TicketIcon2 } from '@/components/ui/icons/ticket-icon';
+import { TicketIcon2 } from '@/components/ui/icons/ticket-icon';
 import { SightingIcon } from '@/components/ui/icons/sighting-icon';
 import { MapPin } from '../components/map/MapPin';
 import FilterPanel from '../components/FilterPanel';
@@ -329,10 +329,10 @@ const TicketSpyHeatMap: React.FC = () => {
 
           {/* Check if user is logged in */}
           {isLoggedIn ? (
-            <div className={styles.profileButtonGroup}>
+            <Link href="profile/" className={styles.profileButtonGroup}>
               <ProfileIcon size={46} />
               <span>{username}</span>
-            </div>
+            </Link>
           ) : (
             <>
               {/*login button routes to login page*/}
