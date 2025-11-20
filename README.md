@@ -87,7 +87,7 @@ ticketspy/
 ### Running the system
 
 DEPENDENCIES
-1. Install node.js v22.20.0 in google
+1. Install node.js v22.20.0 (either via Node.js in Google OR through nvm)
 2. npm install -g npm@10.9.3
 
 git clone our repo
