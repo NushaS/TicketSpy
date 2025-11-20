@@ -71,13 +71,13 @@ In addition to the features above, TicketSpy users who are signed in can:
     2. Select “just parked here” on the pop-up screen to place the parking icon at the location.
     3. To end the parking session and remove the parking icon, click on the parking icon on the map and click “end parking” on the pop-up screen.
     4. To bookmark the location for future use, select “yes” on the pop-up screen; otherwise, select “no”.
-
-- Enable/disable notifications for parking enforcement sightings
+ 
+- Enable/disable notifications for parking enforcement sightings (Work in progress):
   1. Click on the user icon with their name in the upper right corner of the screen.
   2. Navigate to the top half of the screen (under “notification settings”).
   3. Enable or disable each setting via the corresponding toggle.
 
-- Manage their account information
+- Manage their account information (Work in progress):
   1. Click on the user icon with their name in the upper right corner of the screen.
   2. Navigate to the bottom half of the screen (under “my account”).
   - Log out or delete the account via the corresponding buttons, or
