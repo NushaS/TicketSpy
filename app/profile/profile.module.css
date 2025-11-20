@@ -1,0 +1,80 @@
+/* profile page styles */
+.profilePage {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  font-family: Arial, sans-serif;
+  gap: 2rem;
+  flex: 1;
+}
+
+/* header styles */
+.profileHeader {
+  font-family: 'Jersey 10', sans-serif;
+  font-weight: 500px;
+  font-size: 1.5rem;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 20;
+  display: flex;
+  text-align: center;
+  justify-content: space-between;
+  padding: 1.5rem 2rem 2.5rem 2rem; 
+  background-color: #445B35;
+  backdrop-filter: blur(8px);
+  color: #FAF8F1D9;
+}
+
+.headerTitle {
+  color: #fff;
+  position: absolute;
+  font-size: 2.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.arrowLeft {
+  width: 32px;
+  height: 32px;
+  color: #fff;
+  stroke-width: 4;
+}
+
+/* section styles (to style each part of the profile page) */
+.sectionContent {
+  margin: 0 4rem;
+  gap: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  color: #000;
+}
+
+.sectionHeader {
+  background-color: #f5f0e1;
+  color: #445B35; /* black text */
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-bottom: 1rem;
+  text-align: center;
+  padding: 0.5rem;
+}
+
+/* notification section styles */
+.notificationHeading {
+  font-weight: 900;
+  font-size: 1.1rem;
+}
+
+.notificationContent {
+  display: flex;
+  align-items: center; 
+  justify-content: space-between;
+  color: #444141;
+  gap: 1rem;
+}
+
+
+
+
+
