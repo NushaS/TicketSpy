@@ -37,49 +37,27 @@ Our goal is to deliver a resouce that the local community can engage with in ord
 
 ```
 ticketspy/
-├── README.md
+├── README.md                # High-level README file
 ├── package.json
-├── tsconfig.json / jsconfig.json
+├── tsconfig.json
 ├── next.config.js
 ├── postcss.config.js
 ├── tailwind.config.js
-├── .env.local
+├── .env.local                # environment variables
 ├── .gitignore
 │
-├── public/
-│   ├── favicon.ico
-│   ├── logo.png
-│   └── icons/
+├── app/
+│   ├── layout.tsx            # Root layout (applied to all pages)
+│   ├── page.tsx              # Landing page with map visualization
+│   ├── api/
+│   │   └── post-ticket/
+│   │       └── route.ts      # API route for posting tickets
+|   ├── auth/                 # Auth/login for supabase
 │
-├── src/
-│   ├── app/
-│   │   ├── layout.tsx            # Root layout (applied to all pages)
-│   │   ├── page.tsx              # Landing page with map visualization
-│   │   ├── report/
-│   │   │   └── page.tsx          # Form page for self-reporting tickets
-│   │   ├── api/
-│   │   │   └── tickets/
-│   │   │       └── route.ts      # API route for fetching/adding tickets
-│   │   └── _components/
-│   │       ├── MapView.tsx       # Interactive map & heatmap
-│   │       ├── TicketForm.tsx    # User input form
-│   │       ├── Navbar.tsx        # Navigation bar
-│   │       └── Footer.tsx        # Footer component
-│   │
-│   ├── lib/
-│   │   ├── supabaseClient.ts     # Supabase client configuration
-│   │   ├── fetchTickets.ts       # Data fetching with TanStack Query
-│   │   └── mapUtils.ts           # Map data processing helpers
-│   │
-│   ├── styles/
-│   │   └── globals.css           # Tailwind global styles
-│   │
-│   └── types/
-│       └── ticket.ts             # TypeScript interfaces
-│
-└── vercel.json                   # (Optional) Deployment configuration
-
-
+├── lib/
+│   ├── hooks/        # hooks to get/post to Supabase
+│   ├── supabase/     # Supabase client creation to access Supabase
+│   └── utils/        # Util such as filtering tickets & map data points
 ```
 
 ## Getting Started
