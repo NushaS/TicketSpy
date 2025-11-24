@@ -5,20 +5,37 @@ type SendEmailParams = {
   to: string;
   subject?: string;
   kind?: 'parking' | 'bookmark';
+  latitude?: number;
+  longitude?: number;
 };
 
 interface EmailTemplateProps {
   body: string;
+  latitude?: number | null;
+  longitude?: number | null;
 }
 
-const body2 =
+const BOOKMARK_BODY =
   'There was a ticket or parking enforcement officer reported near one of your bookmarks';
-const body1 = 'There was a ticket or parking enforcement officer reported near your parking spot';
+const PARKING_BODY =
+  'There was a ticket or parking enforcement officer reported near your parking spot';
 
-function EmailBody({ body }: EmailTemplateProps) {
+function EmailBody({ body, latitude, longitude }: EmailTemplateProps) {
   return (
-    <div>
-      <h1>{body}</h1>
+    <div style={{ fontFamily: 'system-ui, -apple-system, "Segoe UI", Roboto, sans-serif' }}>
+      <h1 style={{ fontSize: '18px', margin: '8px 0' }}>{body}</h1>
+
+      {/* Show coordinates only when provided (useful for bookmarked locations) */}
+      {typeof latitude === 'number' && typeof longitude === 'number' && (
+        <div style={{ marginTop: '8px', fontSize: '14px' }}>
+          <strong>Location of your bookmarked spot:</strong>
+          <div>Latitude: {latitude.toFixed(6)}</div>
+          <div>Longitude: {longitude.toFixed(6)}</div>
+        </div>
+      )}
+      <p style={{ marginTop: '12px', fontSize: '13px', color: '#555' }}>
+        Please check the area if this affects you.
+      </p>
     </div>
   );
 }
@@ -29,12 +46,25 @@ function getResendClient() {
   return new Resend(resendApiKey);
 }
 
-export async function sendNotificationEmail({ to, subject, kind = 'parking' }: SendEmailParams) {
+export async function sendNotificationEmail({
+  to,
+  subject,
+  kind = 'parking',
+  latitude,
+  longitude,
+}: SendEmailParams) {
   const resend = getResendClient();
   const from = 'TicketSpy <onboarding@resend.dev>';
 
   // choose template and default subject based on kind
-  const react = kind === 'bookmark' ? <EmailBody body={body2} /> : <EmailBody body={body1} />;
+  const body = kind === 'bookmark' ? BOOKMARK_BODY : PARKING_BODY;
+
+  const react =
+    kind === 'bookmark' ? (
+      <EmailBody body={body} latitude={latitude ?? null} longitude={longitude ?? null} />
+    ) : (
+      <EmailBody body={body} />
+    );
 
   const defaultSubject =
     kind === 'bookmark'

@@ -1,5 +1,5 @@
 import { createAdminClient } from '@/lib/supabase/server-admin';
-import { logNearbyParkingSessions } from '@/lib/server/nearbyParkingSessions';
+import { notifyUsers } from '@/lib/server/nearbySessionsAndBookmarks';
 import { NextResponse } from 'next/server';
 //import { z } from 'zod';
 
@@ -46,7 +46,7 @@ export async function POST(req: Request) {
   // 3) Trigger nearby parking session check server-side
   if (typeof latitude === 'number' && typeof longitude === 'number') {
     try {
-      await logNearbyParkingSessions(latitude, longitude);
+      await notifyUsers(latitude, longitude);
     } catch (err) {
       console.error('Failed to log nearby parking sessions:', err);
     }

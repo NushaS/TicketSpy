@@ -25,19 +25,19 @@ function milesBetweenPoints(
   return earthRadiusMiles * c;
 }
 
-type ParkingSessionRow = {
-  parking_session_id: string;
-  user_id: string | null;
-  latitude: number | null;
-  longitude: number | null;
-};
+// type ParkingSessionRow = {
+//   parking_session_id: string;
+//   user_id: string | null;
+//   latitude: number | null;
+//   longitude: number | null;
+// };
 
-type BookmarkRow = {
-  bookmark_id: string;
-  user_id: string | null;
-  latitude: number | null;
-  longitude: number | null;
-};
+// type BookmarkRow = {
+//   bookmark_id: string;
+//   user_id: string | null;
+//   latitude: number | null;
+//   longitude: number | null;
+// };
 
 type UserRow = {
   user_id: string;
@@ -47,7 +47,7 @@ type UserRow = {
   display_name?: string | null;
 };
 
-export async function logNearbyParkingSessions(latitude: number, longitude: number) {
+export async function notifyUsers(latitude: number, longitude: number) {
   const sb = createAdminClient();
 
   const [
@@ -134,7 +134,6 @@ export async function logNearbyParkingSessions(latitude: number, longitude: numb
     if (user?.parking_notifications_on) {
       notifiedParkingUsers.push(session.user_id);
       if (user.email) {
-        const name = user.display_name || user.email || 'there';
         emailSends.push(
           sendNotificationEmail({
             to: user.email,
@@ -156,11 +155,13 @@ export async function logNearbyParkingSessions(latitude: number, longitude: numb
     if (user?.bookmark_notifications_on) {
       notifiedBookmarkUsers.push(bookmark.user_id);
       if (user.email) {
-        const name = user.display_name || user.email || 'there';
         emailSends.push(
           sendNotificationEmail({
             to: user.email,
             subject: 'TicketSpy: Parking alert near your bookmark',
+            kind: 'bookmark',
+            latitude: bookmark.latitude ?? undefined,
+            longitude: bookmark.longitude ?? undefined,
           }).catch((err) => {
             console.error('Failed to send bookmark notification email:', err);
           })
