@@ -54,12 +54,8 @@ export async function logNearbyParkingSessions(latitude: number, longitude: numb
     { data: parkingSessions, error: parkingError },
     { data: bookmarks, error: bookmarkError },
   ] = await Promise.all([
-    sb
-      .from('parking_sessions')
-      .select('parking_session_id, user_id, latitude, longitude'),
-    sb
-      .from('bookmarked_locations')
-      .select('bookmark_id, user_id, latitude, longitude'),
+    sb.from('parking_sessions').select('parking_session_id, user_id, latitude, longitude'),
+    sb.from('bookmarked_locations').select('bookmark_id, user_id, latitude, longitude'),
   ]);
 
   if (parkingError) {
@@ -71,10 +67,7 @@ export async function logNearbyParkingSessions(latitude: number, longitude: numb
 
   const nearbySessions =
     parkingSessions?.filter((session) => {
-      if (
-        typeof session.latitude !== 'number' ||
-        typeof session.longitude !== 'number'
-      ) {
+      if (typeof session.latitude !== 'number' || typeof session.longitude !== 'number') {
         return false;
       }
 
@@ -90,10 +83,7 @@ export async function logNearbyParkingSessions(latitude: number, longitude: numb
 
   const nearbyBookmarks =
     bookmarks?.filter((bookmark) => {
-      if (
-        typeof bookmark.latitude !== 'number' ||
-        typeof bookmark.longitude !== 'number'
-      ) {
+      if (typeof bookmark.latitude !== 'number' || typeof bookmark.longitude !== 'number') {
         return false;
       }
 
@@ -126,9 +116,7 @@ export async function logNearbyParkingSessions(latitude: number, longitude: numb
       : { data: [] as UserRow[], error: null };
 
   if (userPrefsError) {
-    throw new Error(
-      `Failed to fetch user notification preferences: ${userPrefsError.message}`
-    );
+    throw new Error(`Failed to fetch user notification preferences: ${userPrefsError.message}`);
   }
 
   const userMap = new Map<string, UserRow>();
@@ -151,7 +139,6 @@ export async function logNearbyParkingSessions(latitude: number, longitude: numb
           sendNotificationEmail({
             to: user.email,
             subject: 'TicketSpy: Parking alert near your parked car',
-            firstName: name,
           }).catch((err) => {
             console.error('Failed to send parking notification email:', err);
           })
@@ -174,7 +161,6 @@ export async function logNearbyParkingSessions(latitude: number, longitude: numb
           sendNotificationEmail({
             to: user.email,
             subject: 'TicketSpy: Parking alert near your bookmark',
-            firstName: name,
           }).catch((err) => {
             console.error('Failed to send bookmark notification email:', err);
           })

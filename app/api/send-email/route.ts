@@ -7,7 +7,6 @@ export async function GET() {
     const data = await sendNotificationEmail({
       to: 'leitoparal@gmail.com',
       subject: 'TicketSpy test email',
-      firstName: 'John',
     });
     return NextResponse.json({ success: true, data });
   } catch (error) {
