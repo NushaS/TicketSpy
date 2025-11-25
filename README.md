@@ -70,11 +70,13 @@ DEPENDENCIES
 
 git clone our repo
 
-1. (optional if you don't want to see existing data) Add a .env.local file under TicketSpy/ticketspy for the Supabase credentials  
+1. Add a .env.local file under the main directory "TicketSpy/" for the Supabase credentials  
    **_.env.local_**  
-   NEXT_PUBLIC_SUPABASE_URL=YourSupabaseUrl  
+   NEXT_PUBLIC_SUPABASE_URL=YourSupabaseUrl 
    NEXT_PUBLIC_SUPABASE_PUBLISHABLE_OR_ANON_KEY=YourSupabaseApiKey
    SUPABASE_SERVICE_ROLE_KEY=YourServiceRoleKey
+   (Note: This is required as components that use /lib/supabase throw errors if not)
+   
    If you are a UW student, you can access our API keys here!
    https://docs.google.com/document/d/1XV_wcLVr5xJQiNSPcsQuTWJQUjbESwpbuEIlXwFTbkE/edit?usp=sharing
 3. npm install
