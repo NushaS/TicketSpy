@@ -497,6 +497,32 @@
   background-color: #5a7259;
 }
 
+/* Enforcement confirm modal button tweaks */
+.ticketReportModalContent .ticketReportSubmitButton {
+  margin-top: 0; /* remove extra top margin when used inline with the 'no' button */
+  padding: 0.75rem 1.5rem;
+  min-height: 44px;
+}
+
+.enforcementNoButton {
+  padding: 0.75rem 1.25rem;
+  background-color: #ffffff;
+  color: #333;
+  border: 1px solid rgba(16, 24, 40, 0.06);
+  border-radius: 50px;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  justify-content: center;
+  min-height: 44px;
+}
+
+.enforcementNoButton:hover {
+  background-color: #fbfbfb;
+}
+
 /* Responsive adjustments for ticket report modal */
 @media (max-width: 640px) {
   .ticketReportFormGroup {

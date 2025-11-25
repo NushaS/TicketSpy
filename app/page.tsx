@@ -751,12 +751,27 @@ const TicketSpyHeatMap: React.FC = () => {
       {/* Enforcement Confirm Modal (centered) */}
       {showEnforcementConfirm && enforcementLocation && (
         <div className={styles.modalOverlay}>
-          <div className={styles.enforcementConfirmContent}>
-            <h2 className={styles.enforcementConfirmTitle}>
+          <div className={styles.ticketReportModalContent}>
+            <button
+              onClick={() => {
+                setShowEnforcementConfirm(false);
+                setEnforcementLocation(null);
+              }}
+              className={styles.ticketReportCloseButton}
+            >
+              <X size={20} />
+            </button>
+
+            <h2 className={styles.ticketReportTitle}>
               Confirm parking enforcement officer sighting?
             </h2>
 
-            <div className={styles.enforcementButtons}>
+            <p style={{ marginTop: 8 }}>
+              Are you sure you want to report a parking enforcement officer at (
+              {enforcementLocation.lat.toFixed(5)}, {enforcementLocation.lng.toFixed(5)})?
+            </p>
+
+            <div style={{ display: 'flex', gap: 12, marginTop: 18, justifyContent: 'center' }}>
               <button
                 className={styles.enforcementNoButton}
                 onClick={() => {
@@ -770,7 +785,7 @@ const TicketSpyHeatMap: React.FC = () => {
 
               <button
                 type="button"
-                className={styles.enforcementYesButton}
+                className={styles.ticketReportSubmitButton}
                 onClick={async () => {
                   if (!enforcementLocation) return;
                   setEnforcementSubmitting(true);
@@ -824,7 +839,10 @@ const TicketSpyHeatMap: React.FC = () => {
                 }}
                 disabled={enforcementSubmitting}
               >
-                {enforcementSubmitting ? 'Submitting...' : '✓ yes!'}
+                <Check size={18} />
+                <span style={{ marginLeft: 8 }}>
+                  {enforcementSubmitting ? 'Submitting...' : 'Yes, report'}
+                </span>
               </button>
             </div>
           </div>
