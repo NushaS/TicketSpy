@@ -1,0 +1,162 @@
+# Team Report (Nov 17, 2025)
+
+## Project meeting agenda
+- Sharing progress & issues and plans & goals sections from status report
+- Request and review any current project feedback
+- Miscellaneous Q&A time (upcoming deadlines, sticking points, procedural questions, etc.)
+
+# Team Goals
+
+## 1. Last week's goals
+- Finally finish connecting frontend and backend for reporting enforcement sightings (2 days)
+- Implement enforcement sighting notifications to stay on the map for exactly 1 hour after being reported (2 days)
+  - Continue working through text/email notifications for enforcement sightings (up to 3 days)
+- Complete bookmark/parking session pin logic (removing pins, and converting between pin types) (3 days)
+- Get notifications sent to parked and bookmarked users when enforcement is spotted or tickets are reported (2 days)
+- Fix up UI for logged in  (2 days)
+- Solidify ticket_violation_type enum (1 day)
+
+## 2. Progress and issues
+
+### What we did and learned:
+- Cleaned up outdated branches
+- Created the profile settings page and linked it to the user profile icon
+- Set up email notifications
+- Implemented the notification settings UI
+- Implement enforcement report submission
+
+### Challenges/things that we had trouble with include:
+- Had trouble implementing the enforcement reporting due to the route API not correctly connecting with the report button
+  - Were able to fix it and get the data to show up on both the map and the database
+- Replaced Twilio w/ Email notifications as we could not get Twilio verification to work
+
+# 3. Plans and goals for the next week
+measurable + time estimate
+
+- Record and submit gamma release presentation! (1 day)
+- Implement log out functionality (2 days)
+- Finish implementing account detail functionalities (updating name and email, deleting account) (3 days)
+- Style pin logic popups (1 day)
+- Get notifications fully working for ALL users (2 days)
+- Reroute log in button on pop up to the actual log in page (1 day)
+- Add a thank you/a link to official directions on how to protest a ticket when a user reports a parking ticket (2 days)
+- Finish ticket_type enum (1 day)
+
+# Individual Contributions/Goals
+
+## 1. Last week's goals
+
+### Nusha:
+- Work with Ahana to fix the parking enforcement reporting and make sure the frontend and backend are connected (2 days)
+- Work on ensuring the alerts for parking enforcement stay on the map for 1 hour after they are reported (2 days)
+- Create Thank you message for reporting your ticket and/or provide information on how to appeal your parking ticket (2 days)
+- Long-term goal: create bookmark interface
+
+### Abigail:
+- Get email notifications set up (2 days)
+- Get rid of opacity slider when looking at different pop ups (1 day)
+- Make sure delete API route is working properly (2 days)
+- User-test instructions to see if it is clear enough (2 days)
+- Help with profile page UI/backend (1 day)
+
+### Timofei:
+- Setup email notifications, further investigate sms messaging (2 days)
+- Write more tests, tests for front-end rendering on different button presses, tests for rest of report buttons (2 days)
+- Fix bugs in front end (pop-ups not disappearing, visuals) (2 days)
+
+### Ahana:
+- Finish completing connecting frontend to backend so user can successfully report enforcement (2 days)
+- See if backend needs help with anything else (1 day)
+
+### Aya:
+- Finish handling removing parking sessions/bookmarks by clicking on the map pins (1 day)
+- Handle parking at a bookmarked location and bookmarking a parking spot (2 days)
+
+### Leo:
+- Solidify ticket_violation_type enum, correctly this time (1 day)
+- Work with Tim & Abigail to verify Twilio accounts. If not, email notifications (2 days)
+- Talk w/ everyone and ask for important branches, delete obsolete ones
+
+## 2. Progress and issues - what you did, what worked, what you learned, where you had trouble, and where you are stuck
+
+### Nusha:
+- Connected the frontend to the backend for parking enforcement reporting
+  - Had trouble connecting to the route API at first
+  - Also struggled with successfully adding the report to the database and had to deal with a few errors
+- Decided with the group to have parking enforcement popups appear for one hour on the map and to disappear after that
+  - Had issues with ensuring that the popup was not too small/big on the map, and the size changed dynamically when you zoom in and out
+- Worked on getting the opacity slider to fade away when other popups are the main focus
+
+### Abigail:
+- Got email notifications for bookmarks and parking sessions working with Timofei, but need to get a version beyond the just testing emails version of Resend to send notifs to more people because right now emails can only be sent to Timofei
+- Didn’t have to get rid of opacity slider when other popups are visible because it was already done
+- Ensured delete was working properly for bookmarks and parking sessions
+- Asked others outside our group for user feedback about clarity of the instructions created on the website
+- Created hook for using the users table, specifically for getting the data for notification settings for a user
+- I had trouble fully understanding hooks when I was creating it
+- I’m not currently stuck on anything except rate limiting with the email notifs/only being able to send to Timofei
+
+### Timofei:
+- Implemented logic for sending notifications to parked users and users with bookmarks. A ticket report or parking enforcement spotting triggers a check that notifies any users that have markers in the area
+- New instructions popup removed the UI display that I was going to fix
+- Challenges with figuring out optimal architecture for doing the email notifications, where to put and call the server side functions
+
+### Ahana:
+- Connected frontend to backend for enforcement reporting
+  - Verified changes on feature/enforcement branch
+  - Tested submission for enforcement reporting, worked successfully (updated in database)
+- Challenges: 
+  - Had issues with errors showing up initially, changes were different from remote vs. local
+  - Updating .env.local file and reinstalling npm fixed issues
+
+### Aya:
+- Created the profile settings page
+  - Linked the page to the profile icon, so the page can be accessed by logged-in users
+  - Implemented the UI for the toggleable notification settings (to be linked to the email notification backend)
+  - Began implementing the editable `name` and `email fields for the account details section
+  - Updated the figma design for updating `password` (previously an editable field, now a link to the password reset page)
+  - Changes: 
+    - In the previous status report, I was set to work on the bookmark/parking pin logic, but we redistributed tasks slightly the next day; Timofei took on the pin logic task while I started the profile page work.
+  - Challenges: 
+    - It took me some time to determine how user records should be updated; the name and email fields are stored in public.users while encrypted password is stored in auth.users, and there is no RLS policy that allows updates to the user table. Abigail and Leo helped me determine that a policy would not be needed because of the service role key that has been defined, and we also agreed to replace the password field on the profile settings page with a link to make use of the existing password reset functionality.
+
+### Leo:
+- Created send-email api route using RESEND Api for Email notification functionality
+  - Issue: Twilio did not seem to work so switched to email notifications
+- Created send-email test page & set up WelcomeEmail template
+- Listed out Branches to delete
+- Reset enforcement_sightings & tickets tables to On delete -> Set to Null instead of Cascading delete
+
+## 3. Plans and goals for the next week  
+measurable + time estimate
+
+### Nusha:
+- Clean up the  parking enforcement reporting popup to make it match the rest of the site (1 day)
+- Create Thank you message for reporting your ticket and/or provide information on how to appeal your parking ticket (2 days)
+- Long-term goal: create bookmark interface
+
+### Abigail:
+- Reroute “log in” button on popup to route to actual log in page (1 day)
+- Set up higher rate limiting and ensure emails can be sent to more people for notifications (2 days)
+- Help with backend for profile page, like log out and delete account (2 days)
+
+### Timofei:
+- Adding functionality to profile page to allow user to toggle notifications for parking and for bookmarks on and off (1 day)
+- Make report parking enforcement also send notifications (1 day)
+- Work with Abigail to upgrade account for sending emails to a production account so we can have higher sending rates (2 days)
+
+### Ahana:
+- See what backend needs help with and work accordingly (to be discussed at 11/25 team meeting) (1 day)
+
+### Aya:
+- Finish account detail functionality on the profile settings page (3 days)
+  - Apply styling to be consistent with the rest of the page
+  - Add the link to the password update field
+- Implement log out and delete account buttons
+- Update styling for the bookmark pin and parking session edit and delete pin popups (1-2 day)
+
+### Leo:
+- Finish up ticket_type_enum as before but this time only for parking tickets (2 days)
+- Verify branches are cleaned up and deleted (1 day)
+- Create a DB schema (3 days)
+- Set up at least 1 unit test for parking sessions (2 days)
