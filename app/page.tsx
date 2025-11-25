@@ -303,7 +303,6 @@ const TicketSpyHeatMap: React.FC = () => {
           <span>Ticket reported successfully!</span>
         </div>
       )}
-
       {/* Error Toast */}
       {showErrorToast && (
         <div className={styles.errorToast}>
@@ -311,7 +310,6 @@ const TicketSpyHeatMap: React.FC = () => {
           <span>{errorMessage}</span>
         </div>
       )}
-
       {/* Header */}
       <header className={styles.header}>
         <div className={styles.logoContainer}>
@@ -357,7 +355,6 @@ const TicketSpyHeatMap: React.FC = () => {
           )}
         </div>
       </header>
-
       {/* Filters Button */}
       <button
         className={styles.filtersButton}
@@ -370,7 +367,6 @@ const TicketSpyHeatMap: React.FC = () => {
         <Menu size={20} />
         <span>filters</span>
       </button>
-
       {/* Filter side panel */}
       <FilterPanel
         visible={showFilters}
@@ -380,7 +376,6 @@ const TicketSpyHeatMap: React.FC = () => {
           setFilters(f);
         }}
       />
-
       {/* MapLibre Map */}
       <div className={styles.mapContainer}>
         {/* opacity control: positioned over the map */}
@@ -457,7 +452,6 @@ const TicketSpyHeatMap: React.FC = () => {
           {userId && <MapPinsLayer userId={userId} />}
         </Map>
       </div>
-
       {/* Instructions Modal (Logged In) */}
       {showInstructions && (
         <div
@@ -576,7 +570,6 @@ const TicketSpyHeatMap: React.FC = () => {
           </div>
         </div>
       )}
-
       {/* Pin Location Popup Modal */}
       {pinLocation && (
         // for authenticated users
@@ -673,7 +666,6 @@ const TicketSpyHeatMap: React.FC = () => {
           )}
         </>
       )}
-
       {/* Ticket Report Modal */}
       {showTicketReportModal && (
         <div className={styles.modalOverlay}>
@@ -790,8 +782,7 @@ const TicketSpyHeatMap: React.FC = () => {
           </div>
         </div>
       )}
-
-      {/* Login Modal */}
+      Login Modal
       {showLoginModal && (
         <div className={styles.modalOverlay}>
           <div className={styles.loginModalContent}>
