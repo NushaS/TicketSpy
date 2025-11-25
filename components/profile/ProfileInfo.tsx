@@ -224,10 +224,10 @@ export default function ProfileInfo() {
         {isEditing && hasChanges && (
           <div className={styles.buttonGroup}>
             <button type="button" onClick={handleDiscard} className={styles.discardButton}>
-              <FaTimes /> Discard Changes
+              <FaTimes /> discard changes
             </button>
             <button type="submit" className={styles.saveButton}>
-              <FaCheck /> Save Changes
+              <FaCheck /> save changes
             </button>
           </div>
         )}
@@ -238,13 +238,13 @@ export default function ProfileInfo() {
         <div>
           <div className={styles.accountFormGroup}>
             <div className={styles.forgotPasswordLink}>
-              <Link href="/auth/forgot-password">Forgot your password?</Link>
+              <Link href="/auth/forgot-password">forgot your password?</Link>
             </div>
           </div>
 
           <div className={styles.accountActionButtons}>
             <button type="button" onClick={handleLogout} className={styles.logoutButton}>
-              <FaSignOutAlt /> Log Out
+              <FaSignOutAlt /> log out
             </button>
 
             <button
@@ -252,7 +252,7 @@ export default function ProfileInfo() {
               onClick={() => setShowDeleteModal(true)}
               className={styles.deleteButton}
             >
-              <FaTrash /> Delete Account
+              <FaTrash /> delete account
             </button>
           </div>
         </div>
