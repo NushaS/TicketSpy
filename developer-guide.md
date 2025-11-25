@@ -53,8 +53,11 @@ Follow these steps to build and run the project locally:
    Create a file named `.env.local` in the project root.  
    Add your Supabase credentials and project-specific configuration values, for example:
    ```bash
-    NEXT_PUBLIC_SUPABASE_URL=https://zknbtqijbtbkonysrtjr.supabase.co
-    NEXT_PUBLIC_SUPABASE_PUBLISHABLE_OR_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InprbmJ0cWlqYnRia29ueXNydGpyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjAwNDI4MTYsImV4cCI6MjA3NTYxODgxNn0.LjEZQWSYmqsWKptDFaG2WyETQzfld0APEeHdlrI5Tco
+   - NEXT_PUBLIC_SUPABASE_URL=https://zknbtqijbtbkonysrtjr.supabase.co
+- NEXT_PUBLIC_SUPABASE_PUBLISHABLE_OR_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InprbmJ0cWlqYnRia29ueXNydGpyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjAwNDI4MTYsImV4cCI6MjA3NTYxODgxNn0.LjEZQWSYmqsWKptDFaG2WyETQzfld0APEeHdlrI5Tco
+- SUPABASE_SERVICE_ROLE_KEY=YourSupabaseServiceRoleKey
+- If you are a UW student, you can access all our API keys (including SupabaseServiceRoleKey)
+- https://docs.google.com/document/d/1XV_wcLVr5xJQiNSPcsQuTWJQUjbESwpbuEIlXwFTbkE/edit?usp=sharing
    ```
 4. **Install dependencies**
    ```bash
@@ -166,3 +169,25 @@ npm run build
 ### Run Sanity Checks
 
 Before releasing, verify that the build works as expected.
+
+## Our version control structure
+### "Git Feature workflow"
+We use git and a minimal 'Git Feature Workflow' to perform version control
+
+We have 2 main branches
+- main (stable, ready to run)
+- dev (to catch any integration and code merging errors)
+
+We then branch off 'dev' by using this naming convection
+- feature/... (ex. feature/supabase-auth)
+- chore/... (ex. chore/insert-developer-guide)
+- fix/... (ex. fix/post-ticket-validation)
+
+In our branch from dev (such as feature/supabase-auth), we make a change by doing...
+- git add . (or adding individual files)
+- git commit -m "Some descriptive message"
+- git push
+Note: on every commit, we use 'husky pre-commit' to automaticallly test, lint, and build our program
+
+Once our team fully agrees that a branch is no longer needed, we make sure to delete said branch to minimize merge conflicts
+- git branch -d feature/supabase-auth

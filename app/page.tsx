@@ -10,9 +10,10 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import styles from './page.module.css';
-import { CarIcon } from '../components/ui/icons/car-icon';
+import { CarIcon, CarIcon2 } from '../components/ui/icons/car-icon';
+import { ProfileIcon } from '../components/ui/icons/profile-icon';
 import { HeartIcon } from '../components/ui/icons/heart-icon';
-import { TicketIcon } from '@/components/ui/icons/ticket-icon';
+import { TicketIcon2 } from '@/components/ui/icons/ticket-icon';
 import { SightingIcon } from '@/components/ui/icons/sighting-icon';
 import { MapPin } from '../components/map/MapPin';
 import FilterPanel from '../components/FilterPanel';
@@ -111,13 +112,18 @@ const TicketSpyHeatMap: React.FC = () => {
       } = await supabase.auth.getSession();
       setIsLoggedIn(!!session);
       // Set username from session if available
-      if (session?.user) {
-        setUsername(session.user.email || session.user.phone || 'Anonymous');
-      }
-      // obtain user id value
-      if (session?.user) {
+      const user = session?.user;
+      if (user) {
         setIsLoggedIn(true);
-        setUserId(session.user.id);
+        setUserId(user.id);
+
+        const { data } = await supabase
+          .from('users')
+          .select('display_name')
+          .eq('user_id', user.id)
+          .single();
+
+        setUsername(data?.display_name || user.email || user.phone || 'Anonymous');
       } else {
         setIsLoggedIn(false);
         setUserId(null);
@@ -250,6 +256,7 @@ const TicketSpyHeatMap: React.FC = () => {
         latitude: Number(row.latitude),
         longitude: Number(row.longitude),
         type: 'heart',
+        id: row.bookmark_id,
       }))
     );
 
@@ -259,6 +266,7 @@ const TicketSpyHeatMap: React.FC = () => {
         latitude: Number(row.latitude),
         longitude: Number(row.longitude),
         type: 'car',
+        id: row.parking_session_id,
       }))
     );
 
@@ -272,6 +280,14 @@ const TicketSpyHeatMap: React.FC = () => {
             latitude={point.latitude}
             longitude={point.longitude}
             icon={point.type === 'car' ? <CarIcon /> : <HeartIcon />}
+            type={point.type}
+            id={point.id}
+            userId={userId}
+            onDelete={() => {
+              // Refetch both bookmarks and parking sessions when any item is deleted
+              refetchBookMarks();
+              refetchParkingSessions();
+            }}
           />
         ))}
       </>
@@ -287,7 +303,6 @@ const TicketSpyHeatMap: React.FC = () => {
           <span>Ticket reported successfully!</span>
         </div>
       )}
-
       {/* Error Toast */}
       {showErrorToast && (
         <div className={styles.errorToast}>
@@ -295,7 +310,6 @@ const TicketSpyHeatMap: React.FC = () => {
           <span>{errorMessage}</span>
         </div>
       )}
-
       {/* Header */}
       <header className={styles.header}>
         <div className={styles.logoContainer}>
@@ -320,17 +334,27 @@ const TicketSpyHeatMap: React.FC = () => {
             <Info size={18} />
             <span>instructions</span>
           </button>
-          {/*login button routes to login page*/}
-          <Link href="/auth/login" className={styles.loginButton}>
-            log in
-          </Link>
-          {/*login button routes to sign up page*/}
-          <Link href="/auth/sign-up">
-            <button className={styles.signupButton}>create account</button>
-          </Link>
+
+          {/* Check if user is logged in */}
+          {isLoggedIn ? (
+            <Link href="profile/" className={styles.profileButtonGroup}>
+              <ProfileIcon size={46} />
+              <span>{username}</span>
+            </Link>
+          ) : (
+            <>
+              {/*login button routes to login page*/}
+              <Link href="/auth/login" className={styles.loginButton}>
+                log in
+              </Link>
+              {/*login button routes to sign up page*/}
+              <Link href="/auth/sign-up">
+                <button className={styles.signupButton}>create account</button>
+              </Link>
+            </>
+          )}
         </div>
       </header>
-
       {/* Filters Button */}
       <button
         className={styles.filtersButton}
@@ -343,7 +367,6 @@ const TicketSpyHeatMap: React.FC = () => {
         <Menu size={20} />
         <span>filters</span>
       </button>
-
       {/* Filter side panel */}
       <FilterPanel
         visible={showFilters}
@@ -353,7 +376,6 @@ const TicketSpyHeatMap: React.FC = () => {
           setFilters(f);
         }}
       />
-
       {/* MapLibre Map */}
       <div className={styles.mapContainer}>
         {/* opacity control: positioned over the map */}
@@ -430,20 +452,124 @@ const TicketSpyHeatMap: React.FC = () => {
           {userId && <MapPinsLayer userId={userId} />}
         </Map>
       </div>
-
       {/* Instructions Modal (Logged In) */}
       {showInstructions && (
-        <div className={styles.modalOverlay}>
-          <div className={styles.modalContent}>
-            <h2 className={styles.modalTitle}>how to use ticketspy:</h2>
-            <p className={styles.modalText}>Ex</p>
-            <button onClick={() => setShowInstructions(false)} className={styles.modalButton}>
-              got it!
-            </button>
+        <div
+          className={styles.modalOverlay}
+          onClick={() => setShowInstructions(false)}
+          role="presentation"
+        >
+          <div
+            className={styles.modalContent}
+            role="dialog"
+            aria-modal="true"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <header className={styles.modalHeader}>
+              <h2 className={styles.modalTitle}>how to use ticketspy</h2>
+              <button
+                type="button"
+                aria-label="Close instructions"
+                onClick={() => setShowInstructions(false)}
+                className={styles.modalCloseBtn}
+              >
+                <X />
+              </button>
+            </header>
+
+            <div className={styles.modalBody}>
+              <section>
+                <h3>Heatmap overview</h3>
+                <p>
+                  This map displays a heatmap of parking ticket density based on real user reports.
+                </p>
+              </section>
+
+              <section>
+                <h3>Reporting a parking ticket you received</h3>
+                <ol>
+                  <li>
+                    1. Click the location on the map where you got the ticket (as close as possible)
+                  </li>
+                  <li>
+                    2. Select <em>“report a ticket”</em>
+                  </li>
+                  <li>3. Enter the date and time of the ticket issued, and violation type</li>
+                  <li>
+                    4. Click <em>submit</em> and your report will appear on the map!
+                  </li>
+                </ol>
+              </section>
+
+              <section>
+                <h3>Reporting parking enforcement you spotted</h3>
+                <ol>
+                  <li>1. Click the location where you saw the parking enforcement officer</li>
+                  <li>
+                    2. Select <em>“report parking enforcement nearby”</em>
+                  </li>
+                  <li>3. Confirm in popup to submit the report</li>
+                </ol>
+              </section>
+
+              <section>
+                <h3>
+                  Start a parking session + receive notifs for tickets/parking enforcement near your
+                  car
+                </h3>
+                <ol>
+                  <li>1. Create an account or log in.</li>
+                  <li>
+                    2. Select your parking spot on the map and click <em>“i just parked”</em>
+                  </li>
+                  <li>3. Open your profile (person icon, upper-right) </li>
+                  <li>
+                    {' '}
+                    4. Enable notifications for tickets and parking enforcement reported within 0.5
+                    miles of your parking spot (session)
+                  </li>
+                  <li>
+                    5. To end your session: click the car icon → <em>“end parking session”</em>
+                  </li>
+                  <li>6. Optionally bookmark the spot when ending a session</li>
+                </ol>
+              </section>
+
+              <section>
+                <h3>
+                  Bookmark favorite spots + receive notifs for tickets/parking enforcement near your
+                  bookmarks{' '}
+                </h3>
+                <ol>
+                  <li>1. Create an account or log in</li>
+                  <li>
+                    2. Select a spot and click <em>“bookmark this spot”</em>
+                  </li>
+                  <li>3. A heart icon marks the bookmarked spot.</li>
+                  <li>4. Open your profile (person icon, upper-right)</li>
+                  <li>
+                    5. Enable notifications for tickets and parking enforcement reported within 0.5
+                    miles of your bookmarked spots
+                  </li>
+                  <li>
+                    6. To remove: click the heart icon → <em>“remove bookmark”</em>
+                  </li>
+                </ol>
+              </section>
+            </div>
+
+            <footer className={styles.modalFooter}>
+              <button
+                type="button"
+                onClick={() => setShowInstructions(false)}
+                className={styles.modalButton}
+              >
+                got it!
+              </button>
+            </footer>
           </div>
         </div>
       )}
-
       {/* Pin Location Popup Modal */}
       {pinLocation && (
         // for authenticated users
@@ -464,7 +590,7 @@ const TicketSpyHeatMap: React.FC = () => {
                       setPinLocation(null);
                     }}
                   >
-                    <TicketIcon />
+                    <TicketIcon2 />
                     <span>report a ticket</span>
                   </button>
 
@@ -479,7 +605,7 @@ const TicketSpyHeatMap: React.FC = () => {
                   </button>
 
                   <button className={styles.parkingSessionButton} onClick={handleParkingSession}>
-                    <CarIcon />
+                    <CarIcon2 />
                     <span>just parked here</span>
                   </button>
                 </div>
@@ -502,7 +628,7 @@ const TicketSpyHeatMap: React.FC = () => {
                       setPinLocation(null);
                     }}
                   >
-                    <TicketIcon />
+                    <TicketIcon2 />
                     <span>report a ticket</span>
                   </button>
                   <button className={styles.reportEnforcementButton}>
@@ -540,7 +666,6 @@ const TicketSpyHeatMap: React.FC = () => {
           )}
         </>
       )}
-
       {/* Ticket Report Modal */}
       {showTicketReportModal && (
         <div className={styles.modalOverlay}>
@@ -657,8 +782,7 @@ const TicketSpyHeatMap: React.FC = () => {
           </div>
         </div>
       )}
-
-      {/* Login Modal */}
+      Login Modal
       {showLoginModal && (
         <div className={styles.modalOverlay}>
           <div className={styles.loginModalContent}>
