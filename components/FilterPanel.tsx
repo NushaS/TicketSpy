@@ -13,7 +13,7 @@ type Props = {
 export default function FilterPanel({ visible, onClose, onApply, initialFilters }: Props) {
   const [local, setLocal] = React.useState<Filters>(
     initialFilters ?? {
-      timeRange: { amount: 3, unit: 'weeks' },
+      timeRange: { amount: 1, unit: 'months' },
       weekdays: { monThu: true, friSun: true },
       timesOfDay: { morning: true, afternoon: true, night: true },
     }
@@ -25,11 +25,14 @@ export default function FilterPanel({ visible, onClose, onApply, initialFilters 
 
   if (!visible) return null;
 
-  const setTimeRangeOption = (opt: '1-3w' | '3-6w' | '6-9m' | '9-12m') => {
-    if (opt === '1-3w') setLocal((s) => ({ ...s, timeRange: { amount: 3, unit: 'weeks' } }));
-    if (opt === '3-6w') setLocal((s) => ({ ...s, timeRange: { amount: 6, unit: 'weeks' } }));
-    if (opt === '6-9m') setLocal((s) => ({ ...s, timeRange: { amount: 9, unit: 'months' } }));
-    if (opt === '9-12m') setLocal((s) => ({ ...s, timeRange: { amount: 12, unit: 'months' } }));
+  const setTimeRangeOption = (opt: '1w' | '2w' | '3w' | '1m' | '3m' | '6m' | '1y') => {
+    if (opt === '1w') setLocal((s) => ({ ...s, timeRange: { amount: 1, unit: 'weeks' } }));
+    if (opt === '2w') setLocal((s) => ({ ...s, timeRange: { amount: 2, unit: 'weeks' } }));
+    if (opt === '3w') setLocal((s) => ({ ...s, timeRange: { amount: 3, unit: 'weeks' } }));
+    if (opt === '1m') setLocal((s) => ({ ...s, timeRange: { amount: 1, unit: 'months' } }));
+    if (opt === '3m') setLocal((s) => ({ ...s, timeRange: { amount: 3, unit: 'months' } }));
+    if (opt === '6m') setLocal((s) => ({ ...s, timeRange: { amount: 6, unit: 'months' } }));
+    if (opt === '1y') setLocal((s) => ({ ...s, timeRange: { amount: 12, unit: 'months' } }));
   };
 
   const toggleWeekday = (key: keyof NonNullable<Filters['weekdays']>) =>
@@ -75,10 +78,32 @@ export default function FilterPanel({ visible, onClose, onApply, initialFilters 
                 <input
                   type="radio"
                   name="time-range"
+                  checked={local.timeRange?.amount === 1 && local.timeRange?.unit === 'weeks'}
+                  onChange={() => setTimeRangeOption('1w')}
+                />{' '}
+                Past 1 week
+              </label>
+            </div>
+            <div>
+              <label>
+                <input
+                  type="radio"
+                  name="time-range"
+                  checked={local.timeRange?.amount === 2 && local.timeRange?.unit === 'weeks'}
+                  onChange={() => setTimeRangeOption('2w')}
+                />{' '}
+                Past 2 weeks
+              </label>
+            </div>
+            <div>
+              <label>
+                <input
+                  type="radio"
+                  name="time-range"
                   checked={local.timeRange?.amount === 3 && local.timeRange?.unit === 'weeks'}
-                  onChange={() => setTimeRangeOption('1-3w')}
+                  onChange={() => setTimeRangeOption('3w')}
                 />{' '}
-                1-3 weeks
+                Past 3 weeks
               </label>
             </div>
             <div>
@@ -86,10 +111,10 @@ export default function FilterPanel({ visible, onClose, onApply, initialFilters 
                 <input
                   type="radio"
                   name="time-range"
-                  checked={local.timeRange?.amount === 6 && local.timeRange?.unit === 'weeks'}
-                  onChange={() => setTimeRangeOption('3-6w')}
+                  checked={local.timeRange?.amount === 1 && local.timeRange?.unit === 'months'}
+                  onChange={() => setTimeRangeOption('1m')}
                 />{' '}
-                3-6 weeks
+                Past 1 month
               </label>
             </div>
             <div>
@@ -97,10 +122,21 @@ export default function FilterPanel({ visible, onClose, onApply, initialFilters 
                 <input
                   type="radio"
                   name="time-range"
-                  checked={local.timeRange?.amount === 9 && local.timeRange?.unit === 'months'}
-                  onChange={() => setTimeRangeOption('6-9m')}
+                  checked={local.timeRange?.amount === 3 && local.timeRange?.unit === 'months'}
+                  onChange={() => setTimeRangeOption('3m')}
                 />{' '}
-                6-9 months
+                Past 3 months
+              </label>
+            </div>
+            <div>
+              <label>
+                <input
+                  type="radio"
+                  name="time-range"
+                  checked={local.timeRange?.amount === 6 && local.timeRange?.unit === 'months'}
+                  onChange={() => setTimeRangeOption('6m')}
+                />{' '}
+                Past 6 months
               </label>
             </div>
             <div>
@@ -109,9 +145,9 @@ export default function FilterPanel({ visible, onClose, onApply, initialFilters 
                   type="radio"
                   name="time-range"
                   checked={local.timeRange?.amount === 12 && local.timeRange?.unit === 'months'}
-                  onChange={() => setTimeRangeOption('9-12m')}
+                  onChange={() => setTimeRangeOption('1y')}
                 />{' '}
-                9-12 months
+                Past 1 year
               </label>
             </div>
           </section>
@@ -165,7 +201,7 @@ export default function FilterPanel({ visible, onClose, onApply, initialFilters 
           </section>
         </div>
 
-        <div style={{ padding: '1rem' }}>
+        <div className={styles.filterPanelFooter}>
           <button className={styles.applyFiltersButton} onClick={apply}>
             <Check size={16} />
             <span style={{ marginLeft: 8 }}>apply filters</span>
