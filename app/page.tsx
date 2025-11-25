@@ -52,6 +52,22 @@ const TicketSpyHeatMap: React.FC = () => {
     lng: number;
     lat: number;
   } | null>(null);
+  const [enforcementSubmitting, setEnforcementSubmitting] = useState(false);
+  const [transientEnforcements, setTransientEnforcements] = useState<
+    { id: string; lat: number; lng: number; expiresAt: number }[]
+  >([]);
+  const [mapZoom, setMapZoom] = useState<number>(initialViewState.zoom ?? 12);
+
+  // Add a transient enforcement marker that auto-removes after `ttlMs` (default 1 hour)
+  const addTransientEnforcement = (lat: number, lng: number, ttlMs = 1000 * 60 * 60) => {
+    const id = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+    const expiresAt = Date.now() + ttlMs;
+    setTransientEnforcements((s) => [...s, { id, lat, lng, expiresAt }]);
+    // schedule removal
+    setTimeout(() => {
+      setTransientEnforcements((s) => s.filter((m) => m.id !== id));
+    }, ttlMs);
+  };
   const router = useRouter();
 
   // filters state (client-side representation)
@@ -68,6 +84,7 @@ const TicketSpyHeatMap: React.FC = () => {
   const { data: ticketRows = [], refetch: refetchTickets } = useTicketTable(serverFilters as any);
   const { refetch: refetchParkingSessions } = useUserParkingSessions(userId || '');
   const { refetch: refetchBookMarks } = useUserBookmarkedLocations(userId || '');
+  const { data: enforcementRows = [], refetch: refetchEnforcement } = useEnforcementSightingTable();
 
   // apply remaining filters client-side (weekday / time-of-day) against rows returned
   // from the server-side query above
@@ -287,6 +304,8 @@ const TicketSpyHeatMap: React.FC = () => {
     );
   }
 
+  // `refetchEnforcement` is provided by the hook above; this placeholder removed.
+
   return (
     <div className={styles.container}>
       {/* Success Toast */}
@@ -406,6 +425,13 @@ const TicketSpyHeatMap: React.FC = () => {
           initialViewState={initialViewState}
           style={{ width: '100%', height: '100%' }}
           mapStyle={mapStyleURL}
+          onMove={(e) => {
+            try {
+              setMapZoom(e.viewState?.zoom ?? mapZoom);
+            } catch (err) {
+              // ignore
+            }
+          }}
           onLoad={(e) => {
             // set the existing style's background layer color so we don't cover tiles
             const map = e.target as unknown as {
@@ -437,6 +463,30 @@ const TicketSpyHeatMap: React.FC = () => {
           )}
           {/* Render ticket + car pins on top of heatmap if user is logged*/}
           {userId && <MapPinsLayer userId={userId} />}
+          {/* Transient enforcement markers (temporary pins that auto-remove after 1 hour) */}
+          {transientEnforcements.map((m) => {
+            // Compute pixel sizes so the whole marker scales down when zoomed out
+            const outerBase = 56; // px at reference zoom
+            const outer = Math.round(Math.min(Math.max(outerBase + (mapZoom - 12) * 6, 28), 80));
+            const inner = Math.round(outer * 0.78);
+            const iconSize = Math.round(inner * 0.74);
+
+            return (
+              <Marker key={m.id} longitude={m.lng} latitude={m.lat} anchor="bottom">
+                <div
+                  className={styles.transientMarker}
+                  style={{ width: outer, height: outer, marginBottom: Math.round(outer * 0.14) }}
+                >
+                  <div
+                    className={styles.transientMarkerInner}
+                    style={{ width: inner, height: inner, transform: 'translateY(-2px)' }}
+                  >
+                    <SightingIcon size={iconSize} />
+                  </div>
+                </div>
+              </Marker>
+            );
+          })}
         </Map>
       </div>
 
@@ -477,7 +527,15 @@ const TicketSpyHeatMap: React.FC = () => {
                     <span>report a ticket</span>
                   </button>
 
-                  <button className={styles.reportEnforcementButton}>
+                  <button
+                    className={styles.reportEnforcementButton}
+                    onClick={() => {
+                      console.debug('Open enforcement confirm for', pinLocation);
+                      setEnforcementLocation(pinLocation);
+                      setShowEnforcementConfirm(true);
+                      setPinLocation(null);
+                    }}
+                  >
                     <SightingIcon />
                     report parking enforcement nearby
                   </button>
@@ -514,7 +572,15 @@ const TicketSpyHeatMap: React.FC = () => {
                     <TicketIcon />
                     <span>report a ticket</span>
                   </button>
-                  <button className={styles.reportEnforcementButton}>
+                  <button
+                    className={styles.reportEnforcementButton}
+                    onClick={() => {
+                      console.debug('Open enforcement confirm for', pinLocation);
+                      setEnforcementLocation(pinLocation);
+                      setShowEnforcementConfirm(true);
+                      setPinLocation(null);
+                    }}
+                  >
                     <SightingIcon />
                     report parking enforcement nearby
                   </button>
@@ -667,96 +733,6 @@ const TicketSpyHeatMap: React.FC = () => {
         </div>
       )}
 
-      {/* Enforcement Confirmation Modal */}
-      {showEnforcementConfirm && enforcementLocation && (
-        <div className={styles.modalOverlay}>
-          <div className={styles.ticketReportModalContent}>
-            <button
-              onClick={() => {
-                setShowEnforcementConfirm(false);
-                setEnforcementLocation(null);
-              }}
-              className={styles.ticketReportCloseButton}
-            >
-              <X size={24} />
-            </button>
-
-            <h2 className={styles.ticketReportTitle}>Report enforcement sighting</h2>
-
-            <p style={{ marginTop: 8 }}>
-              Are you sure you want to report a parking enforcement officer at (
-              {enforcementLocation.lat.toFixed(5)}, {enforcementLocation.lng.toFixed(5)})?
-            </p>
-
-            <div style={{ display: 'flex', gap: 12, marginTop: 18 }}>
-              <button
-                className={styles.ticketReportSubmitButton}
-                onClick={async () => {
-                  // submit enforcement report
-                  try {
-                    const body = {
-                      latitude: enforcementLocation.lat,
-                      longitude: enforcementLocation.lng,
-                      user_id: userId,
-                    };
-
-                    const res = await fetch('/api/post-enforcement', {
-                      method: 'POST',
-                      headers: { 'Content-Type': 'application/json' },
-                      body: JSON.stringify(body),
-                    });
-
-                    const result = await res.json().catch(() => ({}));
-
-                    if (res.ok) {
-                      // refetch enforcement sightings so UI can update
-                      try {
-                        await refetchEnforcement();
-                      } catch (err) {
-                        // ignore refetch errors
-                      }
-
-                      setShowEnforcementConfirm(false);
-                      setEnforcementLocation(null);
-                      setShowEnforcementSuccessToast(true);
-                      setTimeout(() => setShowEnforcementSuccessToast(false), 3000);
-                    } else {
-                      console.error('Error posting enforcement:', result);
-                      setEnforcementErrorMessage(
-                        result.error || 'Failed to submit enforcement report'
-                      );
-                      setShowEnforcementErrorToast(true);
-                      setTimeout(() => setShowEnforcementErrorToast(false), 3000);
-                    }
-                  } catch (error) {
-                    console.error('Network error posting enforcement:', error);
-                    setEnforcementErrorMessage(
-                      'Network error: Failed to submit enforcement report'
-                    );
-                    setShowEnforcementErrorToast(true);
-                    setTimeout(() => setShowEnforcementErrorToast(false), 3000);
-                  }
-                }}
-              >
-                <Check size={18} />
-                <span style={{ marginLeft: 8 }}>Yes, report</span>
-              </button>
-
-              <button
-                onClick={() => {
-                  setShowEnforcementConfirm(false);
-                  setEnforcementLocation(null);
-                }}
-                className={styles.ticketReportCloseButton}
-                style={{ alignSelf: 'center' }}
-              >
-                No
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
       {/* Enforcement toasts */}
       {showEnforcementSuccessToast && (
         <div className={styles.successToast}>
@@ -793,25 +769,36 @@ const TicketSpyHeatMap: React.FC = () => {
               </button>
 
               <button
+                type="button"
                 className={styles.enforcementYesButton}
                 onClick={async () => {
+                  if (!enforcementLocation) return;
+                  setEnforcementSubmitting(true);
+                  console.debug('Submitting enforcement:', enforcementLocation);
                   try {
                     const body = {
                       latitude: enforcementLocation.lat,
                       longitude: enforcementLocation.lng,
                       user_id: userId ?? null,
+                      sighting_time: new Date().toISOString(),
                     };
 
-                    const res = await fetch('/api/post-enforcement', {
+                    const res = await fetch('/api/enforcement-sighting', {
                       method: 'POST',
                       headers: { 'Content-Type': 'application/json' },
                       body: JSON.stringify(body),
                     });
 
                     const data = await res.json().catch(() => ({}));
+                    console.debug('Enforcement response', res.status, data);
 
                     if (res.ok) {
-                      // refetch enforcement sightings if possible
+                      // Add a transient marker for immediate visual feedback
+                      try {
+                        addTransientEnforcement(enforcementLocation.lat, enforcementLocation.lng);
+                      } catch (e) {
+                        // ignore
+                      }
                       try {
                         await refetchEnforcement?.();
                       } catch (e) {
@@ -827,13 +814,17 @@ const TicketSpyHeatMap: React.FC = () => {
                       setTimeout(() => setShowEnforcementErrorToast(false), 3000);
                     }
                   } catch (err) {
+                    console.error('Network error posting enforcement:', err);
                     setEnforcementErrorMessage('Network error: Failed to report enforcement');
                     setShowEnforcementErrorToast(true);
                     setTimeout(() => setShowEnforcementErrorToast(false), 3000);
+                  } finally {
+                    setEnforcementSubmitting(false);
                   }
                 }}
+                disabled={enforcementSubmitting}
               >
-                ✓ yes!
+                {enforcementSubmitting ? 'Submitting...' : '✓ yes!'}
               </button>
             </div>
           </div>
