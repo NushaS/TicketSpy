@@ -13,7 +13,7 @@ import styles from './page.module.css';
 import { CarIcon, CarIcon2 } from '../components/ui/icons/car-icon';
 import { ProfileIcon } from '../components/ui/icons/profile-icon';
 import { HeartIcon } from '../components/ui/icons/heart-icon';
-import { TicketIcon, TicketIcon2 } from '@/components/ui/icons/ticket-icon';
+import { TicketIcon2 } from '@/components/ui/icons/ticket-icon';
 import { SightingIcon } from '@/components/ui/icons/sighting-icon';
 import { MapPin } from '../components/map/MapPin';
 import FilterPanel from '../components/FilterPanel';
@@ -48,7 +48,7 @@ const TicketSpyHeatMap: React.FC = () => {
 
   // filters state (client-side representation)
   const [filters, setFilters] = useState<Filters>({
-    timeRange: { amount: 3, unit: 'weeks' },
+    timeRange: { amount: 1, unit: 'months' },
     weekdays: { monThu: true, friSun: true },
     timesOfDay: { morning: true, afternoon: true, night: true },
   });
@@ -256,6 +256,7 @@ const TicketSpyHeatMap: React.FC = () => {
         latitude: Number(row.latitude),
         longitude: Number(row.longitude),
         type: 'heart',
+        id: row.bookmark_id,
       }))
     );
 
@@ -265,6 +266,7 @@ const TicketSpyHeatMap: React.FC = () => {
         latitude: Number(row.latitude),
         longitude: Number(row.longitude),
         type: 'car',
+        id: row.parking_session_id,
       }))
     );
 
@@ -278,6 +280,14 @@ const TicketSpyHeatMap: React.FC = () => {
             latitude={point.latitude}
             longitude={point.longitude}
             icon={point.type === 'car' ? <CarIcon /> : <HeartIcon />}
+            type={point.type}
+            id={point.id}
+            userId={userId}
+            onDelete={() => {
+              // Refetch both bookmarks and parking sessions when any item is deleted
+              refetchBookMarks();
+              refetchParkingSessions();
+            }}
           />
         ))}
       </>
@@ -293,7 +303,6 @@ const TicketSpyHeatMap: React.FC = () => {
           <span>Ticket reported successfully!</span>
         </div>
       )}
-
       {/* Error Toast */}
       {showErrorToast && (
         <div className={styles.errorToast}>
@@ -301,7 +310,6 @@ const TicketSpyHeatMap: React.FC = () => {
           <span>{errorMessage}</span>
         </div>
       )}
-
       {/* Header */}
       <header className={styles.header}>
         <div className={styles.logoContainer}>
@@ -329,10 +337,10 @@ const TicketSpyHeatMap: React.FC = () => {
 
           {/* Check if user is logged in */}
           {isLoggedIn ? (
-            <div className={styles.profileButtonGroup}>
+            <Link href="profile/" className={styles.profileButtonGroup}>
               <ProfileIcon size={46} />
               <span>{username}</span>
-            </div>
+            </Link>
           ) : (
             <>
               {/*login button routes to login page*/}
@@ -347,7 +355,6 @@ const TicketSpyHeatMap: React.FC = () => {
           )}
         </div>
       </header>
-
       {/* Filters Button */}
       <button
         className={styles.filtersButton}
@@ -360,7 +367,6 @@ const TicketSpyHeatMap: React.FC = () => {
         <Menu size={20} />
         <span>filters</span>
       </button>
-
       {/* Filter side panel */}
       <FilterPanel
         visible={showFilters}
@@ -370,7 +376,6 @@ const TicketSpyHeatMap: React.FC = () => {
           setFilters(f);
         }}
       />
-
       {/* MapLibre Map */}
       <div className={styles.mapContainer}>
         {/* opacity control: positioned over the map */}
@@ -447,7 +452,6 @@ const TicketSpyHeatMap: React.FC = () => {
           {userId && <MapPinsLayer userId={userId} />}
         </Map>
       </div>
-
       {/* Instructions Modal (Logged In) */}
       {showInstructions && (
         <div
@@ -566,7 +570,6 @@ const TicketSpyHeatMap: React.FC = () => {
           </div>
         </div>
       )}
-
       {/* Pin Location Popup Modal */}
       {pinLocation && (
         // for authenticated users
@@ -663,7 +666,6 @@ const TicketSpyHeatMap: React.FC = () => {
           )}
         </>
       )}
-
       {/* Ticket Report Modal */}
       {showTicketReportModal && (
         <div className={styles.modalOverlay}>
@@ -780,8 +782,7 @@ const TicketSpyHeatMap: React.FC = () => {
           </div>
         </div>
       )}
-
-      {/* Login Modal */}
+      Login Modal
       {showLoginModal && (
         <div className={styles.modalOverlay}>
           <div className={styles.loginModalContent}>
