@@ -73,7 +73,7 @@ const TicketSpyHeatMap: React.FC = () => {
 
   // filters state (client-side representation)
   const [filters, setFilters] = useState<Filters>({
-    timeRange: { amount: 3, unit: 'weeks' },
+    timeRange: { amount: 1, unit: 'months' },
     weekdays: { monThu: true, friSun: true },
     timesOfDay: { morning: true, afternoon: true, night: true },
   });
