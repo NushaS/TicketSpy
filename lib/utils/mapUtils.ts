@@ -7,7 +7,8 @@
 export type DataPoint = {
   latitude: number;
   longitude: number;
-  type?: string; // identifies what kind of pin it is (e.g., "car", "heart")
+  type: 'car' | 'heart'; // identifies what kind of pin it is
+  id: string; // unique identifier for the pin
 };
 
 // Filters out invalid or non-numeric coordinates
