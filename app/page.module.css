@@ -39,6 +39,7 @@
 .buttonGroup {
   display: flex;
   align-items: center;
+
   gap: 0.75rem;
 }
 
@@ -557,6 +558,32 @@
   background-color: #5a7259;
 }
 
+/* Enforcement confirm modal button tweaks */
+.ticketReportModalContent .ticketReportSubmitButton {
+  margin-top: 0; /* remove extra top margin when used inline with the 'no' button */
+  padding: 0.75rem 1.5rem;
+  min-height: 44px;
+}
+
+.enforcementNoButton {
+  padding: 0.75rem 1.25rem;
+  background-color: #ffffff;
+  color: #333;
+  border: 1px solid rgba(16, 24, 40, 0.06);
+  border-radius: 50px;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  justify-content: center;
+  min-height: 44px;
+}
+
+.enforcementNoButton:hover {
+  background-color: #fbfbfb;
+}
+
 /* Responsive adjustments for ticket report modal */
 @media (max-width: 640px) {
   .ticketReportFormGroup {
@@ -960,4 +987,37 @@
 
 .applyFiltersButton:hover {
   filter: brightness(0.95);
+}
+
+/* Transient enforcement marker styling (large visible pin with pulse) */
+.transientMarker {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  margin-bottom: 8px; /* lift above anchor */
+  border-radius: 9999px;
+  background: radial-gradient(circle at 30% 30%, #ffffff, #f6efe9 30%);
+  box-shadow: 0 8px 22px rgba(0,0,0,0.28);
+  border: 2px solid rgba(176,123,111,0.12);
+}
+
+.transientMarkerInner {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 9999px;
+  background: linear-gradient(180deg, #f7eaea 0%, #b07b6f 100%);
+  box-shadow: 0 6px 18px rgba(176,123,111,0.28);
+  transform: translateY(-2px);
+  animation: transientPulse 2.6s ease-out infinite;
+}
+
+@keyframes transientPulse {
+  0% { box-shadow: 0 6px 18px rgba(176,123,111,0.28); transform: scale(1); }
+  50% { box-shadow: 0 18px 36px rgba(176,123,111,0.12); transform: scale(1.05); }
+  100% { box-shadow: 0 6px 18px rgba(176,123,111,0.28); transform: scale(1); }
 }
