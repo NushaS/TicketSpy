@@ -857,7 +857,6 @@ const TicketSpyHeatMap: React.FC = () => {
           </div>
         </div>
       )}
-
       {/* Enforcement toasts */}
       {showEnforcementSuccessToast && (
         <div className={styles.successToast}>
@@ -865,14 +864,12 @@ const TicketSpyHeatMap: React.FC = () => {
           <span>Enforcement reported successfully!</span>
         </div>
       )}
-
       {showEnforcementErrorToast && (
         <div className={styles.errorToast}>
           <X size={20} />
           <span>{enforcementErrorMessage}</span>
         </div>
       )}
-
       {/* Enforcement Confirm Modal (centered) */}
       {showEnforcementConfirm && enforcementLocation && (
         <div className={styles.modalOverlay}>
