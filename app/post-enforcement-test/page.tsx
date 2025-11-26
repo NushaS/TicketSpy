@@ -19,7 +19,7 @@ export default function TestEnforcementPage() {
   const mockEnforcement = {
     latitude: 47.6062,
     longitude: -122.3321,
-    observedAt: new Date().toISOString(), // optional — DB defaults to now()
+    sighting_time: new Date().toISOString(), // optional — DB defaults to now()
     // notes: 'Officer seen near Pike Place', // uncomment if you added notes column
   };
 
@@ -29,7 +29,7 @@ export default function TestEnforcementPage() {
     setResult(null);
 
     try {
-      const res = await fetch('/api/post-enforcement', {
+      const res = await fetch('/api/enforcement-sighting', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(mockEnforcement),
