@@ -4,10 +4,10 @@ import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { FaCheck, FaTimes, FaTrash, FaSignOutAlt } from 'react-icons/fa';
-import styles from '@/app/profile/profile.module.css';
+import styles from '@/app/profile-settings/profile-settings.module.css';
 import { createClient } from '@/lib/supabase/client';
 
-export default function ProfileInfo() {
+export default function AccountInfo() {
   const [displayName, setDisplayName] = useState<string>('');
   const [email, setEmail] = useState<string>('');
   const [userId, setUserId] = useState<string | null>(null);
@@ -102,7 +102,7 @@ export default function ProfileInfo() {
     setSuccessMessage(null);
 
     try {
-      const response = await fetch('/api/profile/update', {
+      const response = await fetch('/api/account/update', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -143,7 +143,7 @@ export default function ProfileInfo() {
     if (!userId) return;
 
     try {
-      const response = await fetch('/api/profile/delete', {
+      const response = await fetch('/api/account/delete', {
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ userId }),
