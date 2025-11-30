@@ -365,7 +365,7 @@ const TicketSpyHeatMap: React.FC = () => {
 
           {/* Check if user is logged in */}
           {isLoggedIn ? (
-            <Link href="profile/" className={styles.profileButtonGroup}>
+            <Link href="profile-settings/" className={styles.profileButtonGroup}>
               <ProfileIcon size={46} />
               <span>{username}</span>
             </Link>

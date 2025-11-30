@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import styles from '@/app/profile/profile.module.css';
+import styles from '@/app/profile-settings/profile-settings.module.css';
 import ToggleSwitch from '../ui/toggle-switch';
 
 export default function NotificationSettings() {
