@@ -36,7 +36,7 @@ export async function POST(req: Request) {
       ticket_report_date,
       ticket_report_hour,
       violation_type: violation_type ?? 'default parking ticket',
-      user_id: null, // optional: fill later if needed
+      user_id: null,
     })
     .select('*')
     .single();
@@ -56,7 +56,7 @@ export async function POST(req: Request) {
   return NextResponse.json({ ticket: data }, { status: 201 });
 }
 
-// Optional: block GET
+// block GET
 export function GET() {
   return NextResponse.json({ error: 'Use client→Supabase for GET.' }, { status: 405 });
 }

@@ -75,6 +75,7 @@ export async function sendNotificationEmail({
     from,
     to,
     subject: subject ?? defaultSubject,
+    // Resend accepts react component and renders it
     react,
   });
 
