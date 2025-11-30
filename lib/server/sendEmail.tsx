@@ -54,7 +54,7 @@ export async function sendNotificationEmail({
   longitude,
 }: SendEmailParams) {
   const resend = getResendClient();
-  const from = 'TicketSpy <onboarding@resend.dev>';
+  const from = 'TicketSpy <no-reply@ticketspy.org>'; // ticketspy.app DOMAIN VERIFIED! no-reply email allowed
 
   // choose template and default subject based on kind
   const body = kind === 'bookmark' ? BOOKMARK_BODY : PARKING_BODY;
