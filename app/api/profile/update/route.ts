@@ -31,7 +31,7 @@ export async function POST(request: Request) {
     // Update display_name in public users table
     const { error: usersError } = await supabaseAdmin
       .from('users')
-      .update({ display_name: displayName })
+      .update({ display_name: displayName, email: email })
       .eq('user_id', userId);
 
     if (usersError) {
