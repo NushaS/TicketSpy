@@ -1,4 +1,5 @@
 import { createAdminClient } from '@/lib/supabase/server-admin';
+import { notifyUsers } from '@/lib/server/nearbySessionsAndBookmarks';
 import { NextResponse } from 'next/server';
 //import { z } from 'zod';
 
@@ -19,6 +20,9 @@ import { NextResponse } from 'next/server';
 export async function POST(req: Request) {
   // 1) Parse & validate
   const json = await req.json().catch(() => null);
+  if (!json) {
+    return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 });
+  }
 
   const { latitude, longitude, ticket_report_date, ticket_report_hour, violation_type } = json;
 
@@ -39,7 +43,16 @@ export async function POST(req: Request) {
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
 
-  // 3) Respond with created ticket
+  // 3) Trigger nearby parking session check server-side
+  if (typeof latitude === 'number' && typeof longitude === 'number') {
+    try {
+      await notifyUsers(latitude, longitude);
+    } catch (err) {
+      console.error('Failed to log nearby parking sessions:', err);
+    }
+  }
+
+  // 4) Respond with created ticket
   return NextResponse.json({ ticket: data }, { status: 201 });
 }
 
