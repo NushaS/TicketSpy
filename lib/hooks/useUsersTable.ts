@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { createClient } from '@/lib/supabase/client';
 
-export type UserNotificationRow = {
+export type UserProfileRow = {
   user_id: string;
   email: string | null;
   display_name?: string | null;
@@ -10,7 +10,7 @@ export type UserNotificationRow = {
 };
 
 // --- fetch single user ---
-async function fetchUserNotificationSettings(userId: string) {
+async function fetchUserProfileDetails(userId: string) {
   const supabase = createClient();
   const { data, error } = await supabase
     .from('users')
@@ -19,15 +19,15 @@ async function fetchUserNotificationSettings(userId: string) {
     .limit(1)
     .maybeSingle(); // returns row | null
   if (error) throw new Error(error.message);
-  return data as UserNotificationRow | null;
+  return data as UserProfileRow | null;
 }
 
-export function useUserNotificationSettings(userId?: string | null) {
+export function useUserProfileDetails(userId?: string | null) {
   return useQuery({
     queryKey: ['user_notif_settings', userId],
     queryFn: () => {
       if (!userId) return Promise.resolve(null);
-      return fetchUserNotificationSettings(userId);
+      return fetchUserProfileDetails(userId);
     },
     enabled: Boolean(userId),
     staleTime: 1000 * 60, // 1 minute
