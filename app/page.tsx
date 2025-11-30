@@ -23,6 +23,7 @@ import { filterValidDataPoints } from '@/lib/utils/mapUtils';
 import { filterTickets, Filters } from '@/lib/utils/filterTickets';
 import { getGeoJsonData, heatmapLayer, initialViewState, mapStyleURL } from './heatmapConfig';
 import { useTicketTable } from '@/lib/hooks/useTicketTable';
+import { useEnforcementSightingTable } from '@/lib/hooks/useEnforcementSightingTable';
 
 const TicketSpyHeatMap: React.FC = () => {
   const [showInstructions, setShowInstructions] = useState(false);
@@ -43,12 +44,36 @@ const TicketSpyHeatMap: React.FC = () => {
   const [showSuccessToast, setShowSuccessToast] = useState(false);
   const [showErrorToast, setShowErrorToast] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+  const [showEnforcementSuccessToast, setShowEnforcementSuccessToast] = useState(false);
+  const [showEnforcementErrorToast, setShowEnforcementErrorToast] = useState(false);
+  const [enforcementErrorMessage, setEnforcementErrorMessage] = useState('');
   const [userId, setUserId] = useState<string | null>(null);
+  const [showEnforcementConfirm, setShowEnforcementConfirm] = useState(false);
+  const [enforcementLocation, setEnforcementLocation] = useState<{
+    lng: number;
+    lat: number;
+  } | null>(null);
+  const [enforcementSubmitting, setEnforcementSubmitting] = useState(false);
+  const [transientEnforcements, setTransientEnforcements] = useState<
+    { id: string; lat: number; lng: number; expiresAt: number }[]
+  >([]);
+  const [mapZoom, setMapZoom] = useState<number>(initialViewState.zoom ?? 12);
+
+  // Add a transient enforcement marker that auto-removes after `ttlMs` (default 1 hour)
+  const addTransientEnforcement = (lat: number, lng: number, ttlMs = 1000 * 60 * 60) => {
+    const id = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+    const expiresAt = Date.now() + ttlMs;
+    setTransientEnforcements((s) => [...s, { id, lat, lng, expiresAt }]);
+    // schedule removal
+    setTimeout(() => {
+      setTransientEnforcements((s) => s.filter((m) => m.id !== id));
+    }, ttlMs);
+  };
   const router = useRouter();
 
   // filters state (client-side representation)
   const [filters, setFilters] = useState<Filters>({
-    timeRange: { amount: 3, unit: 'weeks' },
+    timeRange: { amount: 1, unit: 'months' },
     weekdays: { monThu: true, friSun: true },
     timesOfDay: { morning: true, afternoon: true, night: true },
   });
@@ -60,6 +85,7 @@ const TicketSpyHeatMap: React.FC = () => {
   const { data: ticketRows = [], refetch: refetchTickets } = useTicketTable(serverFilters as any);
   const { refetch: refetchParkingSessions } = useUserParkingSessions(userId || '');
   const { refetch: refetchBookMarks } = useUserBookmarkedLocations(userId || '');
+  const { data: enforcementRows = [], refetch: refetchEnforcement } = useEnforcementSightingTable();
 
   // apply remaining filters client-side (weekday / time-of-day) against rows returned
   // from the server-side query above
@@ -256,6 +282,7 @@ const TicketSpyHeatMap: React.FC = () => {
         latitude: Number(row.latitude),
         longitude: Number(row.longitude),
         type: 'heart',
+        id: row.bookmark_id,
       }))
     );
 
@@ -265,6 +292,7 @@ const TicketSpyHeatMap: React.FC = () => {
         latitude: Number(row.latitude),
         longitude: Number(row.longitude),
         type: 'car',
+        id: row.parking_session_id,
       }))
     );
 
@@ -278,11 +306,21 @@ const TicketSpyHeatMap: React.FC = () => {
             latitude={point.latitude}
             longitude={point.longitude}
             icon={point.type === 'car' ? <CarIcon /> : <HeartIcon />}
+            type={point.type}
+            id={point.id}
+            userId={userId}
+            onDelete={() => {
+              // Refetch both bookmarks and parking sessions when any item is deleted
+              refetchBookMarks();
+              refetchParkingSessions();
+            }}
           />
         ))}
       </>
     );
   }
+
+  // `refetchEnforcement` is provided by the hook above; this placeholder removed.
 
   return (
     <div className={styles.container}>
@@ -293,7 +331,6 @@ const TicketSpyHeatMap: React.FC = () => {
           <span>Ticket reported successfully!</span>
         </div>
       )}
-
       {/* Error Toast */}
       {showErrorToast && (
         <div className={styles.errorToast}>
@@ -301,7 +338,6 @@ const TicketSpyHeatMap: React.FC = () => {
           <span>{errorMessage}</span>
         </div>
       )}
-
       {/* Header */}
       <header className={styles.header}>
         <div className={styles.logoContainer}>
@@ -347,7 +383,6 @@ const TicketSpyHeatMap: React.FC = () => {
           )}
         </div>
       </header>
-
       {/* Filters Button */}
       <button
         className={styles.filtersButton}
@@ -360,7 +395,6 @@ const TicketSpyHeatMap: React.FC = () => {
         <Menu size={20} />
         <span>filters</span>
       </button>
-
       {/* Filter side panel */}
       <FilterPanel
         visible={showFilters}
@@ -370,7 +404,6 @@ const TicketSpyHeatMap: React.FC = () => {
           setFilters(f);
         }}
       />
-
       {/* MapLibre Map */}
       <div className={styles.mapContainer}>
         {/* opacity control: positioned over the map */}
@@ -414,6 +447,13 @@ const TicketSpyHeatMap: React.FC = () => {
           initialViewState={initialViewState}
           style={{ width: '100%', height: '100%' }}
           mapStyle={mapStyleURL}
+          onMove={(e) => {
+            try {
+              setMapZoom(e.viewState?.zoom ?? mapZoom);
+            } catch (err) {
+              // ignore
+            }
+          }}
           onLoad={(e) => {
             // set the existing style's background layer color so we don't cover tiles
             const map = e.target as unknown as {
@@ -445,9 +485,32 @@ const TicketSpyHeatMap: React.FC = () => {
           )}
           {/* Render ticket + car pins on top of heatmap if user is logged*/}
           {userId && <MapPinsLayer userId={userId} />}
+          {/* Transient enforcement markers (temporary pins that auto-remove after 1 hour) */}
+          {transientEnforcements.map((m) => {
+            // Compute pixel sizes so the whole marker scales down when zoomed out
+            const outerBase = 56; // px at reference zoom
+            const outer = Math.round(Math.min(Math.max(outerBase + (mapZoom - 12) * 6, 28), 80));
+            const inner = Math.round(outer * 0.78);
+            const iconSize = Math.round(inner * 0.74);
+
+            return (
+              <Marker key={m.id} longitude={m.lng} latitude={m.lat} anchor="bottom">
+                <div
+                  className={styles.transientMarker}
+                  style={{ width: outer, height: outer, marginBottom: Math.round(outer * 0.14) }}
+                >
+                  <div
+                    className={styles.transientMarkerInner}
+                    style={{ width: inner, height: inner, transform: 'translateY(-2px)' }}
+                  >
+                    <SightingIcon size={iconSize} />
+                  </div>
+                </div>
+              </Marker>
+            );
+          })}
         </Map>
       </div>
-
       {/* Instructions Modal (Logged In) */}
       {showInstructions && (
         <div
@@ -566,7 +629,6 @@ const TicketSpyHeatMap: React.FC = () => {
           </div>
         </div>
       )}
-
       {/* Pin Location Popup Modal */}
       {pinLocation && (
         // for authenticated users
@@ -591,7 +653,15 @@ const TicketSpyHeatMap: React.FC = () => {
                     <span>report a ticket</span>
                   </button>
 
-                  <button className={styles.reportEnforcementButton}>
+                  <button
+                    className={styles.reportEnforcementButton}
+                    onClick={() => {
+                      console.debug('Open enforcement confirm for', pinLocation);
+                      setEnforcementLocation(pinLocation);
+                      setShowEnforcementConfirm(true);
+                      setPinLocation(null);
+                    }}
+                  >
                     <SightingIcon />
                     report parking enforcement nearby
                   </button>
@@ -628,7 +698,15 @@ const TicketSpyHeatMap: React.FC = () => {
                     <TicketIcon2 />
                     <span>report a ticket</span>
                   </button>
-                  <button className={styles.reportEnforcementButton}>
+                  <button
+                    className={styles.reportEnforcementButton}
+                    onClick={() => {
+                      console.debug('Open enforcement confirm for', pinLocation);
+                      setEnforcementLocation(pinLocation);
+                      setShowEnforcementConfirm(true);
+                      setPinLocation(null);
+                    }}
+                  >
                     <SightingIcon />
                     report parking enforcement nearby
                   </button>
@@ -663,7 +741,6 @@ const TicketSpyHeatMap: React.FC = () => {
           )}
         </>
       )}
-
       {/* Ticket Report Modal */}
       {showTicketReportModal && (
         <div className={styles.modalOverlay}>
@@ -780,8 +857,120 @@ const TicketSpyHeatMap: React.FC = () => {
           </div>
         </div>
       )}
+      {/* Enforcement toasts */}
+      {showEnforcementSuccessToast && (
+        <div className={styles.successToast}>
+          <Check size={20} />
+          <span>Enforcement reported successfully!</span>
+        </div>
+      )}
+      {showEnforcementErrorToast && (
+        <div className={styles.errorToast}>
+          <X size={20} />
+          <span>{enforcementErrorMessage}</span>
+        </div>
+      )}
+      {/* Enforcement Confirm Modal (centered) */}
+      {showEnforcementConfirm && enforcementLocation && (
+        <div className={styles.modalOverlay}>
+          <div className={styles.ticketReportModalContent}>
+            <button
+              onClick={() => {
+                setShowEnforcementConfirm(false);
+                setEnforcementLocation(null);
+              }}
+              className={styles.ticketReportCloseButton}
+            >
+              <X size={20} />
+            </button>
 
-      {/* Login Modal */}
+            <h2 className={styles.ticketReportTitle}>
+              Confirm parking enforcement officer sighting?
+            </h2>
+
+            <p style={{ marginTop: 8 }}>
+              Are you sure you want to report a parking enforcement officer at (
+              {enforcementLocation.lat.toFixed(5)}, {enforcementLocation.lng.toFixed(5)})?
+            </p>
+
+            <div style={{ display: 'flex', gap: 12, marginTop: 18, justifyContent: 'center' }}>
+              <button
+                className={styles.enforcementNoButton}
+                onClick={() => {
+                  setShowEnforcementConfirm(false);
+                  setEnforcementLocation(null);
+                }}
+              >
+                <span style={{ marginRight: 8 }}>✖</span>
+                no
+              </button>
+
+              <button
+                type="button"
+                className={styles.ticketReportSubmitButton}
+                onClick={async () => {
+                  if (!enforcementLocation) return;
+                  setEnforcementSubmitting(true);
+                  console.debug('Submitting enforcement:', enforcementLocation);
+                  try {
+                    const body = {
+                      latitude: enforcementLocation.lat,
+                      longitude: enforcementLocation.lng,
+                      user_id: userId ?? null,
+                      sighting_time: new Date().toISOString(),
+                    };
+
+                    const res = await fetch('/api/enforcement-sighting', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify(body),
+                    });
+
+                    const data = await res.json().catch(() => ({}));
+                    console.debug('Enforcement response', res.status, data);
+
+                    if (res.ok) {
+                      // Add a transient marker for immediate visual feedback
+                      try {
+                        addTransientEnforcement(enforcementLocation.lat, enforcementLocation.lng);
+                      } catch (e) {
+                        // ignore
+                      }
+                      try {
+                        await refetchEnforcement?.();
+                      } catch (e) {
+                        // ignore
+                      }
+                      setShowEnforcementConfirm(false);
+                      setEnforcementLocation(null);
+                      setShowEnforcementSuccessToast(true);
+                      setTimeout(() => setShowEnforcementSuccessToast(false), 3000);
+                    } else {
+                      setEnforcementErrorMessage(data?.error || 'Failed to report enforcement');
+                      setShowEnforcementErrorToast(true);
+                      setTimeout(() => setShowEnforcementErrorToast(false), 3000);
+                    }
+                  } catch (err) {
+                    console.error('Network error posting enforcement:', err);
+                    setEnforcementErrorMessage('Network error: Failed to report enforcement');
+                    setShowEnforcementErrorToast(true);
+                    setTimeout(() => setShowEnforcementErrorToast(false), 3000);
+                  } finally {
+                    setEnforcementSubmitting(false);
+                  }
+                }}
+                disabled={enforcementSubmitting}
+              >
+                <Check size={18} />
+                <span style={{ marginLeft: 8 }}>
+                  {enforcementSubmitting ? 'Submitting...' : 'Yes, report'}
+                </span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      Login Modal
       {showLoginModal && (
         <div className={styles.modalOverlay}>
           <div className={styles.loginModalContent}>
