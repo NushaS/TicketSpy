@@ -43,10 +43,15 @@ export async function POST(req: Request) {
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
 
+  let ticket_report_timestamp: string | null = null;
+  if (ticket_report_date && ticket_report_hour) {
+    ticket_report_timestamp = `${ticket_report_date}T${ticket_report_hour}`;
+  }
+
   // 3) Trigger nearby parking session check server-side
   if (typeof latitude === 'number' && typeof longitude === 'number') {
     try {
-      await notifyUsers(latitude, longitude);
+      await notifyUsers(latitude, longitude, ticket_report_timestamp ?? new Date().toISOString());
     } catch (err) {
       console.error('Failed to log nearby parking sessions:', err);
     }
