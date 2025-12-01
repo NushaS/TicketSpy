@@ -45,6 +45,7 @@ type UserRow = {
   bookmark_notifications_on: boolean | null;
   email: string | null;
   display_name?: string | null;
+  notification_distance_miles?: number | null;
 };
 
 export async function notifyUsers(latitude: number, longitude: number) {
@@ -65,6 +66,7 @@ export async function notifyUsers(latitude: number, longitude: number) {
     throw new Error(`Failed to fetch bookmarked locations: ${bookmarkError.message}`);
   }
 
+  // Pre-filter by the maximum supported radius (2 miles) to limit user lookups
   const nearbySessions =
     parkingSessions?.filter((session) => {
       if (typeof session.latitude !== 'number' || typeof session.longitude !== 'number') {
@@ -78,7 +80,7 @@ export async function notifyUsers(latitude: number, longitude: number) {
         session.longitude
       );
 
-      return distanceMiles <= 1;
+      return distanceMiles <= 2;
     }) ?? [];
 
   const nearbyBookmarks =
@@ -94,7 +96,7 @@ export async function notifyUsers(latitude: number, longitude: number) {
         bookmark.longitude
       );
 
-      return distanceMiles <= 1;
+      return distanceMiles <= 2;
     }) ?? [];
 
   const userIds = new Set<string>();
@@ -110,7 +112,7 @@ export async function notifyUsers(latitude: number, longitude: number) {
       ? await sb
           .from('users')
           .select(
-            'user_id, parking_notifications_on, bookmark_notifications_on, email, display_name'
+            'user_id, parking_notifications_on, bookmark_notifications_on, email, display_name, notification_distance_miles'
           )
           .in('user_id', Array.from(userIds))
       : { data: [] as UserRow[], error: null };
@@ -131,7 +133,16 @@ export async function notifyUsers(latitude: number, longitude: number) {
   nearbySessions.forEach((session) => {
     if (!session.user_id) return;
     const user = userMap.get(session.user_id);
-    if (user?.parking_notifications_on) {
+    if (!user) return;
+    // respect the user's distance preference per session
+    const distanceMiles = milesBetweenPoints(
+      latitude,
+      longitude,
+      session.latitude as number,
+      session.longitude as number
+    );
+    const allowedDistance = Number(user.notification_distance_miles ?? 1);
+    if (user.parking_notifications_on && distanceMiles <= allowedDistance) {
       notifiedParkingUsers.push(session.user_id);
       if (user.email) {
         emailSends.push(
@@ -144,7 +155,7 @@ export async function notifyUsers(latitude: number, longitude: number) {
         );
       }
       console.log(
-        `Parking notification sent to user ${session.user_id} (session ${session.parking_session_id})`
+        `Parking notification sent to user ${session.user_id} (session ${session.parking_session_id}, distance ${distanceMiles.toFixed(2)} mi, threshold ${allowedDistance} mi)`
       );
     }
   });
@@ -152,7 +163,15 @@ export async function notifyUsers(latitude: number, longitude: number) {
   nearbyBookmarks.forEach((bookmark) => {
     if (!bookmark.user_id) return;
     const user = userMap.get(bookmark.user_id);
-    if (user?.bookmark_notifications_on) {
+    if (!user) return;
+    const distanceMiles = milesBetweenPoints(
+      latitude,
+      longitude,
+      bookmark.latitude as number,
+      bookmark.longitude as number
+    );
+    const allowedDistance = Number(user.notification_distance_miles ?? 1);
+    if (user.bookmark_notifications_on && distanceMiles <= allowedDistance) {
       notifiedBookmarkUsers.push(bookmark.user_id);
       if (user.email) {
         emailSends.push(

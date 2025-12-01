@@ -5,6 +5,7 @@ import styles from '@/app/profile-settings/profile-settings.module.css';
 import ToggleSwitch from '../ui/toggle-switch';
 import { createClient } from '@/lib/supabase/client';
 import { useUserProfileDetails } from '@/lib/hooks/useUsersTable';
+import Slider from '@mui/material/Slider';
 
 export default function NotificationSettings() {
   const [userId, setUserId] = useState<string | null>(null);
@@ -17,6 +18,9 @@ export default function NotificationSettings() {
   const [loadingSave, setLoadingSave] = useState<boolean>(false);
   const [saveMessage, setSaveMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+
+  // notification distance (miles)
+  const [distanceMiles, setDistanceMiles] = useState<number>(0.5);
 
   // get userId from supabase session
   useEffect(() => {
@@ -45,9 +49,27 @@ export default function NotificationSettings() {
     // fall back to false if null
     setEnabledParking(Boolean(userData.parking_notifications_on));
     setEnabledBookmarked(Boolean(userData.bookmark_notifications_on));
+    // Use backend value if present; otherwise keep the local value or default
+    if (typeof userData.notification_distance_miles === 'number') {
+      setDistanceMiles(Number(userData.notification_distance_miles));
+    }
   }, [userData]);
 
-  async function persistDirectSupabase(newVals: { parking: boolean; bookmark: boolean }) {
+  // load distance from localStorage if present (client-side only)
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem('notification_distance_miles');
+      if (stored) setDistanceMiles(Number(stored));
+    } catch (err) {
+      // ignore errors (e.g., server-side render or restricted storage)
+    }
+  }, []);
+
+  async function persistDirectSupabase(newVals: {
+    parking: boolean;
+    bookmark: boolean;
+    distanceMiles?: number;
+  }) {
     if (!userId) {
       setError('Not authenticated');
       return false;
@@ -64,6 +86,7 @@ export default function NotificationSettings() {
           userId,
           parking: newVals.parking,
           bookmark: newVals.bookmark,
+          notification_distance_miles: newVals.distanceMiles,
         }),
       });
 
@@ -97,6 +120,7 @@ export default function NotificationSettings() {
     const ok = await persistDirectSupabase({
       parking: which === 'parking' ? value : prevParking,
       bookmark: which === 'bookmark' ? value : prevBookmark,
+      distanceMiles,
     });
 
     if (!ok) {
@@ -119,8 +143,8 @@ export default function NotificationSettings() {
       <div>
         <h3 className={styles.notificationHeading}>Events near my parking spot</h3>
         <div className={styles.notificationContent}>
-          Notify me when parking enforcement is sighted or a ticket is issued within 0.5 miles of my
-          parking location.
+          Notify me when parking enforcement is sighted or a ticket is issued within{' '}
+          {distanceMiles.toFixed(2)} miles of my parking location.
           <ToggleSwitch
             checked={enabledParking}
             onCheckedChange={(val) => handleToggle('parking', Boolean(val))}
@@ -131,11 +155,51 @@ export default function NotificationSettings() {
       <div>
         <h3 className={styles.notificationHeading}>Events near my bookmarked locations</h3>
         <div className={styles.notificationContent}>
-          Notify me when parking enforcement is sighted or a ticket is issued within 0.5 miles of a
-          bookmarked location.
+          Notify me when parking enforcement is sighted or a ticket is issued within{' '}
+          {distanceMiles.toFixed(2)} miles of a bookmarked location.
           <ToggleSwitch
             checked={enabledBookmarked}
             onCheckedChange={(val) => handleToggle('bookmark', Boolean(val))}
+          />
+        </div>
+      </div>
+
+      <div>
+        <h3 className={styles.notificationHeading}> Notification Slider</h3>
+        <div className={styles.notificationContent}>
+          <div style={{ marginBottom: 8 }}>Miles — {distanceMiles.toFixed(2)} mi</div>
+          <Slider
+            value={distanceMiles}
+            onChange={(e, val) => setDistanceMiles(Number(val))}
+            onChangeCommitted={async (e, val) => {
+              // Persist to server and localStorage
+              try {
+                const chosen = Number(val);
+                localStorage.setItem('notification_distance_miles', String(chosen));
+                // persist via API
+                const ok = await persistDirectSupabase({
+                  parking: enabledParking,
+                  bookmark: enabledBookmarked,
+                  distanceMiles: chosen,
+                });
+                if (ok) {
+                  setSaveMessage('Distance saved');
+                  setTimeout(() => setSaveMessage(null), 1500);
+                }
+              } catch (err) {
+                // ignore or display error
+              }
+            }}
+            valueLabelDisplay="auto"
+            valueLabelFormat={(value) => `${Number(value).toFixed(2)} mi`}
+            step={0.05}
+            marks={Array.from({ length: Math.round((2 - 0.05) / 0.05) + 1 }, (_, i) => ({
+              value: Number((0.05 * i + 0.05).toFixed(2)),
+              label: Number((0.05 * i + 0.05).toFixed(2)).toFixed(2),
+            }))}
+            min={0.05}
+            max={2}
+            aria-label="Mile distance"
           />
         </div>
       </div>

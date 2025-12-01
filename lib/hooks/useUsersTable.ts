@@ -7,6 +7,7 @@ export type UserProfileRow = {
   display_name?: string | null;
   bookmark_notifications_on: boolean | null;
   parking_notifications_on: boolean | null;
+  notification_distance_miles?: number | null;
 };
 
 // --- fetch single user ---
@@ -14,7 +15,9 @@ async function fetchUserProfileDetails(userId: string) {
   const supabase = createClient();
   const { data, error } = await supabase
     .from('users')
-    .select('user_id, email, display_name, bookmark_notifications_on, parking_notifications_on')
+    .select(
+      'user_id, email, display_name, bookmark_notifications_on, parking_notifications_on, notification_distance_miles'
+    )
     .eq('user_id', userId)
     .limit(1)
     .maybeSingle(); // returns row | null
