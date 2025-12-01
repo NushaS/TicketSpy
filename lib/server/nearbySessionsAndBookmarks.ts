@@ -48,7 +48,25 @@ type UserRow = {
   notification_distance_miles?: number | null;
 };
 
-export async function notifyUsers(latitude: number, longitude: number) {
+export async function notifyUsers(
+  latitude: number,
+  longitude: number,
+  enforcement_report_time: string | Date
+) {
+  const ONE_DAY_MS = 24 * 60 * 60 * 1000;
+  const report_time = new Date(enforcement_report_time).getTime();
+  const isRecent = Date.now() - report_time <= ONE_DAY_MS;
+
+  if (!isRecent) {
+    console.log('Skipping user notification, parking report not in last 24 hours.');
+    return {
+      nearbySessions: [],
+      nearbyBookmarks: [],
+      notifiedParkingUsers: [],
+      notifiedBookmarkUsers: [],
+    };
+  }
+
   const sb = createAdminClient();
 
   const [
