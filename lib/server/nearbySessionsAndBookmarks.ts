@@ -57,7 +57,7 @@ export async function notifyUsers(
   const isRecent = Date.now() - report_time <= ONE_DAY_MS;
 
   if (!isRecent) {
-    console.log("Skipping user notification, parking report not in last 24 hours.")
+    console.log('Skipping user notification, parking report not in last 24 hours.');
     return {
       nearbySessions: [],
       nearbyBookmarks: [],
