@@ -89,16 +89,16 @@ In addition to the features above, TicketSpy users who are signed in can:
 Step 1)
 Hover & select a location on the map with your mouse
 Click "report a ticket"
-<img width="622" height="907" alt="ticket-report-1" src="https://github.com/user-attachments/assets/e1f179fe-8d2c-46a9-afd8-360208432c15" />
+<img width="200" height="300" alt="ticket-report-1" src="https://github.com/user-attachments/assets/e1f179fe-8d2c-46a9-afd8-360208432c15" />
 
 Step 2)
 Submit the fields for the date, time, and violation type
 Click "Submit ticket report"
-<img width="626" height="907" alt="ticket-report-2" src="https://github.com/user-attachments/assets/42df0ab6-3772-4312-80b7-44b6d8cfddbc" />
+<img width="200" height="300" alt="ticket-report-2" src="https://github.com/user-attachments/assets/42df0ab6-3772-4312-80b7-44b6d8cfddbc" />
 
 Step 3)
-You can view your current report on the map!
-<img width="626" height="907" alt="ticket-report-3" src="https://github.com/user-attachments/assets/79f604f1-299d-471e-81b1-a864f1547674" />
+You can view your current report on the map! <br>
+<img width="200" height="300" alt="ticket-report-3" src="https://github.com/user-attachments/assets/79f604f1-299d-471e-81b1-a864f1547674" />
 
 ## How to Report a Bug
 
