@@ -73,7 +73,7 @@ const TicketSpyHeatMap: React.FC = () => {
 
   // filters state (client-side representation)
   const [filters, setFilters] = useState<Filters>({
-    timeRange: { amount: 1, unit: 'months' },
+    timeRange: { amount: 3, unit: 'weeks' },
     weekdays: { monThu: true, friSun: true },
     timesOfDay: { morning: true, afternoon: true, night: true },
   });
@@ -722,14 +722,14 @@ const TicketSpyHeatMap: React.FC = () => {
                 </div>
 
                 <div className={styles.authButtons}>
-                  <Link href="/welcome">
+                  <Link href="/auth/sign-up">
                     <button className={styles.createAccountBtn}>create an account</button>
                   </Link>
                   <span className={styles.orText}>or</span>
                   <button
                     onClick={() => {
                       setPinLocation(null);
-                      setShowLoginModal(true);
+                      router.push('/auth/login');
                     }}
                     className={styles.logInBtn}
                   >
