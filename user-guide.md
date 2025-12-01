@@ -88,12 +88,12 @@ In addition to the features above, TicketSpy users who are signed in can:
 #### Example Ticket Report
 Step 1)
 Hover & select a location on the map with your mouse
-Click "report a ticket"
+Click "report a ticket"<br>
 <img width="200" height="300" alt="ticket-report-1" src="https://github.com/user-attachments/assets/e1f179fe-8d2c-46a9-afd8-360208432c15" />
 
 Step 2)
 Submit the fields for the date, time, and violation type
-Click "Submit ticket report"
+Click "Submit ticket report"<br>
 <img width="200" height="300" alt="ticket-report-2" src="https://github.com/user-attachments/assets/42df0ab6-3772-4312-80b7-44b6d8cfddbc" />
 
 Step 3)
