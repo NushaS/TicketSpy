@@ -12,7 +12,7 @@ import { createClient } from '@/lib/supabase/client';
 import styles from './page.module.css';
 import { CarIcon, CarIcon2, CarIcon3 } from '../components/ui/icons/car-icon';
 import { ProfileIcon } from '../components/ui/icons/profile-icon';
-import { HeartIcon } from '../components/ui/icons/heart-icon';
+import { HeartIcon, HeartIcon2 } from '../components/ui/icons/heart-icon';
 import { TicketIcon2 } from '@/components/ui/icons/ticket-icon';
 import { SightingIcon } from '@/components/ui/icons/sighting-icon';
 import { MapPin } from '../components/map/MapPin';
@@ -212,14 +212,18 @@ const TicketSpyHeatMap: React.FC = () => {
         }),
       });
 
+      const result = await response.json().catch(() => null);
+
       if (response.ok) {
         refetchBookMarks();
         setSuccessMessage('Location bookmarked successfully!');
         setShowSuccessToast(true);
         setTimeout(() => setShowSuccessToast(false), 3000);
       } else {
-        const result = await response.json();
-        setErrorMessage(result.error || 'Failed to bookmark location');
+        const msg =
+          (result as any)?.error ||
+          (response.status ? `Failed to bookmark location (status ${response.status})` : null);
+        setErrorMessage(msg || 'Failed to bookmark location');
         setShowErrorToast(true);
         setTimeout(() => setShowErrorToast(false), 3000);
       }
@@ -308,7 +312,7 @@ const TicketSpyHeatMap: React.FC = () => {
             key={i}
             latitude={point.latitude}
             longitude={point.longitude}
-            icon={point.type === 'car' ? <CarIcon3 /> : <HeartIcon size={22} />}
+            icon={point.type === 'car' ? <CarIcon3 /> : <HeartIcon2 />}
             type={point.type}
             id={point.id}
             userId={userId}

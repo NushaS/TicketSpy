@@ -57,13 +57,9 @@ export const CarIcon2: React.FC<CarIconProps> = ({
   </svg>
 );
 
-// Car icon inside a map pin outline
-export const CarIcon3: React.FC<CarIconProps> = ({
-  size = 32,
-  color = '#819A79',
-  className = '',
-}) => (
-  <svg width="25" height="36" viewBox="0 0 22 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+// Car icon inside a map pin outline (static)
+export const CarIcon3: React.FC = () => (
+  <svg width="27" height="37" viewBox="0 0 22 34" fill="none" xmlns="http://www.w3.org/2000/svg">
     <path
       d="M11 0C4.91857 0 0 5.008 0 11.2C0 19.6 11 32 11 32C11 32 22 19.6 22 11.2C22 5.008 17.0814 0 11 0Z"
       fill="#819A79"

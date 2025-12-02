@@ -900,14 +900,15 @@
 }
 
 .mapMarkerWrapper {
-  width: 37;
-  height: 50;
+  width: 41;
+  height: 49;
   cursor: 'pointer';
 }
 /* Map Marker SVG */
 .mapMarkerSvg {
   fill: #a24052;
   stroke: none;
+  filter: drop-shadow(0 10px 22px rgba(16, 24, 40, 0.32));
 }
 .mapIcon {
   size: 24;
