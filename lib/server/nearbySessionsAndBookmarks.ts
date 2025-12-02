@@ -51,11 +51,13 @@ type UserRow = {
 export async function notifyUsers(
   latitude: number,
   longitude: number,
-  enforcement_report_time: string | Date,
-  alertId?: string
+  enforcement_report_time: string | Date | undefined,
+  alertId: string
 ) {
   const ONE_DAY_MS = 24 * 60 * 60 * 1000;
-  const report_time = new Date(enforcement_report_time).getTime();
+  const report_time = enforcement_report_time
+    ? new Date(enforcement_report_time).getTime()
+    : Date.now();
   const isRecent = Date.now() - report_time <= ONE_DAY_MS;
 
   if (!isRecent) {

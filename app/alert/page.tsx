@@ -2,7 +2,7 @@
 // Alert deep-link page: accepts ?id=... for a ticket or enforcement and centers the main map on it.
 
 import { useSearchParams } from 'next/navigation';
-import { useMemo, useEffect, useState, Suspense } from 'react';
+import { useMemo, useEffect, useState, Suspense, useRef } from 'react';
 import { useTicketTable } from '@/lib/hooks/useTicketTable';
 import { useEnforcementSightingTable } from '@/lib/hooks/useEnforcementSightingTable';
 import { AlertParkingEnforcementIcon } from '@/components/ui/icons/alert-parking-enforcement';
@@ -28,6 +28,7 @@ function AlertPageInner() {
   const params = useSearchParams();
   const id = params.get('id')?.trim(); // incoming id from query string
   const [lockedLocation, setLockedLocation] = useState<LocationHit | null>(null);
+  const urlSwappedRef = useRef(false);
   const {
     data: tickets = [],
     isLoading: ticketsLoading,
@@ -46,38 +47,34 @@ function AlertPageInner() {
     const ticket = (tickets as any[]).find(
       (t) => t?.ticket_id === id || t?.id === id || t?.ticketID === id
     );
-    if (
-      ticket &&
-      typeof ticket.latitude === 'number' &&
-      typeof ticket.longitude === 'number' &&
-      Number.isFinite(ticket.latitude) &&
-      Number.isFinite(ticket.longitude)
-    ) {
-      return {
-        lat: ticket.latitude,
-        lng: ticket.longitude,
-        source: 'ticket',
-        observedAt: ticket.ticket_report_date ?? null,
-      };
+    if (ticket) {
+      const lat = Number(ticket.latitude);
+      const lng = Number(ticket.longitude);
+      if (Number.isFinite(lat) && Number.isFinite(lng)) {
+        return {
+          lat,
+          lng,
+          source: 'ticket',
+          observedAt: ticket.ticket_report_date ?? null,
+        };
+      }
     }
 
     // Fall back to enforcement sightings
     const enforcement = (enforcementSightings as any[]).find(
-      (e) => e?.enforcement_id === id || e?.id === id
+      (e) => e?.enforcement_id === id || e?.enforcement_sighting_id === id || e?.id === id
     );
-    if (
-      enforcement &&
-      typeof enforcement.latitude === 'number' &&
-      typeof enforcement.longitude === 'number' &&
-      Number.isFinite(enforcement.latitude) &&
-      Number.isFinite(enforcement.longitude)
-    ) {
-      return {
-        lat: enforcement.latitude,
-        lng: enforcement.longitude,
-        source: 'enforcement',
-        observedAt: enforcement.enforcement_report_time ?? enforcement.sighting_time ?? null,
-      };
+    if (enforcement) {
+      const lat = Number(enforcement.latitude);
+      const lng = Number(enforcement.longitude);
+      if (Number.isFinite(lat) && Number.isFinite(lng)) {
+        return {
+          lat,
+          lng,
+          source: 'enforcement',
+          observedAt: enforcement.enforcement_report_time ?? enforcement.sighting_time ?? null,
+        };
+      }
     }
 
     return null;
@@ -86,22 +83,30 @@ function AlertPageInner() {
   const isBusy = ticketsLoading || ticketsFetching || enforcementLoading || enforcementFetching;
   const effectiveError = null;
 
+  // Debug logging to trace alert resolution
   // Capture the found location and swap the URL once
   useEffect(() => {
     if (!location || lockedLocation) return;
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setLockedLocation(location);
-    requestAnimationFrame(() => {
-      try {
-        window.history.replaceState(null, '', '/');
-      } catch {
-        // ignore
-      }
-    });
   }, [location, lockedLocation]);
 
   const markerLocation = lockedLocation ?? location ?? null;
   const shouldShowNotFound = !isBusy && !markerLocation;
+
+  // Once we have a marker (or know there is none), replace the URL to home without navigating
+  useEffect(() => {
+    if (urlSwappedRef.current) return;
+    if (!markerLocation && isBusy) return;
+    requestAnimationFrame(() => {
+      try {
+        window.history.replaceState(null, '', '/');
+        urlSwappedRef.current = true;
+      } catch {
+        // ignore
+      }
+    });
+  }, [markerLocation, isBusy]);
 
   return (
     <>

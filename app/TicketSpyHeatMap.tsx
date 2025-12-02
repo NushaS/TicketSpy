@@ -89,7 +89,7 @@ const TicketSpyHeatMap: React.FC<TicketSpyHeatMapProps> = ({
       setMapZoom(17);
     }
     if (alertMarker) setShowAlertPopup(true);
-  }, [initialCenter]);
+  }, [initialCenter, alertMarker]);
 
   // Add a transient enforcement marker that auto-removes after `ttlMs` (default 1 hour)
   const addTransientEnforcement = (lat: number, lng: number, ttlMs = 1000 * 60 * 60) => {
@@ -117,7 +117,7 @@ const TicketSpyHeatMap: React.FC<TicketSpyHeatMapProps> = ({
   const { data: ticketRows = [], refetch: refetchTickets } = useTicketTable(serverFilters as any);
   const { refetch: refetchParkingSessions } = useUserParkingSessions(userId || '');
   const { refetch: refetchBookMarks } = useUserBookmarkedLocations(userId || '');
-  const { data: enforcementRows = [], refetch: refetchEnforcement } = useEnforcementSightingTable();
+  const { refetch: refetchEnforcement } = useEnforcementSightingTable();
 
   // apply remaining filters client-side (weekday / time-of-day) against rows returned
   // from the server-side query above
@@ -484,13 +484,22 @@ const TicketSpyHeatMap: React.FC<TicketSpyHeatMapProps> = ({
           />
         </div>
         <Map
-          initialViewState={initialViewState}
+          key={
+            alertMarker
+              ? `${alertMarker.lat}-${alertMarker.lng}-${alertMarker.kind ?? 'alert'}`
+              : 'base-map'
+          }
+          initialViewState={
+            initialCenter
+              ? { longitude: initialCenter.lng, latitude: initialCenter.lat, zoom: 17 }
+              : initialViewState
+          }
           style={{ width: '100%', height: '100%' }}
           mapStyle={mapStyleURL}
           onMove={(e) => {
             try {
               setMapZoom(e.viewState?.zoom ?? mapZoom);
-            } catch (err) {
+            } catch {
               // ignore
             }
           }}
@@ -501,7 +510,7 @@ const TicketSpyHeatMap: React.FC<TicketSpyHeatMapProps> = ({
             };
             try {
               map.setPaintProperty?.('background', 'background-color', '#e6f7ff');
-            } catch (err) {
+            } catch {
               // ignore if background layer not present or setPaintProperty fails
             }
           }}
@@ -513,6 +522,46 @@ const TicketSpyHeatMap: React.FC<TicketSpyHeatMapProps> = ({
           <Source id="tickets" type="geojson" data={geoJsonData}>
             <Layer {...adjustableHeatmap} />
           </Source>
+          {/* Alert marker (from /alert deep link) */}
+          {alertMarker && (
+            <>
+              <Marker longitude={alertMarker.lng} latitude={alertMarker.lat} anchor="bottom">
+                <div className={styles.mapMarkerWrapper} title={alertMarker.label ?? 'Alert'}>
+                  {alertMarker.icon ?? (
+                    <svg
+                      viewBox="0 0 24 24"
+                      className={styles.mapMarkerSvg}
+                      style={{ fill: '#e11d48' }}
+                    >
+                      <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" />
+                      <circle cx="12" cy="9" r="2.5" fill="#fff" />
+                    </svg>
+                  )}
+                </div>
+              </Marker>
+              {showAlertPopup && (
+                <Popup
+                  longitude={alertMarker.lng}
+                  latitude={alertMarker.lat}
+                  anchor="top"
+                  onClose={() => setShowAlertPopup(false)}
+                  closeButton
+                  closeOnClick={false}
+                >
+                  <div style={{ maxWidth: 220 }}>
+                    <strong>
+                      {alertMarker.kind === 'enforcement'
+                        ? 'Parking enforcement spotted'
+                        : 'Ticket'}
+                    </strong>
+                    {alertMarker.label ? (
+                      <div style={{ marginTop: 4 }}>{alertMarker.label}</div>
+                    ) : null}
+                  </div>
+                </Popup>
+              )}
+            </>
+          )}
           {pinLocation && (
             <Marker longitude={pinLocation.lng} latitude={pinLocation.lat} anchor="bottom">
               <div className={styles.mapMarkerWrapper}>

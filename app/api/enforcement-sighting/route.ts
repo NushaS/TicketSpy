@@ -42,7 +42,9 @@ export async function POST(req: Request) {
   try {
     const alertId =
       data?.enforcement_id ?? (data as any)?.enforcement_sighting_id ?? (data as any)?.id ?? null;
-    await notifyUsers(latitude, longitude, alertId ?? undefined);
+    const observedAtIso =
+      sighting_time || observedAt ? new Date(sighting_time || observedAt).toISOString() : undefined;
+    await notifyUsers(latitude, longitude, observedAtIso, alertId ?? undefined);
   } catch (err) {
     console.error('Failed to notify users for enforcement sighting:', err);
   }

@@ -24,7 +24,7 @@ const BOOKMARK_BODY =
 const PARKING_BODY =
   'There was a ticket or parking enforcement officer reported near your parking spot';
 
-function EmailBody({ body, latitude, longitude, alertUrl, bookmarkIds }: EmailTemplateProps) {
+function EmailBody({ body, alertUrl, bookmarkIds }: EmailTemplateProps) {
   return (
     <div style={{ fontFamily: 'system-ui, -apple-system, "Segoe UI", Roboto, sans-serif' }}>
       <h1 style={{ fontSize: '18px', margin: '8px 0' }}>{body}</h1>
@@ -76,8 +76,6 @@ export async function sendNotificationEmail({
   to,
   subject,
   kind = 'parking',
-  latitude,
-  longitude,
   alertId,
   bookmarkIds,
 }: SendEmailParams) {
@@ -91,13 +89,7 @@ export async function sendNotificationEmail({
 
   const react =
     kind === 'bookmark' ? (
-      <EmailBody
-        body={body}
-        latitude={latitude ?? null}
-        longitude={longitude ?? null}
-        alertUrl={alertUrl}
-        bookmarkIds={bookmarkIds}
-      />
+      <EmailBody body={body} alertUrl={alertUrl} bookmarkIds={bookmarkIds} />
     ) : (
       <EmailBody body={body} alertUrl={alertUrl} />
     );
