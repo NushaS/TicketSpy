@@ -4,7 +4,10 @@
 
 import React, { useState } from 'react';
 import { Marker } from 'react-map-gl/maplibre';
-import { X, Trash2 } from 'lucide-react';
+import { FaCheck, FaTrash, FaTimes } from 'react-icons/fa';
+import { CarIcon2 } from '../ui/icons/car-icon';
+import { HeartIcon } from '../ui/icons/heart-icon';
+import styles from '@/app/bookmark-and-parking-pins/pins.module.css';
 
 // The expected props for the MapPin component:
 interface MapPinProps {
@@ -15,6 +18,8 @@ interface MapPinProps {
   id: string;
   userId: string;
   onDelete?: () => void;
+  onConvertToParking?: () => void;
+  onConvertToBookmark?: () => void;
 }
 
 // Renders a single map pin using the Marker component
@@ -26,34 +31,122 @@ export const MapPin: React.FC<MapPinProps> = ({
   id,
   userId,
   onDelete,
+  onConvertToParking,
+  onConvertToBookmark,
 }) => {
   const [isDeleting, setIsDeleting] = useState(false);
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [isConverting, setIsConverting] = useState(false);
+  const [showBookmarkActionsModal, setShowBookmarkActionsModal] = useState(false);
+  const [showEndParkingModal, setShowEndParkingModal] = useState(false);
+  const [showBookmarkConversionModal, setShowBookmarkConversionModal] = useState(false);
+
+  // Deletes bookmark or parking session
+  const deletePin = async (pinType: 'car' | 'heart') => {
+    // choose api endpoint based on pin type
+    const endpoint = pinType === 'car' ? '/api/delete-parking-session' : '/api/delete-bookmark';
+    const response = await fetch(`${endpoint}?id=${id}&user_id=${userId}`, { method: 'DELETE' });
+    if (!response.ok) {
+      const result = await response.json();
+      throw new Error(result.error || 'Delete failed');
+    }
+  };
 
   const handleDelete = async () => {
     if (isDeleting) return;
-
     setIsDeleting(true);
     try {
-      const endpoint = type === 'car' ? '/api/delete-parking-session' : '/api/delete-bookmark';
-
-      const response = await fetch(`${endpoint}?id=${id}&user_id=${userId}`, {
-        method: 'DELETE',
-      });
-
-      if (response.ok) {
-        setShowDeleteModal(false);
-        onDelete?.();
-      } else {
-        const result = await response.json();
-        console.error('Delete failed:', result.error);
-        alert('Failed to delete item. Please try again.');
-      }
+      await deletePin(type); // uses the new helper
+      setShowBookmarkActionsModal(false);
+      setShowBookmarkConversionModal(false);
+      setShowEndParkingModal(false);
+      onDelete?.();
     } catch (error) {
       console.error('Error deleting:', error);
-      alert('Network error. Please try again.');
+      alert('Failed to delete item. Please try again.');
     } finally {
       setIsDeleting(false);
+    }
+  };
+
+  // Convert bookmark -> parking session
+  const handleConvertToParking = async () => {
+    if (isConverting) return;
+
+    setIsConverting(true);
+    try {
+      // delete bookmark
+      await deletePin('heart');
+      // create parking session at same location
+      const parkingResponse = await fetch('/api/new-parking-session', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          user_id: userId,
+          longitude,
+          latitude,
+        }),
+      });
+
+      if (!parkingResponse.ok) {
+        throw new Error('Failed to create parking session');
+      }
+
+      setShowBookmarkActionsModal(false);
+      onConvertToParking?.();
+    } catch (error) {
+      console.error('Error converting:', error);
+      alert('Failed to convert bookmark to parking. Please try again.');
+    } finally {
+      setIsConverting(false);
+    }
+  };
+
+  // Convert parking -> bookmark
+  const handleConvertToBookmark = async () => {
+    if (isConverting) return;
+
+    setIsConverting(true);
+    try {
+      // delete parking session
+      await deletePin('car');
+
+      // create a bookmark at same location
+      const bookmarkResponse = await fetch('/api/bookmark-location', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          user_id: userId,
+          longitude,
+          latitude,
+        }),
+      });
+
+      if (!bookmarkResponse.ok) {
+        throw new Error('Failed to create bookmark');
+      }
+
+      setShowBookmarkConversionModal(false);
+      setShowEndParkingModal(false);
+      onConvertToBookmark?.();
+    } catch (error) {
+      console.error('Error converting:', error);
+      alert('Failed to convert parking to bookmark. Please try again.');
+    } finally {
+      setIsConverting(false);
+    }
+  };
+
+  const handlePinClick = () => {
+    if (type === 'heart') {
+      // for bookmarks, show bookmark action options (delete or park)
+      setShowBookmarkActionsModal(true);
+    } else {
+      // for parking sessions, give option to end the parking session
+      setShowEndParkingModal(true);
     }
   };
 
@@ -61,135 +154,107 @@ export const MapPin: React.FC<MapPinProps> = ({
     <>
       <Marker longitude={longitude} latitude={latitude} anchor="bottom">
         <div
-          style={{
-            cursor: isDeleting ? 'not-allowed' : 'pointer',
-            opacity: isDeleting ? 0.5 : 1,
-            transition: 'opacity 0.2s ease-in-out',
-          }}
+          className={`${styles.markerWrapper} ${isDeleting || isConverting ? styles.disabled : ''}`}
           onClick={(e) => {
             e.stopPropagation();
-            setShowDeleteModal(true);
+            handlePinClick();
           }}
-          title={`Click to delete ${type === 'car' ? 'parking location' : 'bookmark'}`}
+          title={`Click to ${type === 'car' ? 'end parking session' : 'manage bookmark'}`}
         >
           {icon}
         </div>
       </Marker>
 
-      {/* Delete Confirmation Modal */}
-      {showDeleteModal && (
-        <div
-          style={{
-            position: 'fixed',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            backgroundColor: 'rgba(0, 0, 0, 0.5)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            zIndex: 9999,
-          }}
-          onClick={() => setShowDeleteModal(false)}
-        >
-          <div
-            style={{
-              backgroundColor: 'white',
-              padding: '24px',
-              borderRadius: '8px',
-              boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-              maxWidth: '400px',
-              width: '90%',
-            }}
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div
-              style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                marginBottom: '16px',
-              }}
+      {/* Parking Info Modal (only for parking sessions) */}
+      {showEndParkingModal && type === 'car' && (
+        <div className={styles.modalOverlay} onClick={() => setShowEndParkingModal(false)}>
+          <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
+            <button
+              className={styles.modalCloseButton}
+              onClick={() => setShowEndParkingModal(false)}
             >
-              <h3
-                style={{
-                  margin: 0,
-                  fontSize: '18px',
-                  fontWeight: '600',
-                  color: '#1f2937',
-                }}
-              >
-                Delete {type === 'car' ? 'Parking Location' : 'Bookmark'}
-              </h3>
+              <FaTimes size={22} />
+            </button>
+
+            <p className={styles.modalBody}>you have a parking session here</p>
+
+            <button
+              onClick={() => {
+                setShowEndParkingModal(false);
+                setShowBookmarkConversionModal(true);
+              }}
+              className={styles.parkingButtonVariant}
+            >
+              <CarIcon2 />
+              end parking
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Bookmark Conversion Modal (after ending parking) */}
+      {showBookmarkConversionModal && (
+        <div className={styles.modalOverlay} onClick={() => setShowBookmarkConversionModal(false)}>
+          <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
+            <button
+              className={styles.modalCloseButton}
+              onClick={() => setShowBookmarkConversionModal(false)}
+            >
+              <FaTimes size={22} />
+            </button>
+
+            <span className={styles.modalBodyWithIcon}>
+              <HeartIcon size={16} />
+              do you want to bookmark this location?
+            </span>
+
+            <div className={styles.yesNoButtonGroup}>
+              <button onClick={handleDelete} disabled={isDeleting} className={styles.noButton}>
+                <FaTimes />
+                {isDeleting ? 'ending...' : 'no'}
+              </button>
+
               <button
-                onClick={() => setShowDeleteModal(false)}
-                style={{
-                  background: 'none',
-                  border: 'none',
-                  cursor: 'pointer',
-                  padding: '4px',
-                  borderRadius: '4px',
-                  color: '#6b7280',
-                }}
+                onClick={handleConvertToBookmark}
+                disabled={isConverting}
+                className={styles.yesButton}
               >
-                <X size={20} />
+                <FaCheck />
+                {isConverting ? 'saving...' : 'yes'}
               </button>
             </div>
+          </div>
+        </div>
+      )}
 
-            <p
-              style={{
-                margin: '0 0 20px 0',
-                fontSize: '14px',
-                color: '#4b5563',
-                lineHeight: '1.5',
+      {/* Bookmark Actions Modal (only for bookmarks) */}
+      {showBookmarkActionsModal && type === 'heart' && (
+        <div className={styles.modalOverlay} onClick={() => setShowBookmarkActionsModal(false)}>
+          <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
+            <button
+              className={styles.modalCloseButton}
+              onClick={(e) => {
+                setShowBookmarkActionsModal(false);
               }}
             >
-              Are you sure you want to delete this{' '}
-              {type === 'car' ? 'parking location' : 'bookmark'}? This action cannot be undone.
-            </p>
-
-            <div
-              style={{
-                display: 'flex',
-                gap: '12px',
-                justifyContent: 'flex-end',
-              }}
-            >
-              <button
-                onClick={() => setShowDeleteModal(false)}
-                style={{
-                  padding: '8px 16px',
-                  border: '1px solid #d1d5db',
-                  backgroundColor: 'white',
-                  color: '#374151',
-                  borderRadius: '6px',
-                  cursor: 'pointer',
-                  fontSize: '14px',
-                  fontWeight: '500',
-                }}
-              >
-                Cancel
-              </button>
+              <FaTimes size={22} />
+            </button>
+            <div className={styles.modalButtonGroup}>
               <button
                 onClick={handleDelete}
                 disabled={isDeleting}
-                style={{
-                  padding: '8px 16px',
-                  border: 'none',
-                  backgroundColor: isDeleting ? '#9ca3af' : '#dc2626',
-                  color: 'white',
-                  borderRadius: '6px',
-                  cursor: isDeleting ? 'not-allowed' : 'pointer',
-                  fontSize: '14px',
-                  fontWeight: '500',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '6px',
-                }}
+                className={styles.bookmarkButtonVariant}
               >
-                <Trash2 size={16} />
-                {isDeleting ? 'Deleting...' : 'Delete'}
+                <FaTrash />
+                {isDeleting ? 'deleting...' : 'delete bookmark'}
+              </button>
+              <button
+                onClick={handleConvertToParking}
+                disabled={isConverting}
+                className={styles.parkingButtonVariant}
+              >
+                <CarIcon2 />
+                {isConverting ? 'saving...' : 'just parked here'}
               </button>
             </div>
           </div>
