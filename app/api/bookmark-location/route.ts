@@ -21,7 +21,6 @@ export async function POST(req: Request) {
 
   // 2) Insert using admin client
   const sb = createAdminClient();
-  await sb.from('bookmarked_locations').delete().eq('user_id', user_id);
 
   const { data, error } = await sb
     .from('bookmarked_locations')

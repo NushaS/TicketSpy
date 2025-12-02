@@ -51,7 +51,12 @@ export async function POST(req: Request) {
   // 3) Trigger nearby parking session check server-side
   if (typeof latitude === 'number' && typeof longitude === 'number') {
     try {
-      await notifyUsers(latitude, longitude, ticket_report_timestamp ?? new Date().toISOString());
+      await notifyUsers(
+        latitude,
+        longitude,
+        ticket_report_timestamp ?? new Date().toISOString(),
+        data.ticket_id
+      );
     } catch (err) {
       console.error('Failed to log nearby parking sessions:', err);
     }
