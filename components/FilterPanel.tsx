@@ -72,7 +72,7 @@ export default function FilterPanel({ visible, onClose, onApply, initialFilters 
 
         <div className={styles.filterPanelBody}>
           <section className={styles.filterSection}>
-            <h4>Time range (e.g., last)</h4>
+            <h4>Time range</h4>
             <div>
               <label>
                 <input
