@@ -25,6 +25,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
+    // Update the public users table for the authenticated user only
     const updatePayload: Record<string, unknown> = {
       parking_notifications_on: parking,
       bookmark_notifications_on: bookmark,
@@ -32,16 +33,11 @@ export async function POST(request: Request) {
     if (notification_distance_miles !== undefined) {
       updatePayload.notification_distance_miles = notification_distance_miles;
     }
-    const { error } = await supabaseAdmin.from('users').update(updatePayload).eq('user_id', userId);
 
-    // Update the public users table
-    const { error } = await supabaseAdmin
+    const { error } = await supabase
       .from('users')
-      .update({
-        parking_notifications_on: parking,
-        bookmark_notifications_on: bookmark,
-      })
-      .eq('user_id', userId);
+      .update(updatePayload)
+      .eq('user_id', data.user.id);
 
     if (error) {
       console.error('Error updating notifications:', error);

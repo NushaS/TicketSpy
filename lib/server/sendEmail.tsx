@@ -7,35 +7,61 @@ type SendEmailParams = {
   kind?: 'parking' | 'bookmark';
   latitude?: number;
   longitude?: number;
+  alertId?: string; // id to deep link the user to /alert?id=...
+  bookmarkIds?: string[]; // optional list of bookmark ids affected
 };
 
 interface EmailTemplateProps {
   body: string;
   latitude?: number | null;
   longitude?: number | null;
+  alertUrl?: string | null;
+  bookmarkIds?: string[];
 }
 
 const BOOKMARK_BODY =
-  'There was a ticket or parking enforcement officer reported near one of your bookmarks';
+  'There was a ticket or parking enforcement officer reported near your bookmarks';
 const PARKING_BODY =
   'There was a ticket or parking enforcement officer reported near your parking spot';
 
-function EmailBody({ body, latitude, longitude }: EmailTemplateProps) {
+function EmailBody({ body, latitude, longitude, alertUrl, bookmarkIds }: EmailTemplateProps) {
   return (
     <div style={{ fontFamily: 'system-ui, -apple-system, "Segoe UI", Roboto, sans-serif' }}>
       <h1 style={{ fontSize: '18px', margin: '8px 0' }}>{body}</h1>
 
-      {/* Show coordinates only when provided (useful for bookmarked locations) */}
-      {typeof latitude === 'number' && typeof longitude === 'number' && (
-        <div style={{ marginTop: '8px', fontSize: '14px' }}>
-          <strong>Location of your bookmarked spot:</strong>
-          <div>Latitude: {latitude.toFixed(6)}</div>
-          <div>Longitude: {longitude.toFixed(6)}</div>
-        </div>
-      )}
       <p style={{ marginTop: '12px', fontSize: '13px', color: '#555' }}>
         Please check the area if this affects you.
       </p>
+      {Array.isArray(bookmarkIds) && bookmarkIds.length > 0 && (
+        <div style={{ marginTop: '10px', fontSize: '13px', color: '#222' }}>
+          <div style={{ fontWeight: 600, marginBottom: 4 }}>Affected bookmarks:</div>
+          <ul style={{ paddingLeft: '18px', margin: 0 }}>
+            {bookmarkIds.map((id) => (
+              <li key={id} style={{ marginBottom: 2 }}>
+                {id}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+      {alertUrl && (
+        <p style={{ marginTop: '10px' }}>
+          <a
+            href={alertUrl}
+            style={{
+              display: 'inline-block',
+              padding: '10px 14px',
+              borderRadius: '6px',
+              background: '#2563eb',
+              color: 'white',
+              textDecoration: 'none',
+              fontWeight: 600,
+            }}
+          >
+            View on map
+          </a>
+        </p>
+      )}
     </div>
   );
 }
@@ -52,18 +78,28 @@ export async function sendNotificationEmail({
   kind = 'parking',
   latitude,
   longitude,
+  alertId,
+  bookmarkIds,
 }: SendEmailParams) {
   const resend = getResendClient();
   const from = 'TicketSpy <no-reply@ticketspy.org>'; // ticketspy.app DOMAIN VERIFIED! no-reply email allowed
 
   // choose template and default subject based on kind
   const body = kind === 'bookmark' ? BOOKMARK_BODY : PARKING_BODY;
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000';
+  const alertUrl = alertId ? `${baseUrl.replace(/\/$/, '')}/alert?id=${alertId}` : null;
 
   const react =
     kind === 'bookmark' ? (
-      <EmailBody body={body} latitude={latitude ?? null} longitude={longitude ?? null} />
+      <EmailBody
+        body={body}
+        latitude={latitude ?? null}
+        longitude={longitude ?? null}
+        alertUrl={alertUrl}
+        bookmarkIds={bookmarkIds}
+      />
     ) : (
-      <EmailBody body={body} />
+      <EmailBody body={body} alertUrl={alertUrl} />
     );
 
   const defaultSubject =
