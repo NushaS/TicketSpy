@@ -334,6 +334,12 @@ const TicketSpyHeatMap: React.FC<TicketSpyHeatMapProps> = ({
       }))
     );
 
+    // Refetch bookmarks and parking sessions when called
+    const handlePinChange = () => {
+      refetchBookMarks();
+      refetchParkingSessions();
+    };
+
     const allPins = [...bookmarkPoints, ...carPoints];
     // render each point as a MapPin with the corresponding icon
     return (
@@ -347,11 +353,9 @@ const TicketSpyHeatMap: React.FC<TicketSpyHeatMapProps> = ({
             type={point.type}
             id={point.id}
             userId={userId}
-            onDelete={() => {
-              // Refetch both bookmarks and parking sessions when any item is deleted
-              refetchBookMarks();
-              refetchParkingSessions();
-            }}
+            onDelete={handlePinChange}
+            onConvertToParking={handlePinChange}
+            onConvertToBookmark={handlePinChange}
           />
         ))}
       </>
