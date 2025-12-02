@@ -59,29 +59,31 @@ export const heatmapLayer: LayerProps = {
     // slightly stronger intensity scaling with zoom so clusters darken more at high zoom
     'heatmap-intensity': ['interpolate', ['linear'], ['zoom'], 0, 0.8, 12, 1.6, 18, 2.4],
 
-    // color ramp: transparent -> cool desaturated blue -> warm pink -> vivid red
+    // color ramp: transparent -> soft blue -> warm peach -> amber/yellow edges -> restrained red core
     'heatmap-color': [
       'interpolate',
       ['linear'],
       ['heatmap-density'],
       0,
       'rgba(255,255,255,0)', // transparent at zero
-      0.06,
-      'rgba(210,235,255,0.22)', // faint cool hint
-      0.18,
-      'rgba(180,205,255,0.30)', // airy blue
-      0.35,
-      'rgba(246,178,190,0.58)', // slightly pinker mid
-      0.55,
-      'rgba(249,125,140,0.82)', // warm pink
-      0.85,
-      'rgba(220,70,50,0.88)', // vivid orange-red
+      0.05,
+      'rgba(215,232,255,0.2)', // faint cool hint
+      0.16,
+      'rgba(184,210,255,0.32)', // airy blue
+      0.32,
+      'rgba(246,187,176,0.55)', // peachy mid
+      0.48,
+      'rgba(248,206,120,0.7)', // amber/yellow edge to feel more "heatmap"
+      0.68,
+      'rgba(244,152,104,0.82)', // warm orange core
+      0.9,
+      'rgba(200,60,60,0.88)', // restrained red
       1,
-      'rgba(140,18,36,0.96)', // deep red at max density
+      'rgba(140,30,45,0.95)', // deep red at max density
     ],
 
     // radius tuned for smooth blending but still localized
-    'heatmap-radius': ['interpolate', ['linear'], ['zoom'], 0, 6, 12, 22, 18, 36],
+    'heatmap-radius': ['interpolate', ['linear'], ['zoom'], 0, 7, 12, 24, 18, 38],
 
     // overall opacity curve (UI slider will multiply on top of this)
     'heatmap-opacity': ['interpolate', ['linear'], ['zoom'], 0, 0.55, 8, 0.48, 15, 0.38],

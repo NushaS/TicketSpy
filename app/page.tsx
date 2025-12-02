@@ -10,9 +10,9 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import styles from './page.module.css';
-import { CarIcon, CarIcon2 } from '../components/ui/icons/car-icon';
+import { CarIcon, CarIcon2, CarIcon3 } from '../components/ui/icons/car-icon';
 import { ProfileIcon } from '../components/ui/icons/profile-icon';
-import { HeartIcon } from '../components/ui/icons/heart-icon';
+import { HeartIcon, HeartIcon2 } from '../components/ui/icons/heart-icon';
 import { TicketIcon2 } from '@/components/ui/icons/ticket-icon';
 import { SightingIcon } from '@/components/ui/icons/sighting-icon';
 import { MapPin } from '../components/map/MapPin';
@@ -42,6 +42,7 @@ const TicketSpyHeatMap: React.FC = () => {
   const [reportLocation, setReportLocation] = useState<{ lng: number; lat: number } | null>(null);
   const [username, setUsername] = useState<string | null>(null);
   const [showSuccessToast, setShowSuccessToast] = useState(false);
+  const [successMessage, setSuccessMessage] = useState('');
   const [showErrorToast, setShowErrorToast] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [showEnforcementSuccessToast, setShowEnforcementSuccessToast] = useState(false);
@@ -211,13 +212,18 @@ const TicketSpyHeatMap: React.FC = () => {
         }),
       });
 
+      const result = await response.json().catch(() => null);
+
       if (response.ok) {
         refetchBookMarks();
+        setSuccessMessage('Location bookmarked successfully!');
         setShowSuccessToast(true);
         setTimeout(() => setShowSuccessToast(false), 3000);
       } else {
-        const result = await response.json();
-        setErrorMessage(result.error || 'Failed to bookmark location');
+        const msg =
+          (result as any)?.error ||
+          (response.status ? `Failed to bookmark location (status ${response.status})` : null);
+        setErrorMessage(msg || 'Failed to bookmark location');
         setShowErrorToast(true);
         setTimeout(() => setShowErrorToast(false), 3000);
       }
@@ -250,6 +256,7 @@ const TicketSpyHeatMap: React.FC = () => {
 
       if (response.ok) {
         refetchParkingSessions();
+        setSuccessMessage('Parking session started successfully!');
         setShowSuccessToast(true);
         setTimeout(() => setShowSuccessToast(false), 3000);
       } else {
@@ -305,7 +312,7 @@ const TicketSpyHeatMap: React.FC = () => {
             key={i}
             latitude={point.latitude}
             longitude={point.longitude}
-            icon={point.type === 'car' ? <CarIcon /> : <HeartIcon />}
+            icon={point.type === 'car' ? <CarIcon3 /> : <HeartIcon2 />}
             type={point.type}
             id={point.id}
             userId={userId}
@@ -328,7 +335,7 @@ const TicketSpyHeatMap: React.FC = () => {
       {showSuccessToast && (
         <div className={styles.successToast}>
           <Check size={20} />
-          <span>Ticket reported successfully!</span>
+          <span>{successMessage || 'Success'}</span>
         </div>
       )}
       {/* Error Toast */}
@@ -349,6 +356,7 @@ const TicketSpyHeatMap: React.FC = () => {
             priority
             className={styles.logo}
           />
+          <span className={styles.logoTagline}>park easy.</span>
         </div>
 
         <div className={styles.buttonGroup}>
@@ -366,7 +374,7 @@ const TicketSpyHeatMap: React.FC = () => {
           {/* Check if user is logged in */}
           {isLoggedIn ? (
             <Link href="profile-settings/" className={styles.profileButtonGroup}>
-              <ProfileIcon size={46} />
+              <ProfileIcon size={35} />
               <span>{username}</span>
             </Link>
           ) : (
@@ -412,11 +420,12 @@ const TicketSpyHeatMap: React.FC = () => {
             position: 'absolute',
             top: '1.9rem',
             left: 18,
-            background: 'rgba(255,255,255,0.9)',
+            background: 'rgba(255, 255, 255, 0.68)',
             padding: '8px 10px',
-            borderRadius: 8,
+            borderRadius: 10,
             zIndex: 1000,
-            boxShadow: '0 2px 6px rgba(0,0,0,0.12)',
+            boxShadow: '0 6px 14px rgba(15, 23, 42, 0.14)',
+            backdropFilter: 'blur(6px)',
             display: 'flex',
             flexDirection: 'column',
             gap: 6,
@@ -672,7 +681,7 @@ const TicketSpyHeatMap: React.FC = () => {
                   </button>
 
                   <button className={styles.parkingSessionButton} onClick={handleParkingSession}>
-                    <CarIcon2 />
+                    <CarIcon2 size={46} />
                     <span>just parked here</span>
                   </button>
                 </div>
@@ -793,6 +802,7 @@ const TicketSpyHeatMap: React.FC = () => {
                     // Refresh the heatmap data to show the new ticket
                     refetchTickets();
                     // Show success toast
+                    setSuccessMessage('Ticket reported successfully!');
                     setShowSuccessToast(true);
                     setTimeout(() => setShowSuccessToast(false), 3000);
                   } else {
@@ -888,9 +898,10 @@ const TicketSpyHeatMap: React.FC = () => {
               Confirm parking enforcement officer sighting?
             </h2>
 
-            <p style={{ marginTop: 8 }}>
-              Are you sure you want to report a parking enforcement officer at (
-              {enforcementLocation.lat.toFixed(5)}, {enforcementLocation.lng.toFixed(5)})?
+            <p style={{ marginTop: 8, textAlign: 'center' }}>
+              Confirm that you would like to report a parking enforcement officer at the selected
+              location (within the past 10 minutes)?
+              <br />({enforcementLocation.lat.toFixed(5)}, {enforcementLocation.lng.toFixed(5)})
             </p>
 
             <div style={{ display: 'flex', gap: 12, marginTop: 18, justifyContent: 'center' }}>
@@ -901,7 +912,7 @@ const TicketSpyHeatMap: React.FC = () => {
                   setEnforcementLocation(null);
                 }}
               >
-                <span style={{ marginRight: 8 }}>✖</span>
+                <span>✖</span>
                 no
               </button>
 
@@ -962,9 +973,7 @@ const TicketSpyHeatMap: React.FC = () => {
                 disabled={enforcementSubmitting}
               >
                 <Check size={18} />
-                <span style={{ marginLeft: 8 }}>
-                  {enforcementSubmitting ? 'Submitting...' : 'Yes, report'}
-                </span>
+                <span>{enforcementSubmitting ? 'submitting...' : 'confirm'}</span>
               </button>
             </div>
           </div>
