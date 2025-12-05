@@ -94,7 +94,6 @@ function AlertPageInner() {
   const markerLocation = lockedLocation ?? location ?? null;
   const shouldShowNotFound = !isBusy && !markerLocation;
 
-  // Once we have a marker (or know there is none), replace the URL to home without navigating
   useEffect(() => {
     if (urlSwappedRef.current) return;
     if (!markerLocation && isBusy) return;
