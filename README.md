@@ -104,6 +104,21 @@ Leonardo Paredes
 
 - [Living document](https://docs.google.com/document/d/1yHUFKiWZ9WVeeeol_CF2iBfmA2T_carpx6tqQ4-J_iM/edit?usp=sharing)
 
+## DISCLAIMER
+Security & Privacy Note
+
+TicketSpy does not expose sensitive or private information.
+Parking enforcement vehicles are already public, highly visible, and deliberately marked so the public can see them. 
+The app simply allows users to share information that is already observable in public spaces.
+
+TicketSpy does not track individual users and does not provide tools for evading law enforcement. 
+Reports are crowdsourced from voluntary user submissions and may be inaccurate or incomplete. Always follow local parking laws regardless of what the map shows.
+
+If you're concerned about your own privacy:
+- Location sharing is opt-in.
+- You can delete your account at any time.
+- All user-generated data is tied only to your Supabase user ID and is removed if you delete your account (via ON DELETE CASCADE).
+
 ## Testing
 
 added husky to do pre-push testing locally
