@@ -7,7 +7,7 @@ type TicketResult = {
   id?: number;
   latitude: number;
   longitude: number;
-  violation_type: string | null;
+  ticket_violation_type: string | null; // TODO: update to ViolationType enum
   ticket_report_date: string | null;
   ticket_report_hour: string | null;
   // Add additional fields as needed
@@ -23,7 +23,7 @@ export default function TestTicketPage() {
   const mockTicket = {
     latitude: 47.6062,
     longitude: -122.3321,
-    violation_type: null,
+    ticket_violation_type: null,
     ticket_report_date: null,
     ticket_report_hour: null,
   };

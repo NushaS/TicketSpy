@@ -24,6 +24,7 @@ import { filterTickets, Filters } from '@/lib/utils/filterTickets';
 import { getGeoJsonData, heatmapLayer, initialViewState, mapStyleURL } from './heatmapConfig';
 import { useTicketTable } from '@/lib/hooks/useTicketTable';
 import { useEnforcementSightingTable } from '@/lib/hooks/useEnforcementSightingTable';
+import { violationEnumToUserLabels, ViolationType } from '@/lib/enums/ticketViolationType';
 
 type MapCenter = { lat: number; lng: number };
 
@@ -50,7 +51,9 @@ const TicketSpyHeatMap: React.FC<TicketSpyHeatMapProps> = ({
   const [showTicketReportModal, setShowTicketReportModal] = useState(false);
   const [ticketDateIssued, setTicketDateIssued] = useState('');
   const [ticketTimeIssued, setTicketTimeIssued] = useState('');
-  const [ticketViolationType, setTicketViolationType] = useState('');
+  const [ticketViolationType, setTicketViolationType] = useState<ViolationType>(
+    ViolationType.Other
+  );
   const [reportLocation, setReportLocation] = useState<{ lng: number; lat: number } | null>(null);
   const [username, setUsername] = useState<string | null>(null);
   const [showSuccessToast, setShowSuccessToast] = useState(false);
@@ -834,6 +837,11 @@ const TicketSpyHeatMap: React.FC<TicketSpyHeatMapProps> = ({
           )}
         </>
       )}
+      {/* <TicketReportModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onSubmit={(violationType) => console.log('Submitted:', violationType)}
+      /> */}
       {/* Ticket Report Modal */}
       {showTicketReportModal && (
         <div className={styles.modalOverlay}>
@@ -843,7 +851,7 @@ const TicketSpyHeatMap: React.FC<TicketSpyHeatMapProps> = ({
                 setShowTicketReportModal(false);
                 setTicketDateIssued('');
                 setTicketTimeIssued('');
-                setTicketViolationType('');
+                setTicketViolationType(ViolationType.Other);
               }}
               className={styles.ticketReportCloseButton}
             >
@@ -862,7 +870,7 @@ const TicketSpyHeatMap: React.FC<TicketSpyHeatMapProps> = ({
                   ticket_report_date: ticketDateIssued,
                   ticket_report_hour: ticketTimeIssued,
                   username: username || 'Anonymous',
-                  violationType: ticketViolationType,
+                  ticket_violation_type: ticketViolationType as ViolationType,
                 };
 
                 try {
@@ -905,7 +913,7 @@ const TicketSpyHeatMap: React.FC<TicketSpyHeatMapProps> = ({
                 setShowTicketReportModal(false);
                 setTicketDateIssued('');
                 setTicketTimeIssued('');
-                setTicketViolationType('');
+                setTicketViolationType(ViolationType.Other);
                 setReportLocation(null);
               }}
               className={styles.ticketReportForm}
@@ -931,18 +939,26 @@ const TicketSpyHeatMap: React.FC<TicketSpyHeatMapProps> = ({
                   required
                 />
               </div>
-
               <div className={styles.ticketReportFormGroup}>
                 <label className={styles.ticketReportLabel}>Violation type:</label>
-                <input
-                  type="text"
+                <select
                   className={styles.ticketReportInput}
                   value={ticketViolationType}
-                  onChange={(e) => setTicketViolationType(e.target.value)}
+                  onChange={(e) => {
+                    const val = e.target.value as keyof typeof ViolationType;
+                    setTicketViolationType(ViolationType[val]);
+                    console.log('Value: ', val);
+                  }}
                   required
-                />
+                >
+                  {Object.values(ViolationType).map((type) => (
+                    <option key={type} value={type}>
+                      {/* NOTE: value (above) -> Whats ACTUALLY being submitted to Supabase*/}
+                      {violationEnumToUserLabels[type]}
+                    </option>
+                  ))}
+                </select>
               </div>
-
               <button type="submit" className={styles.ticketReportSubmitButton}>
                 <Check size={20} />
                 <span>Submit ticket report</span>
