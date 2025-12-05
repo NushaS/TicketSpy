@@ -21,6 +21,7 @@ Users can visit TicketSpy at https://ticketspy.vercel.app/.
 While TicketSpy is available to anyone with web browser access, some app features are only available to users who have signed in with an active TicketSpy account.
 
 ### Public Users
+#### DISCLAIMER: Please do not try to input a long username over 40 characters
 
 All TicketSpy users, regardless of whether they are signed in, can:
 
