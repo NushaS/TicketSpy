@@ -467,6 +467,7 @@ const TicketSpyHeatMap: React.FC<TicketSpyHeatMapProps> = ({
         longitude: Number(row.longitude),
         type: 'car',
         id: row.parking_session_id,
+        start_datetime: new Date(row.parking_session_start_datetime).toISOString(),
       }))
     );
 
@@ -490,6 +491,7 @@ const TicketSpyHeatMap: React.FC<TicketSpyHeatMapProps> = ({
             id={point.id}
             userId={userId}
             {...(point.type === 'heart' ? { bookmarkName: point.name } : {})}
+            {...(point.type === 'car' ? { startTime: point.start_datetime } : {})}
             onDelete={handlePinChange}
             onConvertToParking={handlePinChange}
             onConvertToBookmark={handlePinChange}
