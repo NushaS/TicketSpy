@@ -8,7 +8,7 @@ type SendEmailParams = {
   latitude?: number;
   longitude?: number;
   alertId?: string; // id to deep link the user to /alert?id=...
-  bookmarkIds?: string[]; // optional list of bookmark ids affected
+  bookmarkNames?: string[]; // optional list of bookmark names affected
 };
 
 interface EmailTemplateProps {
@@ -16,7 +16,7 @@ interface EmailTemplateProps {
   latitude?: number | null;
   longitude?: number | null;
   alertUrl?: string | null;
-  bookmarkIds?: string[];
+  bookmarkNames?: string[];
 }
 
 const BOOKMARK_BODY =
@@ -24,7 +24,7 @@ const BOOKMARK_BODY =
 const PARKING_BODY =
   'There was a ticket or parking enforcement officer reported near your parking spot';
 
-function EmailBody({ body, alertUrl, bookmarkIds }: EmailTemplateProps) {
+function EmailBody({ body, alertUrl, bookmarkNames }: EmailTemplateProps) {
   return (
     <div style={{ fontFamily: 'system-ui, -apple-system, "Segoe UI", Roboto, sans-serif' }}>
       <h1 style={{ fontSize: '18px', margin: '8px 0' }}>{body}</h1>
@@ -32,13 +32,13 @@ function EmailBody({ body, alertUrl, bookmarkIds }: EmailTemplateProps) {
       <p style={{ marginTop: '12px', fontSize: '13px', color: '#555' }}>
         Please check the area if this affects you.
       </p>
-      {Array.isArray(bookmarkIds) && bookmarkIds.length > 0 && (
+      {Array.isArray(bookmarkNames) && bookmarkNames.length > 0 && (
         <div style={{ marginTop: '10px', fontSize: '13px', color: '#222' }}>
           <div style={{ fontWeight: 600, marginBottom: 4 }}>Affected bookmarks:</div>
           <ul style={{ paddingLeft: '18px', margin: 0 }}>
-            {bookmarkIds.map((id) => (
-              <li key={id} style={{ marginBottom: 2 }}>
-                {id}
+            {bookmarkNames.map((name, idx) => (
+              <li key={`${name}-${idx}`} style={{ marginBottom: 2 }}>
+                {name}
               </li>
             ))}
           </ul>
@@ -77,7 +77,7 @@ export async function sendNotificationEmail({
   subject,
   kind = 'parking',
   alertId,
-  bookmarkIds,
+  bookmarkNames,
 }: SendEmailParams) {
   const resend = getResendClient();
   const from = 'TicketSpy <no-reply@ticketspy.org>'; // ticketspy.app DOMAIN VERIFIED! no-reply email allowed
@@ -89,7 +89,7 @@ export async function sendNotificationEmail({
 
   const react =
     kind === 'bookmark' ? (
-      <EmailBody body={body} alertUrl={alertUrl} bookmarkIds={bookmarkIds} />
+      <EmailBody body={body} alertUrl={alertUrl} bookmarkNames={bookmarkNames} />
     ) : (
       <EmailBody body={body} alertUrl={alertUrl} />
     );
