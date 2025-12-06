@@ -177,8 +177,10 @@ export default function NotificationSettings() {
             <div style={{ marginBottom: 8 }}>
               {' '}
               Receive notifications about events (parking enforcement sighting or parking ticket
-              issued) within <span className={styles.mileRadius}>{distanceMiles.toFixed(2)}</span> miles of your parking location and/or
-              bookmarked locations
+              issued) within <span className={styles.mileRadius}>
+                {distanceMiles.toFixed(2)}
+              </span>{' '}
+              miles of your parking location and/or bookmarked locations
             </div>
             <Slider
               value={distanceMiles}
