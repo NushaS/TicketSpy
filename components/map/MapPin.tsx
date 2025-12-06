@@ -11,12 +11,18 @@ import styles from '@/app/bookmark-and-parking-pins/pins.module.css';
 
 type ParkingInfoModalProps = {
   open: boolean;
+  startTime?: string | null;
   onClose: () => void;
   onEndParking: () => void;
 };
 
 // Modal that prompts to end an active parking session.
-const ParkingInfoModal: React.FC<ParkingInfoModalProps> = ({ open, onClose, onEndParking }) => {
+const ParkingInfoModal: React.FC<ParkingInfoModalProps> = ({
+  open,
+  startTime,
+  onClose,
+  onEndParking,
+}) => {
   if (!open) return null;
 
   return (
@@ -26,7 +32,24 @@ const ParkingInfoModal: React.FC<ParkingInfoModalProps> = ({ open, onClose, onEn
           <FaTimes size={22} />
         </button>
 
-        <p className={styles.modalBody}>you have a parking session here</p>
+        <p className={styles.modalBody}>
+          {startTime ? (
+            <>
+              you parked here at
+              <span>
+                {' '}
+                {new Date(startTime).toLocaleTimeString([], {
+                  hour: '2-digit',
+                  minute: '2-digit',
+                })}{' '}
+              </span>
+              on
+              <span> {new Date(startTime).toLocaleDateString()}</span>
+            </>
+          ) : (
+            <>you have a parking session here.</>
+          )}
+        </p>
 
         <button onClick={onEndParking} className={styles.parkingButtonVariant}>
           <CarIcon2 />
@@ -162,6 +185,7 @@ interface MapPinProps {
   id: string;
   userId: string;
   bookmarkName?: string | null;
+  startTime?: string | null;
   onDelete?: () => void;
   onConvertToParking?: () => void;
   onConvertToBookmark?: () => void;
@@ -177,6 +201,7 @@ export const MapPin: React.FC<MapPinProps> = ({
   id,
   userId,
   bookmarkName,
+  startTime,
   onDelete,
   onConvertToParking,
   onConvertToBookmark,
@@ -301,6 +326,7 @@ export const MapPin: React.FC<MapPinProps> = ({
 
       <ParkingInfoModal
         open={showEndParkingModal && type === 'car'}
+        startTime={startTime}
         onClose={() => setShowEndParkingModal(false)}
         onEndParking={() => {
           setShowEndParkingModal(false);
