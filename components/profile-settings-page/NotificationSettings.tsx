@@ -140,122 +140,131 @@ export default function NotificationSettings() {
 
   return (
     <div className={styles.sectionContent}>
-      <div>
-        <h3 className={styles.notificationHeading}>Events near my parking spot</h3>
-        <div className={styles.notificationContent}>
-          Notify me when parking enforcement is sighted or a parking ticket is issued within{' '}
-          {distanceMiles.toFixed(2)} miles of my parking location.
-          <ToggleSwitch
-            checked={enabledParking}
-            onCheckedChange={(val) => handleToggle('parking', Boolean(val))}
-          />
-        </div>
-      </div>
-
-      <div>
-        <h3 className={styles.notificationHeading}>Events near my bookmarked locations</h3>
-        <div className={styles.notificationContent}>
-          Notify me when parking enforcement is sighted or a parking ticket is issued within{' '}
-          {distanceMiles.toFixed(2)} miles of a bookmarked location.
-          <ToggleSwitch
-            checked={enabledBookmarked}
-            onCheckedChange={(val) => handleToggle('bookmark', Boolean(val))}
-          />
-        </div>
-      </div>
-
-      <div>
-        <h3 className={styles.notificationHeading}> Notification radius</h3>
-        <div className={styles.notificationContent}>
-          <div style={{ marginBottom: 8 }}>
-            {' '}
-            Receive notifications about events (parking enforcement sighting or parking ticket
-            issued) within {distanceMiles.toFixed(2)} miles of your parking location and/or
-            bookmarked locations
+      <div className={styles.notificationSettingGroup}>
+        <div>
+          <h3 className={styles.notificationHeading}>Events near my parking spot</h3>
+          <div className={styles.notificationContent}>
+            Notify me when parking enforcement is sighted or a parking ticket is issued within{' '}
+            {distanceMiles.toFixed(2)} miles of my parking location.
+            <ToggleSwitch
+              checked={enabledParking}
+              onCheckedChange={(val) => handleToggle('parking', Boolean(val))}
+            />
           </div>
-          <Slider
-            value={distanceMiles}
-            onChange={(e, val) => setDistanceMiles(Number(val))}
-            onChangeCommitted={async (e, val) => {
-              try {
-                const chosen = Number(val);
-                localStorage.setItem('notification_distance_miles', String(chosen));
-                const ok = await persistDirectSupabase({
-                  parking: enabledParking,
-                  bookmark: enabledBookmarked,
-                  distanceMiles: chosen,
-                });
-                if (ok) {
-                  setSaveMessage('distance saved!');
-                  setTimeout(() => setSaveMessage(null), 2000);
+        </div>
+
+        <div>
+          <h3 className={styles.notificationHeading}>Events near my bookmarked locations</h3>
+          <div className={styles.notificationContent}>
+            Notify me when parking enforcement is sighted or a parking ticket is issued within{' '}
+            {distanceMiles.toFixed(2)} miles of a bookmarked location.
+            <ToggleSwitch
+              checked={enabledBookmarked}
+              onCheckedChange={(val) => handleToggle('bookmark', Boolean(val))}
+            />
+          </div>
+        </div>
+
+        <div>
+          <h3 className={styles.notificationHeading}> Notification radius</h3>
+          <div className={styles.notificationContent}>
+            <div style={{ marginBottom: 8 }}>
+              {' '}
+              Receive notifications about events (parking enforcement sighting or parking ticket
+              issued) within {distanceMiles.toFixed(2)} miles of your parking location and/or
+              bookmarked locations
+            </div>
+            <Slider
+              value={distanceMiles}
+              onChange={(e, val) => setDistanceMiles(Number(val))}
+              onChangeCommitted={async (e, val) => {
+                try {
+                  const chosen = Number(val);
+                  localStorage.setItem('notification_distance_miles', String(chosen));
+                  const ok = await persistDirectSupabase({
+                    parking: enabledParking,
+                    bookmark: enabledBookmarked,
+                    distanceMiles: chosen,
+                  });
+                  if (ok) {
+                    setSaveMessage('distance saved!');
+                    setTimeout(() => setSaveMessage(null), 2000);
+                  }
+                } catch {
+                  /* ignore */
                 }
-              } catch {
-                /* ignore */
-              }
-            }}
-            valueLabelDisplay="auto"
-            valueLabelFormat={(value) => `${Number(value).toFixed(2)} mi`}
-            step={0.05}
-            marks={[
-              { value: 0.5, label: '0.5' },
-              { value: 1, label: '1.0' },
-              { value: 1.5, label: '1.5' },
-              { value: 2, label: '2.0' },
-              { value: 2.5, label: '2.5' },
-              { value: 2.98, label: '3.0' },
-            ]}
-            min={0.05}
-            max={3}
-            aria-label="Mile distance"
-            sx={{
-              color: '#6b856b',
-              height: 12,
-              '& .MuiSlider-rail': {
-                opacity: 1,
-                background: '#e9ecef',
-              },
-              '& .MuiSlider-track': {
-                border: 'none',
-                background: 'linear-gradient(90deg, #6b856b 0%, #7f9d7f 100%)',
-              },
-              '& .MuiSlider-thumb': {
-                height: 24,
-                width: 24,
-                backgroundColor: '#fff',
-                boxShadow: '0 6px 18px rgba(16,24,40,0.22)',
-                border: '2px solid #6b856b',
-                '&:focus, &:hover, &.Mui-active': {
-                  boxShadow: '0 8px 22px rgba(16,24,40,0.28)',
+              }}
+              valueLabelDisplay="auto"
+              valueLabelFormat={(value) => `${Number(value).toFixed(2)} mi`}
+              step={0.05}
+              marks={[
+                { value: 0.25, label: '0.25' },
+                { value: 0.5, label: '0.5' },
+                { value: 0.75, label: '0.75' },
+                { value: 1, label: '1.0' },
+                { value: 1.25, label: '1.25' },
+                { value: 1.5, label: '1.5' },
+                { value: 1.75, label: '1.75' },
+                { value: 2, label: '2.0' },
+              ]}
+              min={0.05}
+              max={2}
+              aria-label="Mile distance"
+              sx={{
+                color: '#6b856b',
+                height: 12,
+                '& .MuiSlider-rail': {
+                  opacity: 1,
+                  background: '#e9ecef',
                 },
-              },
-              '& .MuiSlider-mark': {
-                height: 7,
-                width: 3,
-                borderRadius: 10,
-                border: 'none',
-                backgroundColor: '#6b856b',
-                opacity: 0.9,
-              },
-              '& .MuiSlider-markLabel': {
-                color: '#555',
-                fontSize: '0.82rem',
-                fontWeight: 600,
-              },
-              '& .MuiSlider-valueLabel': {
-                backgroundColor: '#fff',
-                color: '#2f3c2f',
-                border: '1px solid #6b856b',
-                borderRadius: 10,
-                boxShadow: '0 8px 16px rgba(16,24,40,0.18)',
-                fontWeight: 700,
-              },
-            }}
-          />
+                '& .MuiSlider-track': {
+                  border: 'none',
+                  background: 'linear-gradient(90deg, #6b856b 0%, #7f9d7f 100%)',
+                },
+                '& .MuiSlider-thumb': {
+                  height: 24,
+                  width: 24,
+                  backgroundColor: '#fff',
+                  boxShadow: '0 6px 18px rgba(16,24,40,0.22)',
+                  border: '2px solid #6b856b',
+                  '&:focus, &:hover, &.Mui-active': {
+                    boxShadow: '0 8px 22px rgba(16,24,40,0.28)',
+                  },
+                },
+                '& .MuiSlider-mark': {
+                  height: 7,
+                  width: 3,
+                  borderRadius: 10,
+                  border: 'none',
+                  backgroundColor: '#6b856b',
+                  opacity: 0.9,
+                },
+                '& .MuiSlider-markLabel': {
+                  color: '#555',
+                  fontSize: '0.82rem',
+                  fontWeight: 600,
+                },
+                '& .MuiSlider-valueLabel': {
+                  backgroundColor: '#fff',
+                  color: '#2f3c2f',
+                  border: '1px solid #6b856b',
+                  borderRadius: 10,
+                  boxShadow: '0 8px 16px rgba(16,24,40,0.18)',
+                  fontWeight: 700,
+                },
+              }}
+            />
+          </div>
         </div>
       </div>
 
-      {saveMessage && <p className={styles.successMessage}>{saveMessage}</p>}
-      {error && <p className={styles.accountError}>Error: {error}</p>}
+      <div className={styles.messageContainer}>
+        {error ? (
+          <p className={styles.accountError}>Error: {error}</p>
+        ) : saveMessage ? (
+          <p className={styles.successMessage}>{saveMessage}</p>
+        ) : null}
+      </div>
     </div>
   );
 }

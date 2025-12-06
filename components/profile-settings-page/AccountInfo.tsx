@@ -191,9 +191,6 @@ export default function AccountInfo() {
           />
         </div>
 
-        {error && <p className={styles.accountError}>Error: {error}</p>}
-        {successMessage && <p className={styles.successMessage}>{successMessage}</p>}
-
         {hasChanges && (
           <div className={styles.buttonGroup}>
             <button type="button" onClick={handleDiscard} className={styles.discardButton}>
@@ -213,6 +210,14 @@ export default function AccountInfo() {
             <div className={styles.forgotPasswordLink}>
               <Link href="/auth/forgot-password">forgot your password?</Link>
             </div>
+          </div>
+
+          <div className={styles.messageContainer}>
+            {error ? (
+              <p className={styles.accountError}>error: {error}</p>
+            ) : successMessage ? (
+              <p className={styles.successMessage}>{successMessage}</p>
+            ) : null}
           </div>
 
           <div className={styles.accountActionButtons}>
