@@ -36,6 +36,10 @@
     gap: 1rem;
 }
 
+.modalContent svg {
+  height: 24px;
+}
+
 .modalBody {
   font-family: 'Jersey 10', sans-serif;
   font-weight: 500;
