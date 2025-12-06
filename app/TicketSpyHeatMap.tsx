@@ -25,7 +25,10 @@ import { filterTickets, Filters } from '@/lib/utils/filterTickets';
 import { getGeoJsonData, heatmapLayer, initialViewState, mapStyleURL } from './heatmapConfig';
 import { useTicketTable } from '@/lib/hooks/useTicketTable';
 import { useEnforcementSightingTable } from '@/lib/hooks/useEnforcementSightingTable';
-import { violationEnumToUserLabels, ViolationType } from '@/lib/enums/ticketViolationType';
+import { ViolationType } from '@/lib/enums/ticketViolationType';
+import TicketReportModal from '@/components/map/TicketReportModal';
+import BookmarkNameModal from '@/components/map/BookmarkNameModal';
+import Toast from '@/components/map/Toast';
 
 type MapCenter = { lat: number; lng: number };
 
@@ -65,9 +68,6 @@ const TicketSpyHeatMap: React.FC<TicketSpyHeatMapProps> = ({
   const [successMessage, setSuccessMessage] = useState('');
   const [showErrorToast, setShowErrorToast] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
-  const [showEnforcementSuccessToast, setShowEnforcementSuccessToast] = useState(false);
-  const [showEnforcementErrorToast, setShowEnforcementErrorToast] = useState(false);
-  const [enforcementErrorMessage, setEnforcementErrorMessage] = useState('');
   const [userId, setUserId] = useState<string | null>(null);
   const [showEnforcementConfirm, setShowEnforcementConfirm] = useState(false);
   const [enforcementLocation, setEnforcementLocation] = useState<{
@@ -82,6 +82,12 @@ const TicketSpyHeatMap: React.FC<TicketSpyHeatMapProps> = ({
   const [mapZoom, setMapZoom] = useState<number>(
     initialCenter ? (initialZoom ?? 17) : (initialViewState.zoom ?? 12)
   );
+  const [showBookmarkNameModal, setShowBookmarkNameModal] = useState(false);
+  const [bookmarkName, setBookmarkName] = useState('');
+  const [bookmarkLocation, setBookmarkLocation] = useState<{ lat: number; lng: number } | null>(
+    null
+  );
+  const [isBookmarkSubmitting, setIsBookmarkSubmitting] = useState(false);
   // When the page is loaded via /alert, show a popup on the highlighted marker
   const [showAlertPopup, setShowAlertPopup] = useState<boolean>(!!alertMarker);
   const [alertDismissed, setAlertDismissed] = useState(false);
@@ -199,6 +205,70 @@ const TicketSpyHeatMap: React.FC<TicketSpyHeatMapProps> = ({
   }, [heatmapOpacityMultiplier]);
   // TODO: validate testData in heatmapConfig.ts
 
+  const resetTicketReportFields = () => {
+    setTicketDateIssued('');
+    setTicketTimeIssued('');
+    setTicketViolationType(ViolationType.Other);
+  };
+
+  const handleTicketReportClose = () => {
+    setShowTicketReportModal(false);
+    resetTicketReportFields();
+  };
+
+  const handleTicketReportSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    const ticketData = {
+      latitude: reportLocation?.lat,
+      longitude: reportLocation?.lng,
+      ticket_report_date: ticketDateIssued,
+      ticket_report_hour: ticketTimeIssued,
+      username: username || 'Anonymous',
+      ticket_violation_type: ticketViolationType as ViolationType,
+    };
+
+    try {
+      console.log('Submitting ticket data:', ticketData);
+
+      const response = await fetch('/api/post-ticket', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(ticketData),
+      });
+
+      console.log('Response status:', response.status);
+
+      const result = await response.json();
+      console.log('Response data:', result);
+
+      if (response.ok) {
+        console.log('Ticket submitted successfully:', result);
+        // Refresh the heatmap data to show the new ticket
+        refetchTickets();
+        // Show success toast
+        setSuccessMessage('Ticket reported successfully!');
+        setShowSuccessToast(true);
+        setTimeout(() => setShowSuccessToast(false), 3000);
+      } else {
+        console.error('Error submitting ticket:', result);
+        setErrorMessage(result.error || 'Failed to submit ticket');
+        setShowErrorToast(true);
+        setTimeout(() => setShowErrorToast(false), 3000);
+      }
+    } catch (error) {
+      console.error('Network error:', error);
+      setErrorMessage('Network error: Failed to submit ticket');
+      setShowErrorToast(true);
+      setTimeout(() => setShowErrorToast(false), 3000);
+    }
+
+    handleTicketReportClose();
+    setReportLocation(null);
+  };
+
   // TODO: check if user is logged in, non functional
   React.useEffect(() => {
     const checkAuth = async () => {
@@ -264,10 +334,32 @@ const TicketSpyHeatMap: React.FC<TicketSpyHeatMapProps> = ({
     }
   };
 
-  // Handle bookmark location
-  const handleBookmarkLocation = async () => {
-    if (!pinLocation || !userId) return;
+  const openBookmarkNameModal = (location: { lat: number; lng: number } | null) => {
+    if (!location) return;
+    if (!userId) {
+      setErrorMessage('Please log in to bookmark this spot');
+      setShowErrorToast(true);
+      setTimeout(() => setShowErrorToast(false), 3000);
+      return;
+    }
+    setBookmarkLocation(location);
+    setBookmarkName('');
+    setShowBookmarkNameModal(true);
+    setPinLocation(null);
+  };
 
+  const closeBookmarkNameModal = () => {
+    setShowBookmarkNameModal(false);
+    setBookmarkName('');
+    setBookmarkLocation(null);
+  };
+
+  // Handle bookmark location with a name
+  const handleBookmarkLocation = async () => {
+    const trimmedName = bookmarkName.trim();
+    if (!bookmarkLocation || !userId || !trimmedName) return;
+
+    setIsBookmarkSubmitting(true);
     try {
       const response = await fetch('/api/bookmark-location', {
         method: 'POST',
@@ -276,8 +368,9 @@ const TicketSpyHeatMap: React.FC<TicketSpyHeatMapProps> = ({
         },
         body: JSON.stringify({
           user_id: userId,
-          latitude: pinLocation.lat,
-          longitude: pinLocation.lng,
+          latitude: bookmarkLocation.lat,
+          longitude: bookmarkLocation.lng,
+          name: trimmedName,
         }),
       });
 
@@ -288,6 +381,9 @@ const TicketSpyHeatMap: React.FC<TicketSpyHeatMapProps> = ({
         setSuccessMessage('Location bookmarked successfully!');
         setShowSuccessToast(true);
         setTimeout(() => setShowSuccessToast(false), 3000);
+        setShowBookmarkNameModal(false);
+        setBookmarkName('');
+        setBookmarkLocation(null);
       } else {
         const msg =
           (result as any)?.error ||
@@ -301,9 +397,9 @@ const TicketSpyHeatMap: React.FC<TicketSpyHeatMapProps> = ({
       setErrorMessage('Network error: Failed to bookmark location');
       setShowErrorToast(true);
       setTimeout(() => setShowErrorToast(false), 3000);
+    } finally {
+      setIsBookmarkSubmitting(false);
     }
-
-    setPinLocation(null);
   };
 
   // Handle parking session
@@ -359,6 +455,7 @@ const TicketSpyHeatMap: React.FC<TicketSpyHeatMapProps> = ({
         longitude: Number(row.longitude),
         type: 'heart',
         id: row.bookmark_id,
+        name: row.name ?? null,
       }))
     );
 
@@ -391,9 +488,11 @@ const TicketSpyHeatMap: React.FC<TicketSpyHeatMapProps> = ({
             type={point.type}
             id={point.id}
             userId={userId}
+            {...(point.type === 'heart' ? { bookmarkName: point.name } : {})}
             onDelete={handlePinChange}
             onConvertToParking={handlePinChange}
             onConvertToBookmark={handlePinChange}
+            onRequestNamedBookmark={openBookmarkNameModal}
           />
         ))}
       </>
@@ -405,19 +504,17 @@ const TicketSpyHeatMap: React.FC<TicketSpyHeatMapProps> = ({
   return (
     <div className={styles.container}>
       {/* Success Toast */}
-      {showSuccessToast && (
-        <div className={styles.successToast}>
-          <Check size={20} />
-          <span>{successMessage || 'Success'}</span>
-        </div>
-      )}
+      {showSuccessToast && <Toast variant="success" message={successMessage || 'Success'} />}
       {/* Error Toast */}
-      {showErrorToast && (
-        <div className={styles.errorToast}>
-          <X size={20} />
-          <span>{errorMessage}</span>
-        </div>
-      )}
+      {showErrorToast && <Toast variant="error" message={errorMessage} />}
+      <BookmarkNameModal
+        isOpen={showBookmarkNameModal}
+        name={bookmarkName}
+        onNameChange={setBookmarkName}
+        onClose={closeBookmarkNameModal}
+        onSubmit={handleBookmarkLocation}
+        isSubmitting={isBookmarkSubmitting}
+      />
       {/* Header */}
       <header className={styles.header}>
         <div className={styles.logoContainer}>
@@ -819,7 +916,10 @@ const TicketSpyHeatMap: React.FC<TicketSpyHeatMapProps> = ({
                     report parking enforcement nearby
                   </button>
 
-                  <button className={styles.bookmarkButton} onClick={handleBookmarkLocation}>
+                  <button
+                    className={styles.bookmarkButton}
+                    onClick={() => openBookmarkNameModal(pinLocation)}
+                  >
                     <HeartIcon color="white" />
                     <span>bookmark this spot</span>
                   </button>
@@ -900,143 +1000,18 @@ const TicketSpyHeatMap: React.FC<TicketSpyHeatMapProps> = ({
         onSubmit={(violationType) => console.log('Submitted:', violationType)}
       /> */}
       {/* Ticket Report Modal */}
-      {showTicketReportModal && (
-        <div className={styles.modalOverlay}>
-          <div className={styles.ticketReportModalContent}>
-            <button
-              onClick={() => {
-                setShowTicketReportModal(false);
-                setTicketDateIssued('');
-                setTicketTimeIssued('');
-                setTicketViolationType(ViolationType.Other);
-              }}
-              className={styles.ticketReportCloseButton}
-            >
-              <X size={24} />
-            </button>
-
-            <h2 className={styles.ticketReportTitle}>Report a ticket:</h2>
-
-            <form
-              onSubmit={async (e) => {
-                e.preventDefault();
-
-                const ticketData = {
-                  latitude: reportLocation?.lat,
-                  longitude: reportLocation?.lng,
-                  ticket_report_date: ticketDateIssued,
-                  ticket_report_hour: ticketTimeIssued,
-                  username: username || 'Anonymous',
-                  ticket_violation_type: ticketViolationType as ViolationType,
-                };
-
-                try {
-                  console.log('Submitting ticket data:', ticketData);
-
-                  const response = await fetch('/api/post-ticket', {
-                    method: 'POST',
-                    headers: {
-                      'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(ticketData),
-                  });
-
-                  console.log('Response status:', response.status);
-
-                  const result = await response.json();
-                  console.log('Response data:', result);
-
-                  if (response.ok) {
-                    console.log('Ticket submitted successfully:', result);
-                    // Refresh the heatmap data to show the new ticket
-                    refetchTickets();
-                    // Show success toast
-                    setSuccessMessage('Ticket reported successfully!');
-                    setShowSuccessToast(true);
-                    setTimeout(() => setShowSuccessToast(false), 3000);
-                  } else {
-                    console.error('Error submitting ticket:', result);
-                    setErrorMessage(result.error || 'Failed to submit ticket');
-                    setShowErrorToast(true);
-                    setTimeout(() => setShowErrorToast(false), 3000);
-                  }
-                } catch (error) {
-                  console.error('Network error:', error);
-                  setErrorMessage('Network error: Failed to submit ticket');
-                  setShowErrorToast(true);
-                  setTimeout(() => setShowErrorToast(false), 3000);
-                }
-
-                setShowTicketReportModal(false);
-                setTicketDateIssued('');
-                setTicketTimeIssued('');
-                setTicketViolationType(ViolationType.Other);
-                setReportLocation(null);
-              }}
-              className={styles.ticketReportForm}
-            >
-              <div className={styles.ticketReportFormGroup}>
-                <label className={styles.ticketReportLabel}>Date issued:</label>
-                <input
-                  type="date"
-                  className={styles.ticketReportInput}
-                  value={ticketDateIssued}
-                  onChange={(e) => setTicketDateIssued(e.target.value)}
-                  required
-                />
-              </div>
-
-              <div className={styles.ticketReportFormGroup}>
-                <label className={styles.ticketReportLabel}>Time issued:</label>
-                <input
-                  type="time"
-                  className={styles.ticketReportInput}
-                  value={ticketTimeIssued}
-                  onChange={(e) => setTicketTimeIssued(e.target.value)}
-                  required
-                />
-              </div>
-              <div className={styles.ticketReportFormGroup}>
-                <label className={styles.ticketReportLabel}>Violation type:</label>
-                <select
-                  className={styles.ticketReportInput}
-                  value={ticketViolationType}
-                  onChange={(e) => {
-                    const val = e.target.value as keyof typeof ViolationType;
-                    setTicketViolationType(ViolationType[val]);
-                    console.log('Value: ', val);
-                  }}
-                  required
-                >
-                  {Object.values(ViolationType).map((type) => (
-                    <option key={type} value={type}>
-                      {/* NOTE: value (above) -> Whats ACTUALLY being submitted to Supabase*/}
-                      {violationEnumToUserLabels[type]}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <button type="submit" className={styles.ticketReportSubmitButton}>
-                <Check size={20} />
-                <span>Submit ticket report</span>
-              </button>
-            </form>
-          </div>
-        </div>
-      )}
-      {/* Enforcement toasts */}
-      {showEnforcementSuccessToast && (
-        <div className={styles.successToast}>
-          <Check size={20} />
-          <span>Enforcement reported successfully!</span>
-        </div>
-      )}
-      {showEnforcementErrorToast && (
-        <div className={styles.errorToast}>
-          <X size={20} />
-          <span>{enforcementErrorMessage}</span>
-        </div>
-      )}
+      <TicketReportModal
+        isOpen={showTicketReportModal}
+        ticketDateIssued={ticketDateIssued}
+        ticketTimeIssued={ticketTimeIssued}
+        ticketViolationType={ticketViolationType}
+        onClose={handleTicketReportClose}
+        onDateChange={setTicketDateIssued}
+        onTimeChange={setTicketTimeIssued}
+        onViolationChange={setTicketViolationType}
+        onSubmit={handleTicketReportSubmit}
+        onBookmarkClick={() => openBookmarkNameModal(reportLocation)}
+      />
       {/* Enforcement Confirm Modal (centered) */}
       {showEnforcementConfirm && enforcementLocation && (
         <div className={styles.modalOverlay}>
@@ -1111,18 +1086,19 @@ const TicketSpyHeatMap: React.FC<TicketSpyHeatMapProps> = ({
                       }
                       setShowEnforcementConfirm(false);
                       setEnforcementLocation(null);
-                      setShowEnforcementSuccessToast(true);
-                      setTimeout(() => setShowEnforcementSuccessToast(false), 3000);
+                      setSuccessMessage('Enforcement reported successfully!');
+                      setShowSuccessToast(true);
+                      setTimeout(() => setShowSuccessToast(false), 3000);
                     } else {
-                      setEnforcementErrorMessage(data?.error || 'Failed to report enforcement');
-                      setShowEnforcementErrorToast(true);
-                      setTimeout(() => setShowEnforcementErrorToast(false), 3000);
+                      setErrorMessage(data?.error || 'Failed to report enforcement');
+                      setShowErrorToast(true);
+                      setTimeout(() => setShowErrorToast(false), 3000);
                     }
                   } catch (err) {
                     console.error('Network error posting enforcement:', err);
-                    setEnforcementErrorMessage('Network error: Failed to report enforcement');
-                    setShowEnforcementErrorToast(true);
-                    setTimeout(() => setShowEnforcementErrorToast(false), 3000);
+                    setErrorMessage('Network error: Failed to report enforcement');
+                    setShowErrorToast(true);
+                    setTimeout(() => setShowErrorToast(false), 3000);
                   } finally {
                     setEnforcementSubmitting(false);
                   }
@@ -1133,49 +1109,6 @@ const TicketSpyHeatMap: React.FC<TicketSpyHeatMapProps> = ({
                 <span>{enforcementSubmitting ? 'submitting...' : 'confirm'}</span>
               </button>
             </div>
-          </div>
-        </div>
-      )}
-      Login Modal
-      {showLoginModal && (
-        <div className={styles.modalOverlay}>
-          <div className={styles.loginModalContent}>
-            <button onClick={() => setShowLoginModal(false)} className={styles.closeButton}>
-              <X className={styles.mapIcon} />
-            </button>
-
-            <h2 className={styles.loginTitle}>log in</h2>
-
-            <form onSubmit={handleLogin} className={styles.loginForm}>
-              <div className={styles.loginFormGroup}>
-                <label className={styles.loginLabel}>phone number:</label>
-                <input
-                  type="tel"
-                  className={styles.loginInput}
-                  value={phoneNumber}
-                  onChange={(e) => setPhoneNumber(e.target.value)}
-                  required
-                />
-              </div>
-
-              <div className={styles.loginFormGroup}>
-                <label className={styles.loginLabel}>password:</label>
-                <input
-                  type="password"
-                  className={styles.loginInput}
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                />
-              </div>
-
-              {error && <p className={styles.loginError}>{error}</p>}
-
-              <button type="submit" className={styles.submitButton} disabled={isLoading}>
-                <Check size={20} />
-                <span>{isLoading ? 'logging in...' : 'submit'}</span>
-              </button>
-            </form>
           </div>
         </div>
       )}
