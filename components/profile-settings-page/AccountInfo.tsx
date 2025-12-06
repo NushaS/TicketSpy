@@ -105,7 +105,7 @@ export default function AccountInfo() {
       await refetch();
       setSuccessMessage('profile updated successfully!');
 
-      setTimeout(() => setSuccessMessage(null), 1500);
+      setTimeout(() => setSuccessMessage(null), 2000);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');
     }
@@ -191,9 +191,6 @@ export default function AccountInfo() {
           />
         </div>
 
-        {error && <p className={styles.loginError}>{error}</p>}
-        {successMessage && <p className={styles.successMessage}>{successMessage}</p>}
-
         {hasChanges && (
           <div className={styles.buttonGroup}>
             <button type="button" onClick={handleDiscard} className={styles.discardButton}>
@@ -213,6 +210,14 @@ export default function AccountInfo() {
             <div className={styles.forgotPasswordLink}>
               <Link href="/auth/forgot-password">forgot your password?</Link>
             </div>
+          </div>
+
+          <div className={styles.messageContainer}>
+            {error ? (
+              <p className={styles.accountError}>error: {error}</p>
+            ) : successMessage ? (
+              <p className={styles.successMessage}>{successMessage}</p>
+            ) : null}
           </div>
 
           <div className={styles.accountActionButtons}>
