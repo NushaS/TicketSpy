@@ -10,11 +10,12 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import styles from './page.module.css';
-import { CarIcon, CarIcon2, CarIcon3 } from '../components/ui/icons/car-icon';
+import { CarIcon2, CarIcon3 } from '../components/ui/icons/car-icon';
 import { ProfileIcon } from '../components/ui/icons/profile-icon';
 import { HeartIcon, HeartIcon2 } from '../components/ui/icons/heart-icon';
 import { TicketIcon2 } from '@/components/ui/icons/ticket-icon';
 import { SightingIcon } from '@/components/ui/icons/sighting-icon';
+import { ParkingEnforcementIcon } from '@/components/ui/icons/parking-enforcement';
 import { MapPin } from '../components/map/MapPin';
 import FilterPanel from '../components/FilterPanel';
 import { useUserParkingSessions } from '@/lib/hooks/useParkingSessionTable';
@@ -30,14 +31,18 @@ type MapCenter = { lat: number; lng: number };
 
 type TicketSpyHeatMapProps = {
   initialCenter?: MapCenter | null;
+  initialZoom?: number | null;
   alertMarker?:
     | (MapCenter & { label?: string; kind?: 'ticket' | 'enforcement'; icon?: React.ReactNode })
     | null;
+  redirectAfterAlertDismiss?: boolean;
 };
 
 const TicketSpyHeatMap: React.FC<TicketSpyHeatMapProps> = ({
   initialCenter = null,
+  initialZoom = null,
   alertMarker = null,
+  redirectAfterAlertDismiss = false,
 }) => {
   const [showInstructions, setShowInstructions] = useState(false);
   const [showLoginModal, setShowLoginModal] = useState(false);
@@ -75,24 +80,54 @@ const TicketSpyHeatMap: React.FC<TicketSpyHeatMapProps> = ({
   >([]);
   const mapRef = useRef<import('react-map-gl/maplibre').MapRef | null>(null);
   const [mapZoom, setMapZoom] = useState<number>(
-    initialCenter ? 17 : (initialViewState.zoom ?? 12)
+    initialCenter ? (initialZoom ?? 17) : (initialViewState.zoom ?? 12)
   );
   // When the page is loaded via /alert, show a popup on the highlighted marker
   const [showAlertPopup, setShowAlertPopup] = useState<boolean>(!!alertMarker);
+  const [alertDismissed, setAlertDismissed] = useState(false);
+  const alertKey = React.useMemo(() => {
+    if (!alertMarker) return null;
+    const kind = alertMarker.kind ?? 'alert';
+    const lat = Number(alertMarker.lat).toFixed(6);
+    const lng = Number(alertMarker.lng).toFixed(6);
+    return `${kind}:${lat}:${lng}`;
+  }, [alertMarker]);
+  const prevAlertKeyRef = useRef<string | null>(null);
+  const alertRedirectRef = useRef(false);
 
   React.useEffect(() => {
     if (initialCenter && mapRef.current) {
       // Fly to the alert location with a tight zoom when provided
       mapRef.current.flyTo({
         center: [initialCenter.lng, initialCenter.lat],
-        zoom: 17,
+        zoom: initialZoom ?? 17,
         duration: 800,
         essential: true,
       });
-      setMapZoom(17);
+      setMapZoom(initialZoom ?? 17);
     }
-    if (alertMarker) setShowAlertPopup(true);
-  }, [initialCenter, alertMarker]);
+    if (alertKey !== prevAlertKeyRef.current) {
+      prevAlertKeyRef.current = alertKey;
+      alertRedirectRef.current = false;
+      if (alertKey) {
+        try {
+          const stored = localStorage.getItem(`alert-dismissed:${alertKey}`);
+          if (stored === 'true') {
+            setShowAlertPopup(false);
+            setAlertDismissed(true);
+            return;
+          }
+        } catch {
+          // ignore storage errors
+        }
+        setShowAlertPopup(true);
+        setAlertDismissed(false);
+      } else {
+        setShowAlertPopup(false);
+        setAlertDismissed(false);
+      }
+    }
+  }, [initialCenter, initialZoom, alertKey]);
 
   // Add a transient enforcement marker that auto-removes after `ttlMs` (default 1 hour)
   const addTransientEnforcement = (lat: number, lng: number, ttlMs = 1000 * 60 * 60) => {
@@ -498,7 +533,11 @@ const TicketSpyHeatMap: React.FC<TicketSpyHeatMapProps> = ({
           }
           initialViewState={
             initialCenter
-              ? { longitude: initialCenter.lng, latitude: initialCenter.lat, zoom: 17 }
+              ? {
+                  longitude: initialCenter.lng,
+                  latitude: initialCenter.lat,
+                  zoom: initialZoom ?? 17,
+                }
               : initialViewState
           }
           style={{ width: '100%', height: '100%' }}
@@ -529,20 +568,23 @@ const TicketSpyHeatMap: React.FC<TicketSpyHeatMapProps> = ({
           <Source id="tickets" type="geojson" data={geoJsonData}>
             <Layer {...adjustableHeatmap} />
           </Source>
-          {/* Alert marker (from /alert deep link) */}
+          {/* Alert marker (from /alert) */}
           {alertMarker && (
             <>
               <Marker longitude={alertMarker.lng} latitude={alertMarker.lat} anchor="bottom">
                 <div className={styles.mapMarkerWrapper} title={alertMarker.label ?? 'Alert'}>
-                  {alertMarker.icon ?? (
-                    <svg
-                      viewBox="0 0 24 24"
-                      className={styles.mapMarkerSvg}
-                      style={{ fill: '#e11d48' }}
-                    >
-                      <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" />
-                      <circle cx="12" cy="9" r="2.5" fill="#fff" />
-                    </svg>
+                  {/* Show the alert icon while the popup is open; switch to the softer icon after dismissal */}
+                  {alertMarker.kind === 'enforcement' ? (
+                    !alertDismissed && alertMarker.icon ? (
+                      // while the popup is open, show the red alert icon
+                      alertMarker.icon
+                    ) : (
+                      // after dismissal, use the softer orange enforcement icon
+                      <ParkingEnforcementIcon size={36} />
+                    )
+                  ) : (
+                    // else for tickets, show the provided alert icon (or nothing if absent)
+                    (alertMarker.icon ?? null)
                   )}
                 </div>
               </Marker>
@@ -551,7 +593,17 @@ const TicketSpyHeatMap: React.FC<TicketSpyHeatMapProps> = ({
                   longitude={alertMarker.lng}
                   latitude={alertMarker.lat}
                   anchor="top"
-                  onClose={() => setShowAlertPopup(false)}
+                  onClose={() => {
+                    setShowAlertPopup(false);
+                    setAlertDismissed(true);
+                    if (alertKey) {
+                      try {
+                        localStorage.setItem(`alert-dismissed:${alertKey}`, 'true');
+                      } catch {
+                        // ignore storage errors
+                      }
+                    }
+                  }}
                   closeButton
                   closeOnClick={false}
                 >
@@ -583,11 +635,16 @@ const TicketSpyHeatMap: React.FC<TicketSpyHeatMapProps> = ({
           {userId && <MapPinsLayer userId={userId} />}
           {/* Transient enforcement markers (temporary pins that auto-remove after 1 hour) */}
           {transientEnforcements.map((m) => {
-            // Compute pixel sizes so the whole marker scales down when zoomed out
+            /*
+              // Compute pixel sizes so the whole marker scales down when zoomed out
             const outerBase = 56; // px at reference zoom
             const outer = Math.round(Math.min(Math.max(outerBase + (mapZoom - 12) * 6, 28), 80));
             const inner = Math.round(outer * 0.78);
-            const iconSize = Math.round(inner * 0.74);
+            const iconSize = Math.round(inner * 0.74); */
+            // Use a fixed size for enforcement markers
+            const outer = 36;
+            const inner = 36;
+            const iconSize = 36;
 
             return (
               <Marker key={m.id} longitude={m.lng} latitude={m.lat} anchor="bottom">
@@ -599,7 +656,7 @@ const TicketSpyHeatMap: React.FC<TicketSpyHeatMapProps> = ({
                     className={styles.transientMarkerInner}
                     style={{ width: inner, height: inner, transform: 'translateY(-2px)' }}
                   >
-                    <SightingIcon size={iconSize} />
+                    <ParkingEnforcementIcon size={iconSize} />
                   </div>
                 </div>
               </Marker>
