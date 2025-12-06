@@ -14,6 +14,8 @@ export default function TestParkingSession() {
     const listItems = data?.map((currSessionRow) => (
       <li key={currSessionRow.parking_session_id}>
         User_id: {currSessionRow.user_id} : {currSessionRow.latitude},{currSessionRow.longitude}
+        <br></br>
+        Date toString: {currSessionRow.parking_session_start_datetime.toString()}
       </li>
     ));
 
