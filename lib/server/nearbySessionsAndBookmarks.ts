@@ -1,29 +1,6 @@
 import { createAdminClient } from '@/lib/supabase/server-admin';
 import { sendNotificationEmail } from '@/lib/server/sendEmail';
-
-function milesBetweenPoints(
-  latitudeA: number,
-  longitudeA: number,
-  latitudeB: number,
-  longitudeB: number
-) {
-  // Haversine distance in miles
-  const toRad = (value: number) => (value * Math.PI) / 180;
-  const earthRadiusMiles = 3958.8;
-
-  const latDelta = toRad(latitudeB - latitudeA);
-  const lonDelta = toRad(longitudeB - longitudeA);
-
-  const a =
-    Math.sin(latDelta / 2) * Math.sin(latDelta / 2) +
-    Math.cos(toRad(latitudeA)) *
-      Math.cos(toRad(latitudeB)) *
-      Math.sin(lonDelta / 2) *
-      Math.sin(lonDelta / 2);
-
-  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-  return earthRadiusMiles * c;
-}
+import { milesBetweenPoints } from '../utils/distance'; // exported from lib/utils/distance.ts for testing & modularity
 
 // type ParkingSessionRow = {
 //   parking_session_id: string;
