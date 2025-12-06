@@ -9,6 +9,150 @@ import { CarIcon2 } from '../ui/icons/car-icon';
 import { HeartIcon } from '../ui/icons/heart-icon';
 import styles from '@/app/bookmark-and-parking-pins/pins.module.css';
 
+type ParkingInfoModalProps = {
+  open: boolean;
+  onClose: () => void;
+  onEndParking: () => void;
+};
+
+// Modal that prompts to end an active parking session.
+const ParkingInfoModal: React.FC<ParkingInfoModalProps> = ({ open, onClose, onEndParking }) => {
+  if (!open) return null;
+
+  return (
+    <div className={styles.modalOverlay} onClick={onClose}>
+      <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
+        <button className={styles.modalCloseButton} onClick={onClose}>
+          <FaTimes size={22} />
+        </button>
+
+        <p className={styles.modalBody}>you have a parking session here</p>
+
+        <button onClick={onEndParking} className={styles.parkingButtonVariant}>
+          <CarIcon2 />
+          end parking
+        </button>
+      </div>
+    </div>
+  );
+};
+
+type BookmarkConversionModalProps = {
+  open: boolean;
+  onClose: () => void;
+  onDelete: () => void;
+  onConvertToBookmark: () => void;
+  onRequestNamedBookmark?: () => void;
+  isDeleting: boolean;
+  isConverting: boolean;
+};
+
+// Modal shown after ending parking to confirm making a bookmark.
+const BookmarkConversionModal: React.FC<BookmarkConversionModalProps> = ({
+  open,
+  onClose,
+  onDelete,
+  onConvertToBookmark,
+  onRequestNamedBookmark,
+  isDeleting,
+  isConverting,
+}) => {
+  if (!open) return null;
+
+  const handleRequestNamedBookmark = () => {
+    onClose();
+    onRequestNamedBookmark?.();
+  };
+
+  return (
+    <div className={styles.modalOverlay} onClick={onClose}>
+      <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
+        <button className={styles.modalCloseButton} onClick={onClose}>
+          <FaTimes size={22} />
+        </button>
+
+        <button
+          type="button"
+          className={styles.modalBodyWithIcon}
+          onClick={handleRequestNamedBookmark}
+          style={{ background: 'none', border: 'none', padding: 0, textAlign: 'left' }}
+        >
+          <HeartIcon size={16} />
+          do you want to bookmark this location?
+        </button>
+
+        <div className={styles.yesNoButtonGroup}>
+          <button onClick={onDelete} disabled={isDeleting} className={styles.noButton}>
+            <FaTimes />
+            {isDeleting ? 'ending...' : 'no'}
+          </button>
+
+          <button
+            onClick={onConvertToBookmark}
+            disabled={isConverting}
+            className={styles.yesButton}
+          >
+            <FaCheck />
+            {isConverting ? 'saving...' : 'yes'}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+type BookmarkActionsModalProps = {
+  open: boolean;
+  onClose: () => void;
+  onDelete: () => void;
+  onConvertToParking: () => void;
+  isDeleting: boolean;
+  isConverting: boolean;
+  bookmarkName?: string | null;
+};
+
+// Modal with actions available for a bookmark pin.
+const BookmarkActionsModal: React.FC<BookmarkActionsModalProps> = ({
+  open,
+  onClose,
+  onDelete,
+  onConvertToParking,
+  isDeleting,
+  isConverting,
+  bookmarkName,
+}) => {
+  if (!open) return null;
+
+  return (
+    <div className={styles.modalOverlay} onClick={onClose}>
+      <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
+        <button className={styles.modalCloseButton} onClick={onClose}>
+          <FaTimes size={22} />
+        </button>
+        {bookmarkName && (
+          <h2 className={styles.modalBody} style={{ fontSize: '2.6rem' }}>
+            {bookmarkName}
+          </h2>
+        )}
+        <div className={styles.modalButtonGroup}>
+          <button onClick={onDelete} disabled={isDeleting} className={styles.bookmarkButtonVariant}>
+            <FaTrash />
+            {isDeleting ? 'deleting...' : 'delete bookmark'}
+          </button>
+          <button
+            onClick={onConvertToParking}
+            disabled={isConverting}
+            className={styles.parkingButtonVariant}
+          >
+            <CarIcon2 />
+            {isConverting ? 'saving...' : 'just parked here'}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 // The expected props for the MapPin component:
 interface MapPinProps {
   longitude: number;
@@ -17,9 +161,11 @@ interface MapPinProps {
   type: 'car' | 'heart';
   id: string;
   userId: string;
+  bookmarkName?: string | null;
   onDelete?: () => void;
   onConvertToParking?: () => void;
   onConvertToBookmark?: () => void;
+  onRequestNamedBookmark?: (location: { lat: number; lng: number }) => void;
 }
 
 // Renders a single map pin using the Marker component
@@ -30,9 +176,11 @@ export const MapPin: React.FC<MapPinProps> = ({
   type,
   id,
   userId,
+  bookmarkName,
   onDelete,
   onConvertToParking,
   onConvertToBookmark,
+  onRequestNamedBookmark,
 }) => {
   const [isDeleting, setIsDeleting] = useState(false);
   const [isConverting, setIsConverting] = useState(false);
@@ -40,7 +188,7 @@ export const MapPin: React.FC<MapPinProps> = ({
   const [showEndParkingModal, setShowEndParkingModal] = useState(false);
   const [showBookmarkConversionModal, setShowBookmarkConversionModal] = useState(false);
 
-  // Deletes bookmark or parking session
+  // Deletes bookmark or parking session.
   const deletePin = async (pinType: 'car' | 'heart') => {
     // choose api endpoint based on pin type
     const endpoint = pinType === 'car' ? '/api/delete-parking-session' : '/api/delete-bookmark';
@@ -51,6 +199,7 @@ export const MapPin: React.FC<MapPinProps> = ({
     }
   };
 
+  // Handles delete click for whichever pin type is active.
   const handleDelete = async () => {
     if (isDeleting) return;
     setIsDeleting(true);
@@ -68,7 +217,7 @@ export const MapPin: React.FC<MapPinProps> = ({
     }
   };
 
-  // Convert bookmark -> parking session
+  // Convert bookmark -> parking session.
   const handleConvertToParking = async () => {
     if (isConverting) return;
 
@@ -103,7 +252,7 @@ export const MapPin: React.FC<MapPinProps> = ({
     }
   };
 
-  // Convert parking -> bookmark
+  // Convert parking -> bookmark.
   const handleConvertToBookmark = async () => {
     if (isConverting) return;
 
@@ -112,26 +261,10 @@ export const MapPin: React.FC<MapPinProps> = ({
       // delete parking session
       await deletePin('car');
 
-      // create a bookmark at same location
-      const bookmarkResponse = await fetch('/api/bookmark-location', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          user_id: userId,
-          longitude,
-          latitude,
-        }),
-      });
-
-      if (!bookmarkResponse.ok) {
-        throw new Error('Failed to create bookmark');
-      }
-
       setShowBookmarkConversionModal(false);
       setShowEndParkingModal(false);
-      onConvertToBookmark?.();
+      onRequestNamedBookmark?.({ lat: latitude, lng: longitude });
+      onConvertToBookmark?.(); // notify parent to refresh pins
     } catch (error) {
       console.error('Error converting:', error);
       alert('Failed to convert parking to bookmark. Please try again.');
@@ -140,6 +273,7 @@ export const MapPin: React.FC<MapPinProps> = ({
     }
   };
 
+  // Decide which modal to show when a pin is clicked.
   const handlePinClick = () => {
     if (type === 'heart') {
       // for bookmarks, show bookmark action options (delete or park)
@@ -165,101 +299,38 @@ export const MapPin: React.FC<MapPinProps> = ({
         </div>
       </Marker>
 
-      {/* Parking Info Modal (only for parking sessions) */}
-      {showEndParkingModal && type === 'car' && (
-        <div className={styles.modalOverlay} onClick={() => setShowEndParkingModal(false)}>
-          <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
-            <button
-              className={styles.modalCloseButton}
-              onClick={() => setShowEndParkingModal(false)}
-            >
-              <FaTimes size={22} />
-            </button>
+      <ParkingInfoModal
+        open={showEndParkingModal && type === 'car'}
+        onClose={() => setShowEndParkingModal(false)}
+        onEndParking={() => {
+          setShowEndParkingModal(false);
+          setShowBookmarkConversionModal(true);
+        }}
+      />
 
-            <p className={styles.modalBody}>you have a parking session here</p>
+      <BookmarkConversionModal
+        open={showBookmarkConversionModal}
+        onClose={() => setShowBookmarkConversionModal(false)}
+        onDelete={handleDelete}
+        onConvertToBookmark={handleConvertToBookmark}
+        onRequestNamedBookmark={
+          onRequestNamedBookmark
+            ? () => onRequestNamedBookmark({ lat: latitude, lng: longitude })
+            : undefined
+        }
+        isDeleting={isDeleting}
+        isConverting={isConverting}
+      />
 
-            <button
-              onClick={() => {
-                setShowEndParkingModal(false);
-                setShowBookmarkConversionModal(true);
-              }}
-              className={styles.parkingButtonVariant}
-            >
-              <CarIcon2 />
-              end parking
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* Bookmark Conversion Modal (after ending parking) */}
-      {showBookmarkConversionModal && (
-        <div className={styles.modalOverlay} onClick={() => setShowBookmarkConversionModal(false)}>
-          <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
-            <button
-              className={styles.modalCloseButton}
-              onClick={() => setShowBookmarkConversionModal(false)}
-            >
-              <FaTimes size={22} />
-            </button>
-
-            <span className={styles.modalBodyWithIcon}>
-              <HeartIcon size={16} />
-              do you want to bookmark this location?
-            </span>
-
-            <div className={styles.yesNoButtonGroup}>
-              <button onClick={handleDelete} disabled={isDeleting} className={styles.noButton}>
-                <FaTimes />
-                {isDeleting ? 'ending...' : 'no'}
-              </button>
-
-              <button
-                onClick={handleConvertToBookmark}
-                disabled={isConverting}
-                className={styles.yesButton}
-              >
-                <FaCheck />
-                {isConverting ? 'saving...' : 'yes'}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Bookmark Actions Modal (only for bookmarks) */}
-      {showBookmarkActionsModal && type === 'heart' && (
-        <div className={styles.modalOverlay} onClick={() => setShowBookmarkActionsModal(false)}>
-          <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
-            <button
-              className={styles.modalCloseButton}
-              onClick={(e) => {
-                setShowBookmarkActionsModal(false);
-              }}
-            >
-              <FaTimes size={22} />
-            </button>
-            <div className={styles.modalButtonGroup}>
-              <button
-                onClick={handleDelete}
-                disabled={isDeleting}
-                className={styles.bookmarkButtonVariant}
-              >
-                <FaTrash />
-                {isDeleting ? 'deleting...' : 'delete bookmark'}
-              </button>
-              <button
-                onClick={handleConvertToParking}
-                disabled={isConverting}
-                className={styles.parkingButtonVariant}
-              >
-                <CarIcon2 />
-                {isConverting ? 'saving...' : 'just parked here'}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <BookmarkActionsModal
+        open={showBookmarkActionsModal && type === 'heart'}
+        onClose={() => setShowBookmarkActionsModal(false)}
+        onDelete={handleDelete}
+        onConvertToParking={handleConvertToParking}
+        isDeleting={isDeleting}
+        isConverting={isConverting}
+        bookmarkName={bookmarkName}
+      />
     </>
   );
 };

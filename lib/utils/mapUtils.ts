@@ -9,6 +9,7 @@ export type DataPoint = {
   longitude: number;
   type: 'car' | 'heart'; // identifies what kind of pin it is
   id: string; // unique identifier for the pin
+  name?: string | null; // optional label for bookmarks
 };
 
 // Filters out invalid or non-numeric coordinates
