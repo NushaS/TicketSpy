@@ -78,6 +78,10 @@
   gap: 1.25rem;
 }
 
+.mileRadius{
+  color: #445B35;
+  font-weight: 700;
+}
 
 /* editable account fields form */
 .accountForm {
@@ -86,7 +90,6 @@
   gap: 1.5rem;
   margin: 0 4rem;
 }
-
 
 .accountFormGroup {
   display: flex;

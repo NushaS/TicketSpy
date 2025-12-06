@@ -144,8 +144,11 @@ export default function NotificationSettings() {
         <div>
           <h3 className={styles.notificationHeading}>Events near my parking spot</h3>
           <div className={styles.notificationContent}>
-            Notify me when parking enforcement is sighted or a parking ticket is issued within{' '}
-            {distanceMiles.toFixed(2)} miles of my parking location.
+            <span>
+              Notify me when parking enforcement is sighted or a parking ticket is issued within{' '}
+              <span className={styles.mileRadius}>{distanceMiles.toFixed(2)}</span> miles of my
+              parking location.
+            </span>
             <ToggleSwitch
               checked={enabledParking}
               onCheckedChange={(val) => handleToggle('parking', Boolean(val))}
@@ -156,8 +159,11 @@ export default function NotificationSettings() {
         <div>
           <h3 className={styles.notificationHeading}>Events near my bookmarked locations</h3>
           <div className={styles.notificationContent}>
-            Notify me when parking enforcement is sighted or a parking ticket is issued within{' '}
-            {distanceMiles.toFixed(2)} miles of a bookmarked location.
+            <span>
+              Notify me when parking enforcement is sighted or a parking ticket is issued within{' '}
+              <span className={styles.mileRadius}>{distanceMiles.toFixed(2)}</span> miles of a
+              bookmarked location.
+            </span>
             <ToggleSwitch
               checked={enabledBookmarked}
               onCheckedChange={(val) => handleToggle('bookmark', Boolean(val))}
