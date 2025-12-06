@@ -316,3 +316,9 @@
 .cancelDeleteButton:hover {
   background-color: #00000020;
 }
+
+/* error message style */
+.accountError {
+  color: #B14343;
+  font-weight: 700;
+}

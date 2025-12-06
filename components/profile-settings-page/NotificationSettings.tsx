@@ -95,8 +95,8 @@ export default function NotificationSettings() {
       if (!res.ok) throw new Error(data.error || 'Failed to save');
 
       await refetch();
-      setSaveMessage('Saved!');
-      setTimeout(() => setSaveMessage(null), 1500);
+      setSaveMessage('saved!');
+      setTimeout(() => setSaveMessage(null), 2000);
 
       return true;
     } catch (err) {
@@ -186,8 +186,8 @@ export default function NotificationSettings() {
                   distanceMiles: chosen,
                 });
                 if (ok) {
-                  setSaveMessage('Distance saved');
-                  setTimeout(() => setSaveMessage(null), 1500);
+                  setSaveMessage('distance saved!');
+                  setTimeout(() => setSaveMessage(null), 2000);
                 }
               } catch {
                 /* ignore */
@@ -254,9 +254,8 @@ export default function NotificationSettings() {
         </div>
       </div>
 
-      {loadingSave && <p className={styles.smallNote}>saving…</p>}
       {saveMessage && <p className={styles.successMessage}>{saveMessage}</p>}
-      {error && <p className={styles.loginError}>{error}</p>}
+      {error && <p className={styles.accountError}>Error: {error}</p>}
     </div>
   );
 }

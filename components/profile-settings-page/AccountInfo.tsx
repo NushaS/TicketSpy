@@ -105,7 +105,7 @@ export default function AccountInfo() {
       await refetch();
       setSuccessMessage('profile updated successfully!');
 
-      setTimeout(() => setSuccessMessage(null), 1500);
+      setTimeout(() => setSuccessMessage(null), 2000);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');
     }
@@ -191,7 +191,7 @@ export default function AccountInfo() {
           />
         </div>
 
-        {error && <p className={styles.loginError}>{error}</p>}
+        {error && <p className={styles.accountError}>Error: {error}</p>}
         {successMessage && <p className={styles.successMessage}>{successMessage}</p>}
 
         {hasChanges && (
