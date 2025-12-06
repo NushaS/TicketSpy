@@ -7,18 +7,11 @@
 import { useQuery } from '@tanstack/react-query';
 import { createClient } from '@/lib/supabase/client';
 import { z } from 'zod';
+import { ParkingSessionSchema, ParkingSession } from '@/lib/schemas/parkingSessionSchema';
 
-/*
-  Fetch parking sessions for a single user.
-*/
-async function fetchUserParkingSessions(userId: string) {
-  const supabase = createClient();
-  const { data, error } = await supabase.from('parking_sessions').select('*').eq('user_id', userId);
-
-  if (error) throw new Error(error.message);
-  return data;
-}
-
+/**************
+// 1) Fetch parking sessions for a single user.
+***************/
 export function useUserParkingSessions(userId?: string) {
   return useQuery({
     queryKey: ['parking_sessions_user', userId],
@@ -28,32 +21,35 @@ export function useUserParkingSessions(userId?: string) {
   });
 }
 
-/////////////////
-// 1. fetch/use all ParkingSessions
-/////////////////
-// Zod schema
-export const ParkingSessionSchema = z.object({
-  parking_session_id: z.uuid(),
-  user_id: z.uuid(),
-  latitude: z.number(),
-  longitude: z.number(),
-});
-
-// Zod created type from schema
-export type ParkingSession = z.infer<typeof ParkingSessionSchema>;
-
-async function fetchAllParkingSessions(): Promise<ParkingSession[]> {
+async function fetchUserParkingSessions(userId: string) {
   const supabase = createClient();
-  const { data, error } = await supabase.from('parking_sessions').select('*');
-  if (error) throw new Error(error.message);
+  const { data, error } = await supabase.from('parking_sessions').select('*').eq('user_id', userId);
 
+  if (error) {
+    console.log('ERROR fetching user parking sessions:', error);
+    throw new Error(error.message);
+  }
   return z.array(ParkingSessionSchema).parse(data);
 }
 
+/**************
+// 2) fetch/use all ParkingSessions
+***************/
 export function useAllParkingSessions() {
   return useQuery<ParkingSession[]>({
     queryKey: ['parking_sessions_all'],
     queryFn: fetchAllParkingSessions,
     staleTime: 1000 * 60,
   });
+}
+
+async function fetchAllParkingSessions(): Promise<ParkingSession[]> {
+  const supabase = createClient();
+  const { data, error } = await supabase.from('parking_sessions').select('*');
+  if (error) {
+    console.log('ERROR fetching all parking sessions:', error);
+
+    throw new Error(error.message);
+  }
+  return z.array(ParkingSessionSchema).parse(data);
 }
