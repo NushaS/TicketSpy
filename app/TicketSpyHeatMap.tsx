@@ -161,7 +161,8 @@ const TicketSpyHeatMap: React.FC<TicketSpyHeatMapProps> = ({
   const { data: ticketRows = [], refetch: refetchTickets } = useTicketTable(serverFilters as any);
   const { refetch: refetchParkingSessions } = useUserParkingSessions(userId || '');
   const { refetch: refetchBookMarks } = useUserBookmarkedLocations(userId || '');
-  const { refetch: refetchEnforcement } = useEnforcementSightingTable();
+  const { data: enforcementSightings = [], refetch: refetchEnforcement } =
+    useEnforcementSightingTable();
 
   // apply remaining filters client-side (weekday / time-of-day) against rows returned
   // from the server-side query above
@@ -730,21 +731,32 @@ const TicketSpyHeatMap: React.FC<TicketSpyHeatMapProps> = ({
           )}
           {/* Render ticket + car pins on top of heatmap if user is logged*/}
           {userId && <MapPinsLayer userId={userId} />}
-          {/* Transient enforcement markers (temporary pins that auto-remove after 1 hour) */}
-          {transientEnforcements.map((m) => {
-            /*
-              // Compute pixel sizes so the whole marker scales down when zoomed out
-            const outerBase = 56; // px at reference zoom
-            const outer = Math.round(Math.min(Math.max(outerBase + (mapZoom - 12) * 6, 28), 80));
-            const inner = Math.round(outer * 0.78);
-            const iconSize = Math.round(inner * 0.74); */
-            // Use a fixed size for enforcement markers
+          {/* Persistent enforcement sightings from Supabase */}
+          {(enforcementSightings as any[]).map((sighting, idx) => {
+            const lat = Number((sighting as any)?.latitude);
+            const lng = Number((sighting as any)?.longitude);
+            if (!Number.isFinite(lat) || !Number.isFinite(lng)) return null;
+            const observedAt =
+              (sighting as any)?.enforcement_report_time ??
+              (sighting as any)?.sighting_time ??
+              (sighting as any)?.created_at ??
+              null;
+            if (observedAt) {
+              const ts = new Date(observedAt).getTime();
+              if (!Number.isFinite(ts)) return null;
+              const oneHourAgo = Date.now() - 1000 * 60 * 60;
+              if (ts < oneHourAgo) return null;
+            }
+            const key =
+              (sighting as any)?.enforcement_id ??
+              (sighting as any)?.enforcement_sighting_id ??
+              (sighting as any)?.id ??
+              idx;
             const outer = 36;
             const inner = 36;
             const iconSize = 36;
-
             return (
-              <Marker key={m.id} longitude={m.lng} latitude={m.lat} anchor="bottom">
+              <Marker key={key} longitude={lng} latitude={lat} anchor="bottom">
                 <div
                   className={styles.transientMarker}
                   style={{ width: outer, height: outer, marginBottom: Math.round(outer * 0.14) }}

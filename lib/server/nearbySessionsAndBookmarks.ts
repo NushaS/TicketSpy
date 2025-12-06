@@ -54,7 +54,7 @@ export async function notifyUsers(
     { data: bookmarks, error: bookmarkError },
   ] = await Promise.all([
     sb.from('parking_sessions').select('parking_session_id, user_id, latitude, longitude'),
-    sb.from('bookmarked_locations').select('bookmark_id, user_id, latitude, longitude'),
+    sb.from('bookmarked_locations').select('bookmark_id, user_id, latitude, longitude, name'),
   ]);
 
   if (parkingError) {
@@ -123,7 +123,7 @@ export async function notifyUsers(
   const emailSends: Promise<unknown>[] = [];
   const bookmarkNotifications = new Map<
     string,
-    { bookmarkIds: string[]; latitude?: number | null; longitude?: number | null }
+    { bookmarkNames: string[]; latitude?: number | null; longitude?: number | null }
   >();
 
   nearbySessions.forEach((session) => {
@@ -175,11 +175,15 @@ export async function notifyUsers(
     ) {
       notifiedBookmarkUsers.push(bookmark.user_id);
       const existing = bookmarkNotifications.get(bookmark.user_id) ?? {
-        bookmarkIds: [],
+        bookmarkNames: [],
         latitude: undefined,
         longitude: undefined,
       };
-      existing.bookmarkIds.push(String(bookmark.bookmark_id));
+      const name =
+        typeof (bookmark as any)?.name === 'string' && (bookmark as any)?.name.trim()
+          ? (bookmark as any)?.name.trim()
+          : 'Unnamed bookmark';
+      existing.bookmarkNames.push(name);
       // keep first lat/long for context if present
       if (existing.latitude === undefined && typeof bookmark.latitude === 'number')
         existing.latitude = bookmark.latitude;
@@ -204,7 +208,7 @@ export async function notifyUsers(
         latitude: payload.latitude ?? undefined,
         longitude: payload.longitude ?? undefined,
         alertId,
-        bookmarkIds: payload.bookmarkIds,
+        bookmarkNames: payload.bookmarkNames,
       }).catch((err) => {
         console.error('Failed to send bookmark notification email:', err);
       })
