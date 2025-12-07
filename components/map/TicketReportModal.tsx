@@ -1,5 +1,6 @@
 import React from 'react';
-import { Check, X } from 'lucide-react';
+import { Check } from 'lucide-react';
+import { FaTimes } from 'react-icons/fa';
 import styles from '@/app/page.module.css';
 import { ViolationType, violationEnumToUserLabels } from '@/lib/enums/ticketViolationType';
 
@@ -33,8 +34,8 @@ const TicketReportModal: React.FC<TicketReportModalProps> = ({
   return (
     <div className={styles.modalOverlay}>
       <div className={styles.ticketReportModalContent}>
-        <button onClick={onClose} className={styles.ticketReportCloseButton}>
-          <X size={24} />
+        <button onClick={onClose} className={styles.closeButton}>
+          <FaTimes size={22} />
         </button>
 
         <h2 className={styles.ticketReportTitle}>Report a ticket:</h2>

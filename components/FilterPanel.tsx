@@ -1,5 +1,6 @@
 import React from 'react';
-import { X, Check } from 'lucide-react';
+import { Check } from 'lucide-react';
+import { FaTimes } from 'react-icons/fa';
 import styles from '../app/page.module.css';
 import type { Filters } from '@/lib/utils/filterTickets';
 
@@ -66,7 +67,7 @@ export default function FilterPanel({ visible, onClose, onApply, initialFilters 
         <div className={styles.filterPanelHeader}>
           <h3>filters</h3>
           <button onClick={onClose} className={styles.closeButton} aria-label="close filters">
-            <X size={18} />
+            <FaTimes size={22} />
           </button>
         </div>
 

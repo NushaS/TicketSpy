@@ -1,7 +1,8 @@
 'use client';
 
 import React, { useRef, useState } from 'react';
-import { Menu, Info, Check, X } from 'lucide-react';
+import { Menu, Info, Check } from 'lucide-react';
+import { FaTimes } from 'react-icons/fa';
 import Image from 'next/image';
 import logo from './logo.png';
 import Map, { Source, Layer, Marker, Popup } from 'react-map-gl/maplibre';
@@ -29,6 +30,7 @@ import { ViolationType } from '@/lib/enums/ticketViolationType';
 import TicketReportModal from '@/components/map/TicketReportModal';
 import BookmarkNameModal from '@/components/map/BookmarkNameModal';
 import Toast from '@/components/map/Toast';
+import { FaFontAwesome } from 'react-icons/fa';
 
 type MapCenter = { lat: number; lng: number };
 
@@ -811,7 +813,7 @@ const TicketSpyHeatMap: React.FC<TicketSpyHeatMapProps> = ({
                 onClick={() => setShowInstructions(false)}
                 className={styles.modalCloseBtn}
               >
-                <X />
+                <FaTimes size={22} />
               </button>
             </header>
 
@@ -916,7 +918,7 @@ const TicketSpyHeatMap: React.FC<TicketSpyHeatMapProps> = ({
             <div className={styles.pinPopupWrapper}>
               <div className={styles.authOptionsContent}>
                 <button onClick={() => setPinLocation(null)} className={styles.closeButton}>
-                  <X className={styles.mapIcon} />
+                  <FaTimes size={22} />
                 </button>
 
                 <div className={styles.actionButtons}>
@@ -965,7 +967,7 @@ const TicketSpyHeatMap: React.FC<TicketSpyHeatMapProps> = ({
             <div className={styles.pinPopupWrapper}>
               <div className={styles.unauthInstructionsContent}>
                 <button onClick={() => setPinLocation(null)} className={styles.closeButton}>
-                  <X className={styles.mapIcon} />
+                  <FaTimes size={22} />
                 </button>
 
                 <div className={styles.actionButtons}>
@@ -1050,9 +1052,9 @@ const TicketSpyHeatMap: React.FC<TicketSpyHeatMapProps> = ({
                 setShowEnforcementConfirm(false);
                 setEnforcementLocation(null);
               }}
-              className={styles.ticketReportCloseButton}
+              className={styles.closeButton}
             >
-              <X size={20} />
+              <FaTimes size={22} />
             </button>
 
             <h2 className={styles.ticketReportTitle}>
