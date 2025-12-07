@@ -38,14 +38,12 @@ type TicketSpyHeatMapProps = {
   alertMarker?:
     | (MapCenter & { label?: string; kind?: 'ticket' | 'enforcement'; icon?: React.ReactNode })
     | null;
-  redirectAfterAlertDismiss?: boolean;
 };
 
 const TicketSpyHeatMap: React.FC<TicketSpyHeatMapProps> = ({
   initialCenter = null,
   initialZoom = null,
   alertMarker = null,
-  redirectAfterAlertDismiss = false,
 }) => {
   const [showInstructions, setShowInstructions] = useState(false);
   const [showLoginModal, setShowLoginModal] = useState(false);
@@ -90,7 +88,11 @@ const TicketSpyHeatMap: React.FC<TicketSpyHeatMapProps> = ({
   const [isBookmarkSubmitting, setIsBookmarkSubmitting] = useState(false);
   // When the page is loaded via /alert, show a popup on the highlighted marker
   const [showAlertPopup, setShowAlertPopup] = useState<boolean>(!!alertMarker);
-  const [alertDismissed, setAlertDismissed] = useState(false);
+  const [selectedEnforcementPopup, setSelectedEnforcementPopup] = useState<{
+    lat: number;
+    lng: number;
+    label?: string | null;
+  } | null>(null);
   const alertKey = React.useMemo(() => {
     if (!alertMarker) return null;
     const kind = alertMarker.kind ?? 'alert';
@@ -99,7 +101,39 @@ const TicketSpyHeatMap: React.FC<TicketSpyHeatMapProps> = ({
     return `${kind}:${lat}:${lng}`;
   }, [alertMarker]);
   const prevAlertKeyRef = useRef<string | null>(null);
-  const alertRedirectRef = useRef(false);
+  const alertMarkerPosition = React.useMemo(() => {
+    if (!alertMarker) return null;
+    const lat = Number(alertMarker.lat);
+    const lng = Number(alertMarker.lng);
+    if (!Number.isFinite(lat) || !Number.isFinite(lng)) return null;
+    return { lat, lng };
+  }, [alertMarker]);
+  const alertEnforcementKey =
+    alertMarkerPosition && alertMarker?.kind === 'enforcement'
+      ? `${alertMarkerPosition.lat.toFixed(6)}:${alertMarkerPosition.lng.toFixed(6)}`
+      : null;
+  const openAlertPopup = React.useCallback(() => {
+    setShowAlertPopup(true);
+    if (!alertKey) return;
+    try {
+      localStorage.removeItem(`alert-dismissed:${alertKey}`);
+    } catch {
+      // ignore storage errors
+    }
+  }, [alertKey]);
+  const openEnforcementPopup = React.useCallback(
+    (lat: number, lng: number, observedAt?: string | null) => {
+      let label: string | null = null;
+      if (observedAt) {
+        const ts = new Date(observedAt).getTime();
+        if (Number.isFinite(ts)) {
+          label = `Spotted at ${new Date(ts).toLocaleString()}`;
+        }
+      }
+      setSelectedEnforcementPopup({ lat, lng, label });
+    },
+    []
+  );
 
   React.useEffect(() => {
     if (initialCenter && mapRef.current) {
@@ -114,23 +148,19 @@ const TicketSpyHeatMap: React.FC<TicketSpyHeatMapProps> = ({
     }
     if (alertKey !== prevAlertKeyRef.current) {
       prevAlertKeyRef.current = alertKey;
-      alertRedirectRef.current = false;
       if (alertKey) {
         try {
           const stored = localStorage.getItem(`alert-dismissed:${alertKey}`);
           if (stored === 'true') {
             setShowAlertPopup(false);
-            setAlertDismissed(true);
             return;
           }
         } catch {
           // ignore storage errors
         }
         setShowAlertPopup(true);
-        setAlertDismissed(false);
       } else {
         setShowAlertPopup(false);
-        setAlertDismissed(false);
       }
     }
   }, [initialCenter, initialZoom, alertKey]);
@@ -684,33 +714,46 @@ const TicketSpyHeatMap: React.FC<TicketSpyHeatMapProps> = ({
             <Layer {...adjustableHeatmap} />
           </Source>
           {/* Alert marker (from /alert) */}
-          {alertMarker && (
+          {alertMarker && alertMarkerPosition && (
             <>
-              <Marker longitude={alertMarker.lng} latitude={alertMarker.lat} anchor="bottom">
-                <div className={styles.mapMarkerWrapper} title={alertMarker.label ?? 'Alert'}>
-                  {/* Show the alert icon while the popup is open; switch to the softer icon after dismissal */}
+              <Marker
+                longitude={alertMarkerPosition.lng}
+                latitude={alertMarkerPosition.lat}
+                anchor="bottom"
+              >
+                <div
+                  className={styles.mapMarkerWrapper}
+                  title={alertMarker.label ?? 'Alert'}
+                  role="button"
+                  tabIndex={0}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    openAlertPopup();
+                  }}
+                  onMouseDown={(e) => e.stopPropagation()}
+                  onTouchStart={(e) => e.stopPropagation()}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      openAlertPopup();
+                    }
+                  }}
+                >
                   {alertMarker.kind === 'enforcement' ? (
-                    !alertDismissed && alertMarker.icon ? (
-                      // while the popup is open, show the red alert icon
-                      alertMarker.icon
-                    ) : (
-                      // after dismissal, use the softer orange enforcement icon
-                      <ParkingEnforcementIcon size={36} />
-                    )
+                    <ParkingEnforcementIcon size={36} />
                   ) : (
-                    // else for tickets, show the provided alert icon (or nothing if absent)
                     (alertMarker.icon ?? null)
                   )}
                 </div>
               </Marker>
               {showAlertPopup && (
                 <Popup
-                  longitude={alertMarker.lng}
-                  latitude={alertMarker.lat}
+                  longitude={alertMarkerPosition.lng}
+                  latitude={alertMarkerPosition.lat}
                   anchor="top"
                   onClose={() => {
                     setShowAlertPopup(false);
-                    setAlertDismissed(true);
                     if (alertKey) {
                       try {
                         localStorage.setItem(`alert-dismissed:${alertKey}`, 'true');
@@ -753,6 +796,8 @@ const TicketSpyHeatMap: React.FC<TicketSpyHeatMapProps> = ({
             const lat = Number((sighting as any)?.latitude);
             const lng = Number((sighting as any)?.longitude);
             if (!Number.isFinite(lat) || !Number.isFinite(lng)) return null;
+            const coordKey = `${lat.toFixed(6)}:${lng.toFixed(6)}`;
+            if (alertEnforcementKey && coordKey === alertEnforcementKey) return null;
             const observedAt =
               (sighting as any)?.enforcement_report_time ??
               (sighting as any)?.sighting_time ??
@@ -777,6 +822,21 @@ const TicketSpyHeatMap: React.FC<TicketSpyHeatMapProps> = ({
                 <div
                   className={styles.transientMarker}
                   style={{ width: outer, height: outer, marginBottom: Math.round(outer * 0.14) }}
+                  role="button"
+                  tabIndex={0}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    openEnforcementPopup(lat, lng, observedAt);
+                  }}
+                  onMouseDown={(e) => e.stopPropagation()}
+                  onTouchStart={(e) => e.stopPropagation()}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      openEnforcementPopup(lat, lng, observedAt);
+                    }
+                  }}
                 >
                   <div
                     className={styles.transientMarkerInner}
@@ -788,6 +848,23 @@ const TicketSpyHeatMap: React.FC<TicketSpyHeatMapProps> = ({
               </Marker>
             );
           })}
+          {selectedEnforcementPopup && (
+            <Popup
+              longitude={selectedEnforcementPopup.lng}
+              latitude={selectedEnforcementPopup.lat}
+              anchor="top"
+              onClose={() => setSelectedEnforcementPopup(null)}
+              closeButton
+              closeOnClick={false}
+            >
+              <div style={{ maxWidth: 220 }}>
+                <strong>Parking enforcement spotted</strong>
+                {selectedEnforcementPopup.label ? (
+                  <div style={{ marginTop: 4 }}>{selectedEnforcementPopup.label}</div>
+                ) : null}
+              </div>
+            </Popup>
+          )}
         </Map>
       </div>
       {/* Instructions Modal (Logged In) */}
