@@ -70,13 +70,15 @@
 }
 
 .parkingButtonVariant {
-  padding: 1.25rem;
+  font-family: 'Jersey 10', sans-serif;
+  letter-spacing: 0.5px;
+  padding: 1rem;
   background-color: #819A79;
   color: white;
   border: none;
   border-radius: 8px;
-  font-size: 1.25rem;
-  font-weight: 700;
+  font-size: 1.75rem;
+  font-weight: 500;
   cursor: pointer;
   display: flex;
   width: 300px;
@@ -84,7 +86,6 @@
   justify-content: center;
   box-shadow: 0 4px 8px rgba(15, 23, 42, 0.25);
   transition: background-color 0.2s;
-
 }
 
 .parkingButtonVariant:hover {
@@ -92,13 +93,15 @@
 }
 
 .bookmarkButtonVariant {
-  padding: 1.25rem;
+  font-family: 'Jersey 10', sans-serif;
+  letter-spacing: 0.5px;
+  padding: 1rem;
   background-color: #63705B;
   color: white;
   border: none;
   border-radius: 8px;
-  font-size: 1.25rem;
-  font-weight: 700;
+  font-size: 1.75rem;
+  font-weight: 500;
   cursor: pointer;
   display: flex;
   width: 300px;
@@ -111,6 +114,11 @@
 
 .bookmarkButtonVariant:hover {
   background-color: #454e40;
+}
+
+.buttonText {
+  position: relative;
+  top: 2px;
 }
 
 /* yes no buttons */
@@ -127,13 +135,15 @@
 }
 
 .yesButton {
+  font-family: 'Jersey 10', sans-serif;
+  letter-spacing: 0.5px;
   width: 7rem;
   padding: 0.75rem 1.5rem;
   background-color: #63705B;
   color: white;
-  border-radius: 50px;
-  font-size: 1.125rem;
-  font-weight: 700;
+  border-radius: 12px;
+  font-size: 1.5rem;
+  font-weight: 500;
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -148,14 +158,16 @@
 }
 
 .noButton {
+  font-family: 'Jersey 10', sans-serif;
+  letter-spacing: 0.5px;
   width: 7rem;
   padding: 0.75rem 1.5rem;
   background-color: white;
   color: #63705B;
   border: 1px solid black;
-  border-radius: 50px;
-  font-size: 1.125rem;
-  font-weight: 700;
+  border-radius: 12px;
+  font-size: 1.5rem;
+  font-weight: 500;
   cursor: pointer;
   display: flex;
   align-items: center;

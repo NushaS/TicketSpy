@@ -30,7 +30,6 @@ import { ViolationType } from '@/lib/enums/ticketViolationType';
 import TicketReportModal from '@/components/map/TicketReportModal';
 import BookmarkNameModal from '@/components/map/BookmarkNameModal';
 import Toast from '@/components/map/Toast';
-import { FaFontAwesome } from 'react-icons/fa';
 
 type MapCenter = { lat: number; lng: number };
 
@@ -1008,7 +1007,7 @@ const TicketSpyHeatMap: React.FC<TicketSpyHeatMapProps> = ({
 
                 <div className={styles.authButtons}>
                   <Link href="/auth/sign-up">
-                    <button className={styles.createAccountBtn}>create an account</button>
+                    <button className={styles.createAccountBtn}>create account</button>
                   </Link>
                   <span className={styles.orText}>or</span>
                   <button

@@ -20,7 +20,7 @@ export const SightingIcon: React.FC<SightingIconProps> = ({
     xmlns="http://www.w3.org/2000/svg"
     width={size * (9 / 23)} // preserve SVG aspect ratio (9x23)
     height={size}
-    viewBox="0 0 2 23"
+    viewBox="0 0 9 23"
     fill="none"
     className={className}
   >

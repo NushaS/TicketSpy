@@ -53,7 +53,7 @@ const ParkingInfoModal: React.FC<ParkingInfoModalProps> = ({
 
         <button onClick={onEndParking} className={styles.parkingButtonVariant}>
           <CarIcon2 />
-          end parking
+          <span className={styles.buttonText}>end parking</span>
         </button>
       </div>
     </div>
@@ -160,7 +160,9 @@ const BookmarkActionsModal: React.FC<BookmarkActionsModalProps> = ({
         <div className={styles.modalButtonGroup}>
           <button onClick={onDelete} disabled={isDeleting} className={styles.bookmarkButtonVariant}>
             <FaTrash size={16} />
-            {isDeleting ? 'deleting...' : 'delete bookmark'}
+            <span className={styles.buttonText}>
+              {isDeleting ? 'deleting...' : 'delete bookmark'}
+            </span>
           </button>
           <button
             onClick={onConvertToParking}
@@ -168,7 +170,9 @@ const BookmarkActionsModal: React.FC<BookmarkActionsModalProps> = ({
             className={styles.parkingButtonVariant}
           >
             <CarIcon2 />
-            {isConverting ? 'saving...' : 'just parked here'}
+            <span className={styles.buttonText}>
+              {isConverting ? 'saving...' : 'just parked here'}
+            </span>
           </button>
         </div>
       </div>
