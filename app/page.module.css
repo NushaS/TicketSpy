@@ -286,6 +286,11 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  opacity: 0.6
+}
+
+.modalCloseBtn:hover {
+  opacity: 0.4;
 }
 
 /* body: scrollable area */
@@ -412,10 +417,11 @@
   padding: 0.25rem;
   display: flex;
   align-items: center;
+  opacity: 0.6
 }
 
 .closeButton:hover {
-  opacity: 0.7;
+  opacity: 0.4;
 }
 
 .loginTitle {
@@ -503,23 +509,6 @@
   width: 90%;
   margin: 0 1rem;
   position: relative;
-}
-
-.ticketReportCloseButton {
-  position: absolute;
-  top: 1rem;
-  right: 1rem;
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 0.25rem;
-  display: flex;
-  align-items: center;
-  color: #999;
-}
-
-.ticketReportCloseButton:hover {
-  color: #666;
 }
 
 .ticketReportTitle {
@@ -909,10 +898,6 @@
   fill: #a24052;
   stroke: none;
   filter: drop-shadow(0 10px 22px rgba(16, 24, 40, 0.32));
-}
-.mapIcon {
-  size: 24;
-  color: '#999';
 }
 
 /* Responsive adjustments for unauth instructions */

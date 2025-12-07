@@ -1,6 +1,6 @@
 import styles from '../auth.module.css';
 import { LoginForm } from '@/components/login-form';
-import { X } from 'lucide-react';
+import { FaTimes } from 'react-icons/fa';
 import Link from 'next/link';
 import Image from 'next/image';
 import logo from '../../logo.png';
@@ -19,7 +19,7 @@ export default function Page() {
           className={`${styles.closeButton} ${styles.pageCloseButton}`}
           aria-label="Close"
         >
-          <X />
+          <FaTimes size={22} />
         </Link>
         <h1 className={styles.authHeading}>log in</h1>
         <LoginForm />

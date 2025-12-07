@@ -1,5 +1,5 @@
 import React from 'react';
-import { X } from 'lucide-react';
+import { FaTimes } from 'react-icons/fa';
 import styles from '@/app/page.module.css';
 
 type BookmarkNameModalProps = {
@@ -24,8 +24,8 @@ const BookmarkNameModal: React.FC<BookmarkNameModalProps> = ({
   return (
     <div className={styles.modalOverlay} onClick={onClose}>
       <div className={styles.ticketReportModalContent} onClick={(e) => e.stopPropagation()}>
-        <button className={styles.ticketReportCloseButton} onClick={onClose} aria-label="Close">
-          <X size={22} />
+        <button className={styles.closeButton} onClick={onClose} aria-label="Close">
+          <FaTimes size={22} />
         </button>
 
         <h3 className={styles.ticketReportTitle}>bookmark this spot</h3>
