@@ -1,7 +1,8 @@
 'use client';
 
 import React, { useState } from 'react';
-import { ArrowLeft, Check } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
+import { FaCheck } from 'react-icons/fa';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
@@ -105,7 +106,7 @@ const WelcomePage: React.FC = () => {
 
             {/* Submit Button */}
             <button type="submit" className={styles.createButton} disabled={isLoading}>
-              <Check className={styles.check} />
+              <FaCheck className={styles.check} />
               <span>{isLoading ? 'creating...' : 'create'}</span>
             </button>
           </form>

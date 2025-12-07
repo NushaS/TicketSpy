@@ -106,7 +106,7 @@ const BookmarkConversionModal: React.FC<BookmarkConversionModalProps> = ({
 
         <div className={styles.yesNoButtonGroup}>
           <button onClick={onDelete} disabled={isDeleting} className={styles.noButton}>
-            <FaTimes />
+            <FaTimes size={16} />
             {isDeleting ? 'ending...' : 'no'}
           </button>
 
@@ -115,7 +115,7 @@ const BookmarkConversionModal: React.FC<BookmarkConversionModalProps> = ({
             disabled={isConverting}
             className={styles.yesButton}
           >
-            <FaCheck />
+            <FaCheck size={16} />
             {isConverting ? 'saving...' : 'yes'}
           </button>
         </div>
@@ -159,7 +159,7 @@ const BookmarkActionsModal: React.FC<BookmarkActionsModalProps> = ({
         )}
         <div className={styles.modalButtonGroup}>
           <button onClick={onDelete} disabled={isDeleting} className={styles.bookmarkButtonVariant}>
-            <FaTrash />
+            <FaTrash size={16} />
             {isDeleting ? 'deleting...' : 'delete bookmark'}
           </button>
           <button

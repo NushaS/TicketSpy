@@ -1,6 +1,5 @@
 import React from 'react';
-import { Check } from 'lucide-react';
-import { FaTimes } from 'react-icons/fa';
+import { FaTimes, FaCheck } from 'react-icons/fa';
 import styles from '@/app/page.module.css';
 import { ViolationType, violationEnumToUserLabels } from '@/lib/enums/ticketViolationType';
 
@@ -81,8 +80,8 @@ const TicketReportModal: React.FC<TicketReportModalProps> = ({
             </select>
           </div>
           <button type="submit" className={styles.ticketReportSubmitButton}>
-            <Check size={20} />
-            <span>Submit ticket report</span>
+            <FaCheck size={16} />
+            <span>submit ticket report</span>
           </button>
         </form>
       </div>

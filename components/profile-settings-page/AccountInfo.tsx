@@ -194,10 +194,10 @@ export default function AccountInfo() {
         {hasChanges && (
           <div className={styles.buttonGroup}>
             <button type="button" onClick={handleDiscard} className={styles.discardButton}>
-              <FaTimes /> discard changes
+              <FaTimes size={16} /> discard changes
             </button>
             <button type="submit" className={styles.saveButton}>
-              <FaCheck /> save changes
+              <FaCheck size={16} /> save changes
             </button>
           </div>
         )}
@@ -222,7 +222,7 @@ export default function AccountInfo() {
 
           <div className={styles.accountActionButtons}>
             <button type="button" onClick={handleLogout} className={styles.logoutButton}>
-              <FaSignOutAlt /> log out
+              <FaSignOutAlt size={16} /> log out
             </button>
 
             <button
@@ -230,7 +230,7 @@ export default function AccountInfo() {
               onClick={() => setShowDeleteModal(true)}
               className={styles.deleteButton}
             >
-              <FaTrash /> delete account
+              <FaTrash size={16} /> delete account
             </button>
           </div>
         </div>
@@ -258,10 +258,10 @@ export default function AccountInfo() {
                 className={styles.cancelDeleteButton}
                 onClick={() => setShowDeleteModal(false)}
               >
-                <FaTimes /> cancel
+                <FaTimes size={16} /> cancel
               </button>
               <button className={styles.confirmDeleteButton} onClick={handleDeleteAccount}>
-                <FaTrash /> delete account
+                <FaTrash size={16} /> delete account
               </button>
             </div>
           </div>
