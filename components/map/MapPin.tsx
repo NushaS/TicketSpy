@@ -186,6 +186,7 @@ interface MapPinProps {
   userId: string;
   bookmarkName?: string | null;
   startTime?: string | null;
+  allUserBookmarks?: Array<{ latitude: number; longitude: number }>;
   onDelete?: () => void;
   onConvertToParking?: () => void;
   onConvertToBookmark?: () => void;
@@ -202,6 +203,7 @@ export const MapPin: React.FC<MapPinProps> = ({
   userId,
   bookmarkName,
   startTime,
+  allUserBookmarks,
   onDelete,
   onConvertToParking,
   onConvertToBookmark,
@@ -229,7 +231,7 @@ export const MapPin: React.FC<MapPinProps> = ({
     if (isDeleting) return;
     setIsDeleting(true);
     try {
-      await deletePin(type); // uses the new helper
+      await deletePin(type);
       setShowBookmarkActionsModal(false);
       setShowBookmarkConversionModal(false);
       setShowEndParkingModal(false);
@@ -248,9 +250,7 @@ export const MapPin: React.FC<MapPinProps> = ({
 
     setIsConverting(true);
     try {
-      // delete bookmark
-      await deletePin('heart');
-      // create parking session at same location
+      // don't delete bookmark - just create parking session at same location
       const parkingResponse = await fetch('/api/new-parking-session', {
         method: 'POST',
         headers: {
@@ -298,6 +298,35 @@ export const MapPin: React.FC<MapPinProps> = ({
     }
   };
 
+  // End parking session - check if bookmark exists at this location first
+  const handleEndParking = async () => {
+    if (isConverting) return;
+
+    setIsConverting(true);
+    try {
+      // Check if there's a bookmark at this parking location (within ~10 meters)
+      const hasBookmarkHere = (allUserBookmarks || []).some(
+        (bookmark) => bookmark.latitude === latitude && bookmark.longitude === longitude
+      );
+
+      if (hasBookmarkHere) {
+        // Just delete parking session - bookmark will reappear automatically
+        await deletePin('car');
+        setShowEndParkingModal(false);
+        onDelete?.(); // Refresh pins - bookmark now visible
+      } else {
+        // No bookmark exists, show conversion modal
+        setShowEndParkingModal(false);
+        setShowBookmarkConversionModal(true);
+      }
+    } catch (error) {
+      console.error('Error ending parking:', error);
+      alert('Failed to end parking session. Please try again.');
+    } finally {
+      setIsConverting(false);
+    }
+  };
+
   // Decide which modal to show when a pin is clicked.
   const handlePinClick = () => {
     if (type === 'heart') {
@@ -328,10 +357,7 @@ export const MapPin: React.FC<MapPinProps> = ({
         open={showEndParkingModal && type === 'car'}
         startTime={startTime}
         onClose={() => setShowEndParkingModal(false)}
-        onEndParking={() => {
-          setShowEndParkingModal(false);
-          setShowBookmarkConversionModal(true);
-        }}
+        onEndParking={handleEndParking} // Changed from inline function
       />
 
       <BookmarkConversionModal
