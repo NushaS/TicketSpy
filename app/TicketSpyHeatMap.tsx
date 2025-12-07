@@ -451,13 +451,24 @@ const TicketSpyHeatMap: React.FC<TicketSpyHeatMapProps> = ({
 
     // convert bookmark records to pin points in heart shape
     const bookmarkPoints = filterValidDataPoints(
-      (bookmarkData ?? []).map((row) => ({
-        latitude: Number(row.latitude),
-        longitude: Number(row.longitude),
-        type: 'heart',
-        id: row.bookmark_id,
-        name: row.name ?? null,
-      }))
+      (bookmarkData ?? [])
+        // don't show a bookmark if it has an active parking session
+        .filter((bookmark) => {
+          // check if there is a car parked at this bookmark's location
+          const hasCarHere = (carData ?? []).some(
+            (car) =>
+              Number(bookmark.latitude) === Number(car.latitude) &&
+              Number(bookmark.longitude) === Number(car.longitude)
+          );
+          return !hasCarHere;
+        })
+        .map((row) => ({
+          latitude: Number(row.latitude),
+          longitude: Number(row.longitude),
+          type: 'heart',
+          id: row.bookmark_id,
+          name: row.name ?? null,
+        }))
     );
 
     //convert parking session record for given user to pin point in car shape
@@ -492,6 +503,10 @@ const TicketSpyHeatMap: React.FC<TicketSpyHeatMapProps> = ({
             userId={userId}
             {...(point.type === 'heart' ? { bookmarkName: point.name } : {})}
             {...(point.type === 'car' ? { startTime: point.start_datetime } : {})}
+            allUserBookmarks={bookmarkData?.map((b) => ({
+              latitude: Number(b.latitude),
+              longitude: Number(b.longitude),
+            }))}
             onDelete={handlePinChange}
             onConvertToParking={handlePinChange}
             onConvertToBookmark={handlePinChange}
