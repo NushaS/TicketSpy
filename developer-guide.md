@@ -37,33 +37,35 @@ Follow these steps to build and run the project locally:
 
 1. **Clone the repository**
    ```bash
-   https://github.com/NushaS/TicketSpy.git
-   cd TicketSpy
+   - git clone https://github.com/NushaS/TicketSpy.git
+   - cd TicketSpy
    ```
 2. **Create a new branch (optional)**
    ```bash
-   git checkout -b <branch-name>
+   - git checkout -b <branch-name>
    ```
-3. **Set up environment variables**
-   Create a file named `.env.local` in the project root.  
-   Add your Supabase credentials and project-specific configuration values, for example:
-   ```bash
-   - NEXT_PUBLIC_SUPABASE_URL=https://zknbtqijbtbkonysrtjr.supabase.co
-- NEXT_PUBLIC_SUPABASE_PUBLISHABLE_OR_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InprbmJ0cWlqYnRia29ueXNydGpyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjAwNDI4MTYsImV4cCI6MjA3NTYxODgxNn0.LjEZQWSYmqsWKptDFaG2WyETQzfld0APEeHdlrI5Tco
-- SUPABASE_SERVICE_ROLE_KEY=YourSupabaseServiceRoleKey
-- If you are a UW student, you can access all our API keys (including SupabaseServiceRoleKey)
-- https://docs.google.com/document/d/1XV_wcLVr5xJQiNSPcsQuTWJQUjbESwpbuEIlXwFTbkE/edit?usp=sharing
+3. **Add a `.env.local` file under the main `TicketSpy` directory for the Supabase credentials. In the file, define:**
+   - `NEXT_PUBLIC_SUPABASE_URL`=YourSupabaseUrl 
+   - `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_OR_ANON_KEY`=YourSupabaseApiKey
+   - `SUPABASE_SERVICE_ROLE_KEY`=YourServiceRoleKey
+     
+   (Note: This is required, as components that use `/lib/supabase` will throw errors if the credentials are not available.)
+
+   To access our Supabase credentials:
+   - if you are a UW student, access them [here](https://docs.google.com/document/d/1XV_wcLVr5xJQiNSPcsQuTWJQUjbESwpbuEIlXwFTbkE/edit?usp=sharing).
+   - if you are not a UW student, please email us (emails available via the living document in `Acknowledgements`).
+
    ```
 4. **Install dependencies**
    ```bash
-   npm install
+   - npm install
    ```
 5. **Run the development server**
    ```bash
-   npm run dev
+   - npm run dev
    ```
 6. **View the application**
-   Once the build completes successfully, open the URL displayed in your terminal (usually [http://localhost:3000](http://localhost:3000)) to view the website.
+   - Once the build completes successfully, open the URL displayed in your terminal (usually [http://localhost:3000](http://localhost:3000)) to view the website.
 
 
 ## How to Test the Software (CI/CD)
