@@ -1,5 +1,5 @@
 import React from 'react';
-import { FaTimes } from 'react-icons/fa';
+import { FaTimes, FaCheck } from 'react-icons/fa';
 import styles from '@/app/page.module.css';
 
 type BookmarkNameModalProps = {
@@ -53,6 +53,7 @@ const BookmarkNameModal: React.FC<BookmarkNameModalProps> = ({
           </div>
 
           <button className={styles.ticketReportSubmitButton} disabled={isSubmitting} type="submit">
+            <FaCheck size={16}/>
             {isSubmitting ? 'saving...' : 'save bookmark'}
           </button>
         </form>
