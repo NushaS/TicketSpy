@@ -1,5 +1,5 @@
 import React from 'react';
-import { FaTimes } from 'react-icons/fa';
+import { FaTimes, FaCheck } from 'react-icons/fa';
 import styles from '@/app/page.module.css';
 
 type InstructionsModalProps = {
@@ -109,6 +109,7 @@ export const InstructionsModal: React.FC<InstructionsModalProps> = ({ isOpen, on
 
         <footer className={styles.modalFooter}>
           <button type="button" onClick={onClose} className={styles.modalButton}>
+            <FaCheck size={16} />
             got it!
           </button>
         </footer>
