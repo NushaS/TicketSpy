@@ -1,6 +1,7 @@
 'use client';
 
 import { createClient } from '@/lib/supabase/client';
+import { FaCheck } from 'react-icons/fa';
 import Link from 'next/link';
 import { useState } from 'react';
 import styles from '@/app/auth/auth.module.css';
@@ -33,7 +34,7 @@ export function ForgotPasswordForm() {
   return (
     <div className={styles.loginFormContainer}>
       {/* Heading, same style as SignUpForm */}
-      <h1 className={styles.authHeading}>Reset Your Password</h1>
+      <h1 className={styles.authHeading}>reset your password</h1>
       <div style={{ textAlign: 'left', margin: '1.5rem', fontSize: '0.9rem' }}>
         Type in your email and we&apos;ll send you a link to reset your password.
       </div>
@@ -64,13 +65,14 @@ export function ForgotPasswordForm() {
           {error && <p className={styles.loginError}>{error}</p>}
 
           <button type="submit" className={styles.submitButton} disabled={isLoading}>
-            {isLoading ? 'Sending...' : 'Send reset email'}
+            <FaCheck size={16} />
+            {isLoading ? 'sending...' : 'send reset email'}
           </button>
 
           <div style={{ textAlign: 'center', marginTop: '1rem', fontSize: '0.9rem' }}>
             Remember your password?{' '}
             <Link href="/auth/login" className="underline underline-offset-4">
-              Login
+              Log in
             </Link>
           </div>
         </form>

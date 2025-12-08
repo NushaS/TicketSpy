@@ -1,5 +1,5 @@
 import React from 'react';
-import { X, Check } from 'lucide-react';
+import { FaTimes, FaCheck } from 'react-icons/fa';
 import styles from '../app/page.module.css';
 import type { Filters } from '@/lib/utils/filterTickets';
 
@@ -66,13 +66,35 @@ export default function FilterPanel({ visible, onClose, onApply, initialFilters 
         <div className={styles.filterPanelHeader}>
           <h3>filters</h3>
           <button onClick={onClose} className={styles.closeButton} aria-label="close filters">
-            <X size={18} />
+            <FaTimes size={22} />
           </button>
         </div>
 
         <div className={styles.filterPanelBody}>
           <section className={styles.filterSection}>
-            <h4>Time range (e.g., last)</h4>
+            <h4>Time range</h4>
+            <div>
+              <label>
+                <input
+                  type="radio"
+                  name="time-range"
+                  checked={local.timeRange?.amount === 1 && local.timeRange?.unit === 'weeks'}
+                  onChange={() => setTimeRangeOption('1w')}
+                />{' '}
+                Past 1 week
+              </label>
+            </div>
+            <div>
+              <label>
+                <input
+                  type="radio"
+                  name="time-range"
+                  checked={local.timeRange?.amount === 2 && local.timeRange?.unit === 'weeks'}
+                  onChange={() => setTimeRangeOption('2w')}
+                />{' '}
+                Past 2 weeks
+              </label>
+            </div>
             <div>
               <label>
                 <input
@@ -203,7 +225,7 @@ export default function FilterPanel({ visible, onClose, onApply, initialFilters 
 
         <div className={styles.filterPanelFooter}>
           <button className={styles.applyFiltersButton} onClick={apply}>
-            <Check size={16} />
+            <FaCheck size={16} />
             <span style={{ marginLeft: 8 }}>apply filters</span>
           </button>
         </div>

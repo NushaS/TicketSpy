@@ -1,6 +1,7 @@
 'use client';
 // import from supabase
 import { createClient } from '@/lib/supabase/client';
+import { FaCheck } from 'react-icons/fa';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
@@ -113,6 +114,7 @@ export function SignUpForm() {
       {error && <p className={styles.loginError}>{error}</p>}
 
       <button type="submit" className={styles.submitButton} disabled={isLoading}>
+        <FaCheck size={16} />
         <span>{isLoading ? 'creating account...' : 'submit'}</span>
       </button>
 

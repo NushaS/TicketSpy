@@ -1,0 +1,200 @@
+/* Style classes for the bookmark and parking session management modals */
+
+/* marker label */
+.markerWrapper {
+  transition: opacity 0.2s ease-in-out;
+  cursor: pointer;
+}
+
+.markerWrapper.disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+/* modal styles */
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(8px);
+}
+
+.modalContent {
+    position: relative;
+    background-color: #fffcfb;
+    padding: 3rem;
+    border-radius: 20px;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    width: 500px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+}
+
+.modalContent svg {
+  height: 24px;
+}
+
+.modalBody {
+  font-family: 'Jersey 10', sans-serif;
+  font-weight: 500;
+  font-size: 1.625rem;
+  text-align: center;
+  opacity: 0.7;
+  padding: 1rem 0;
+}
+
+.modalBodyWithIcon {
+  font-family: 'Jersey 10', sans-serif;
+  font-weight: 500;
+  font-size: 1.625rem;
+  text-align: center;
+  color: #63705B;
+  display: flex;
+  flex-direction: row;
+  gap: 1rem;
+  padding: 1rem 0;
+  align-items: center;
+}
+
+/* bookmark/parking choice buttons */
+.modalButtonGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.parkingButtonVariant {
+  font-family: 'Jersey 10', sans-serif;
+  letter-spacing: 0.5px;
+  padding: 1rem;
+  background-color: #819A79;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1.75rem;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  width: 300px;
+  gap: 0.5rem;
+  justify-content: center;
+  box-shadow: 0 4px 8px rgba(15, 23, 42, 0.25);
+  transition: background-color 0.2s;
+}
+
+.parkingButtonVariant:hover {
+  background-color: #596e53;
+}
+
+.bookmarkButtonVariant {
+  font-family: 'Jersey 10', sans-serif;
+  letter-spacing: 0.5px;
+  padding: 1rem;
+  background-color: #63705B;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1.75rem;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  width: 300px;
+  gap: 0.85rem;
+  justify-content: center;
+  box-shadow: 0 4px 8px rgba(15, 23, 42, 0.25);
+  transition: background-color 0.2s;
+
+}
+
+.bookmarkButtonVariant:hover {
+  background-color: #454e40;
+}
+
+.buttonText {
+  position: relative;
+  top: 2px;
+}
+
+/* yes no buttons */
+.yesNoButtonGroup {
+  margin-top: 1rem;
+  display: flex;
+  flex-direction: row;
+  gap: 1rem;
+  justify-content: center;
+}
+
+.yesNoButtonGroup svg{
+  height: 16px;
+}
+
+.yesButton {
+  font-family: 'Jersey 10', sans-serif;
+  letter-spacing: 0.5px;
+  width: 7rem;
+  padding: 0.75rem 1.5rem;
+  background-color: #63705B;
+  color: white;
+  border-radius: 12px;
+  font-size: 1.5rem;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  justify-content: center;
+  transition: background-color 0.2s;
+  box-shadow: 0 8px 18px rgba(15, 23, 42, 0.14);
+}
+
+.yesButton:hover {
+  background-color: #454e40;
+}
+
+.noButton {
+  font-family: 'Jersey 10', sans-serif;
+  letter-spacing: 0.5px;
+  width: 7rem;
+  padding: 0.75rem 1.5rem;
+  background-color: white;
+  color: #63705B;
+  border: 1px solid black;
+  border-radius: 12px;
+  font-size: 1.5rem;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  justify-content: center;
+  transition: background-color 0.2s;
+  box-shadow: 0 8px 18px rgba(15, 23, 42, 0.14);
+}
+
+.noButton:hover {
+  background-color: #00000020;
+}
+
+/* close button */
+.modalCloseButton {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.25rem;
+  display: flex;
+  align-items: center;
+  opacity: 0.6;
+}
+
+.modalCloseButton:hover {
+  opacity: 0.4;
+}

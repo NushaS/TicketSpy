@@ -20,10 +20,11 @@ export const ProfileIcon: React.FC<ProfileIconProps> = ({
   <svg
     xmlns="http://www.w3.org/2000/svg"
     width={size}
-    height={(size * 47) / 38} // maintain the 36x47 ratio
+    height={(size * 52) / 38} // maintain the 36x47 ratio
     viewBox="0 0 38 40"
     fill="currentColor"
     className={className}
+    style={{ color, filter: 'drop-shadow(0 2px 6px rgba(15, 23, 42, 0.18))' }}
   >
     <path
       d="M27.636 10C27.636 15.5228 23.1588 20 17.636 20C12.1131 20 7.63599 15.5228 7.63599 10C7.63599 4.47715 12.1131 0 17.636 0C23.1588 0 27.636 4.47715 27.636 10Z"
