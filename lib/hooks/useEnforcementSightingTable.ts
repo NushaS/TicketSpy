@@ -15,6 +15,11 @@ export function useEnforcementSightingTable() {
   return useQuery({
     queryKey: ['enforcement_sightings'], // unique cache key
     queryFn: fetchEnforcementSightings,
-    staleTime: 1000 * 60, // cache for 1 min
+    // Light polling for fresh data plus focus/reconnect refetches.
+    staleTime: 0, // always stale so focus/reconnect will refetch
+    refetchInterval: 120_000, // poll every 2 minutes
+    refetchIntervalInBackground: false,
+    refetchOnWindowFocus: true,
+    refetchOnReconnect: true,
   });
 }

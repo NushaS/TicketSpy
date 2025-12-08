@@ -34,7 +34,12 @@ export function useTicketTable(filters?: Pick<Filters, 'timeRange'>) {
   const query = useQuery({
     queryKey: ['tickets', filters ?? null],
     queryFn: fetchTickets,
-    staleTime: 1000 * 60,
+    staleTime: 0,
+    // Light polling plus focus/reconnect refetches.
+    refetchInterval: 120_000, // poll every 2 minutes
+    refetchIntervalInBackground: false,
+    refetchOnWindowFocus: true,
+    refetchOnReconnect: true,
   });
 
   return {
