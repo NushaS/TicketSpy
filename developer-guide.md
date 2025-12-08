@@ -82,14 +82,15 @@ Follow these steps to run and verify the system’s test cases:
      - Run the linter (`eslint`)
      - Install all necessary dependencies
 
-3. **Run the linter and tests manually**
+2. **Run the linter and tests manually**
    If you want to check for linting or run unit tests (respectively):
    ```bash
    npm run lint
    npm run test
    ```
-
-4. **Check for compile-time issues**
+   Any tests that "npm run test" fails will direct you to the relevant lines of code that failed in the test
+   
+3. **Check for compile-time issues**
    When running the development server, any build or compile errors will be displayed automatically:
    ```bash
    npm run dev
@@ -97,20 +98,17 @@ Follow these steps to run and verify the system’s test cases:
 
 ## How to Add New Tests
 
-Are there any naming conventions/patterns to follow when naming test files? Is there a particular test harness to use?
-
 ### Adding New Tests
 
 Our script `npm run test` (configured in `package.json`) will run **Jest**.  
 Jest will search under the `_tests_` folder by default, as well as any file that matches `*.test.js`, `*.test.ts`, or `*.test.tsx` formats.
 
+In general, our tests will be in the **/app/__tests__/unit** folder and a **/app/__tests__/api** folder
+
 To add a new test:
-
-1. Navigate to the page or component that you want to test.
-2. Create a `__tests__` folder inside the same directory.
-3. Add a file named `yourFileName.test.tsx` inside that folder.
-
-For example, see the `app/welcome/_tests_` folder.
+1.) Decide if it is a unit test or api test
+1.1) If it is neither, add a "__tests__" folder under your module and use JEST to write custom tests
+2.) Use Jest to write custom tests in the folder! Feel free to use our previous tests as a template
 
 ### Naming Conventions/Patterns
 
@@ -120,22 +118,30 @@ For example, see the `app/welcome/_tests_` folder.
   componentName.test.tsx
   ```
 
-  **Example:** If the component is `page.tsx`, name the test `page.test.tsx`.
+  **Example:** If the component is `MapPin.tsx`, name the test `MapPin.test.tsx`.
 
 - Test descriptions inside the test file should communicate expected behavior.
 
 - Tests should follow a behavior-driven structure:
   - **Arrange:** Set up the component / mocks
   - **Act:** Perform the interaction
-  - **Assert:** Verify the expected result
+  - **Assert:** Verify the expected result (Jest uses expect())
 
 - Keep each test focused on one behavior.
 
----
+Example.
+```
+// app/__tests__/unit/formatDistance.test.ts
+import { formatDistance } from '@/lib/utils/formatDistance';
 
+describe('formatDistance', () => {
+  it('formats meters into a readable string', () => {
+    const result = formatDistance(153);   // act
+    expect(result).toBe('153 m');         // assert
+  });
+});
+```
 ## How to Build a Release of the Software
-
-Describe any tasks that are not automated. For example, should a developer update a version number (in code and documentation) prior to invoking the build system? Are there any sanity checks a developer should perform after building a release?
 
 ### Update the Version Number
 
