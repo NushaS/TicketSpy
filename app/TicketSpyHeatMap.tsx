@@ -30,6 +30,7 @@ import BookmarkNameModal from '@/components/map/BookmarkNameModal';
 import Toast from '@/components/map/Toast';
 import { PinActionPopup } from '@/components/map/PinActionPopup';
 import { InstructionsModal } from '@/components/map/InstructionsModal';
+import ThankYouModal from '@/components/map/ThankYouModal';
 import {
   BookmarkActionsModal,
   BookmarkConversionModal,
@@ -88,6 +89,8 @@ const TicketSpyHeatMap: React.FC<TicketSpyHeatMapProps> = ({
     lat: number;
   } | null>(null);
   const [enforcementSubmitting, setEnforcementSubmitting] = useState(false);
+  const [showThankYouModal, setShowThankYouModal] = useState(false);
+  const [showTicketThankYouModal, setShowTicketThankYouModal] = useState(false);
   const [transientEnforcements, setTransientEnforcements] = useState<
     { id: string; lat: number; lng: number; expiresAt: number }[]
   >([]);
@@ -331,6 +334,8 @@ const TicketSpyHeatMap: React.FC<TicketSpyHeatMapProps> = ({
         console.log('Ticket submitted successfully:', result);
         // Refresh the heatmap data to show the new ticket
         refetchTickets();
+        // Show thank you modal
+        setShowTicketThankYouModal(true);
         // Show success toast
         setSuccessMessage('Ticket reported successfully!');
         setShowSuccessToast(true);
@@ -1189,6 +1194,7 @@ const TicketSpyHeatMap: React.FC<TicketSpyHeatMapProps> = ({
                       }
                       setShowEnforcementConfirm(false);
                       setEnforcementLocation(null);
+                      setShowThankYouModal(true);
                       setSuccessMessage('Enforcement reported successfully!');
                       setShowSuccessToast(true);
                       setTimeout(() => setShowSuccessToast(false), 3000);
@@ -1215,6 +1221,17 @@ const TicketSpyHeatMap: React.FC<TicketSpyHeatMapProps> = ({
           </div>
         </div>
       )}
+
+      {/* Thank You Modal for Enforcement */}
+      <ThankYouModal isOpen={showThankYouModal} onClose={() => setShowThankYouModal(false)} />
+
+      {/* Thank You Modal for Ticket */}
+      <ThankYouModal
+        isOpen={showTicketThankYouModal}
+        onClose={() => setShowTicketThankYouModal(false)}
+        title="Thank you for helping our community! 🎉"
+        message="Your ticket report will help other drivers stay informed! Look into your city's ticket response options. These options usually include instructions on how to pay and/or dispute your tickets :)"
+      />
     </div>
   );
 };
