@@ -1078,6 +1078,18 @@
   filter: brightness(0.95);
 }
 
+/* styles for link to profile page*/
+.linkToProfileText {
+  text-align: center;
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.profileLink {
+  color: #6b856b;
+  text-decoration: underline;
+}
+
 /* Transient enforcement marker styling (large visible pin with pulse) */
 .transientMarker {
   display: inline-flex;
