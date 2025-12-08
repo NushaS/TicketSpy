@@ -37,12 +37,12 @@ Follow these steps to build and run the project locally:
 
 1. **Clone the repository**
    ```bash
-   - git clone https://github.com/NushaS/TicketSpy.git
-   - cd TicketSpy
+   git clone https://github.com/NushaS/TicketSpy.git
+   cd TicketSpy
    ```
 2. **Create a new branch (optional)**
    ```bash
-   - git checkout -b <branch-name>
+   git checkout -b <branch-name>
    ```
 3. **Add a `.env.local` file under the main `TicketSpy` directory for the Supabase credentials. In the file, define:**
    - `NEXT_PUBLIC_SUPABASE_URL`=YourSupabaseUrl 
@@ -56,11 +56,11 @@ Follow these steps to build and run the project locally:
    - if you are not a UW student, please email us (emails available via the living document in `Acknowledgements`).
 4. **Install dependencies**
    ```bash
-   - npm install
+   npm install
    ```
 5. **Run the development server**
    ```bash
-   - npm run dev
+   npm run dev
    ```
 6. **View the application**
    - Once the build completes successfully, open the URL displayed in your terminal (usually [http://localhost:3000](http://localhost:3000)) to view the website.
