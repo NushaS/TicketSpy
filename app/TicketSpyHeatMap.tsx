@@ -11,11 +11,9 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import styles from './page.module.css';
-import { CarIcon2, CarIcon3 } from '../components/ui/icons/car-icon';
+import { CarIcon3 } from '../components/ui/icons/car-icon';
 import { ProfileIcon } from '../components/ui/icons/profile-icon';
-import { HeartIcon, HeartIcon2 } from '../components/ui/icons/heart-icon';
-import { TicketIcon2 } from '@/components/ui/icons/ticket-icon';
-import { SightingIcon } from '@/components/ui/icons/sighting-icon';
+import { HeartIcon2 } from '../components/ui/icons/heart-icon';
 import { ParkingEnforcementIcon } from '@/components/ui/icons/parking-enforcement';
 import { MapPin } from '../components/map/MapPin';
 import FilterPanel from '../components/FilterPanel';
@@ -68,12 +66,7 @@ const TicketSpyHeatMap: React.FC<TicketSpyHeatMapProps> = ({
   alertMarker = null,
 }) => {
   const [showInstructions, setShowInstructions] = useState(false);
-  const [showLoginModal, setShowLoginModal] = useState(false);
   const [heatmapOpacityMultiplier, setHeatmapOpacityMultiplier] = useState(0.9);
-  const [phoneNumber, setPhoneNumber] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [pinLocation, setPinLocation] = useState<{ lng: number; lat: number } | null>(null);
   const [showTicketReportModal, setShowTicketReportModal] = useState(false);
@@ -390,39 +383,6 @@ const TicketSpyHeatMap: React.FC<TicketSpyHeatMapProps> = ({
 
   // Filters panel visibility
   const [showFilters, setShowFilters] = useState(false);
-
-  // lazy import of FilterPanel component to keep top of file clean
-  // (component file lives under components/FilterPanel.tsx)
-  // import at top of render to avoid affecting server bundle
-  // (we're in a client component so it's fine to import normally)
-  // -- actual import placed below in the render area
-
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const supabase = createClient();
-    setIsLoading(true);
-    setError(null);
-
-    try {
-      // will change to phone login when we setup phone auth
-      const email = `temp`;
-
-      const { error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
-
-      if (error) throw error;
-
-      setShowLoginModal(false);
-      setIsLoggedIn(true);
-      router.refresh();
-    } catch (error: unknown) {
-      setError(error instanceof Error ? error.message : 'An error occurred');
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
   const openBookmarkNameModal = (location: { lat: number; lng: number } | null) => {
     if (!location) return;
@@ -940,7 +900,10 @@ const TicketSpyHeatMap: React.FC<TicketSpyHeatMapProps> = ({
             } catch {
               // ignore if background layer not present or setPaintProperty fails
             }
-            requestUserLocation(map);
+            // Only auto-locate when not viewing a deep-link alert
+            if (!initialCenter && !alertMarker) {
+              requestUserLocation(map);
+            }
           }}
           onClick={(e) => {
             setPinLocation({ lng: e.lngLat.lng, lat: e.lngLat.lat });

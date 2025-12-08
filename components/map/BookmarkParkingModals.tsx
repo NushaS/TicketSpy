@@ -50,6 +50,13 @@ export const ParkingInfoModal: React.FC<ParkingInfoModalProps> = ({
           <CarIcon2 />
           end parking
         </button>
+        <span className={styles.linkToProfileText}>
+          To receive notifications for events near this spot, ensure that{' '}
+          <a href="profile-settings/" className={styles.profileLink}>
+            notifications are enabled
+          </a>{' '}
+          .
+        </span>
       </div>
     </div>
   );
@@ -89,15 +96,10 @@ export const BookmarkConversionModal: React.FC<BookmarkConversionModalProps> = (
           <FaTimes size={22} />
         </button>
 
-        <button
-          type="button"
-          className={styles.modalBodyWithIcon}
-          onClick={handleRequestNamedBookmark}
-          style={{ background: 'none', border: 'none', padding: 0, textAlign: 'left' }}
-        >
+        <div className={styles.modalBodyWithIcon} style={{ cursor: 'default' }}>
           <HeartIcon size={16} />
           do you want to bookmark this location?
-        </button>
+        </div>
 
         <div className={styles.yesNoButtonGroup}>
           <button onClick={onDelete} disabled={isDeleting} className={styles.noButton}>
@@ -106,7 +108,7 @@ export const BookmarkConversionModal: React.FC<BookmarkConversionModalProps> = (
           </button>
 
           <button
-            onClick={onConvertToBookmark}
+            onClick={handleRequestNamedBookmark}
             disabled={isConverting}
             className={styles.yesButton}
           >
@@ -166,6 +168,14 @@ export const BookmarkActionsModal: React.FC<BookmarkActionsModalProps> = ({
             {isConverting ? 'saving...' : 'just parked here'}
           </button>
         </div>
+
+        <span className={styles.linkToProfileText}>
+          To receive notifications for events near this spot, ensure that{' '}
+          <a href="profile-settings/" className={styles.profileLink}>
+            notifications are enabled
+          </a>{' '}
+          .
+        </span>
       </div>
     </div>
   );
