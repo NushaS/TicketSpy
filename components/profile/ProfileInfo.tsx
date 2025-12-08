@@ -4,11 +4,10 @@ import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { FaCheck, FaTimes, FaTrash, FaSignOutAlt } from 'react-icons/fa';
-import styles from '@/app/profile-settings/profile-settings.module.css';
+import styles from '@/app/profile/profile.module.css';
 import { createClient } from '@/lib/supabase/client';
-import { useUserProfileDetails } from '@/lib/hooks/useUsersTable';
 
-export default function AccountInfo() {
+export default function ProfileInfo() {
   const [displayName, setDisplayName] = useState<string>('');
   const [email, setEmail] = useState<string>('');
   const [userId, setUserId] = useState<string | null>(null);
@@ -18,6 +17,7 @@ export default function AccountInfo() {
   const [originalEmail, setOriginalEmail] = useState<string>('');
 
   // edit mode state
+  const [isEditing, setIsEditing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
@@ -28,7 +28,6 @@ export default function AccountInfo() {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [deleteError, setDeleteError] = useState<string | null>(null);
 
-  // get UserId
   useEffect(() => {
     const loadUser = async () => {
       const supabase = createClient();
@@ -38,26 +37,45 @@ export default function AccountInfo() {
       } = await supabase.auth.getSession();
 
       const user = session?.user;
-      setUserId(user?.id ?? null);
+
+      if (!user) {
+        setUserId(null);
+        setEmail('');
+        setDisplayName('');
+        setOriginalEmail('');
+        setOriginalDisplayName('');
+        return;
+      }
+
+      setUserId(user.id);
+      const userEmail = user.email || '';
+      setEmail(userEmail);
+      setOriginalEmail(userEmail);
+
+      const { data } = await supabase
+        .from('users')
+        .select('display_name')
+        .eq('user_id', user.id)
+        .single();
+
+      const userDisplayName = data?.display_name || 'Anonymous';
+      setDisplayName(userDisplayName);
+      setOriginalDisplayName(userDisplayName);
     };
+
     loadUser();
   }, []);
 
-  // use the hook to fetch user data
-  const { data: userData, isLoading, refetch } = useUserProfileDetails(userId);
-
-  // update local state when userData changes
   useEffect(() => {
-    if (userData) {
-      const userDisplayName = userData.display_name || 'Anonymous';
-      const userEmail = userData.email || '';
+    window.addEventListener('beforeunload', (e) => {
+      e.preventDefault();
+    });
 
-      setDisplayName(userDisplayName);
-      setEmail(userEmail);
-      setOriginalDisplayName(userDisplayName);
-      setOriginalEmail(userEmail);
-    }
-  }, [userData]);
+    return () =>
+      window.removeEventListener('beforeunload', (e) => {
+        e.preventDefault();
+      });
+  }, []);
 
   // check if any changes have been made
   const hasChanges = displayName !== originalDisplayName || email !== originalEmail;
@@ -66,6 +84,7 @@ export default function AccountInfo() {
   const handleDiscard = () => {
     setDisplayName(originalDisplayName);
     setEmail(originalEmail);
+    setIsEditing(false);
     setError(null);
     setSuccessMessage(null);
   };
@@ -83,7 +102,7 @@ export default function AccountInfo() {
     setSuccessMessage(null);
 
     try {
-      const response = await fetch('/api/account/update', {
+      const response = await fetch('/api/profile/update', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -102,10 +121,12 @@ export default function AccountInfo() {
       }
 
       // update original values to reflect saved changes
-      await refetch();
+      setOriginalDisplayName(displayName);
+      setOriginalEmail(email);
+      setIsEditing(false);
       setSuccessMessage('profile updated successfully!');
 
-      setTimeout(() => setSuccessMessage(null), 2000);
+      setTimeout(() => setSuccessMessage(null), 1500);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');
     }
@@ -122,7 +143,7 @@ export default function AccountInfo() {
     if (!userId) return;
 
     try {
-      const response = await fetch('/api/account/delete', {
+      const response = await fetch('/api/profile/delete', {
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ userId }),
@@ -130,7 +151,7 @@ export default function AccountInfo() {
 
       if (!response.ok) {
         const text = await response.text();
-        throw new Error(text);
+        throw new Error(text || 'Failed to delete account');
       }
 
       setShowDeleteModal(false);
@@ -139,9 +160,17 @@ export default function AccountInfo() {
       await supabase.auth.signOut();
       router.push('/');
     } catch (err) {
-      const message = (err instanceof Error && err.message) || 'Failed to delete account';
-      setDeleteError(message);
+      setDeleteError(err instanceof Error ? err.message : 'An error occurred');
       setTimeout(() => setDeleteError(null), 3000);
+    }
+  };
+
+  // changes to account fields
+  const handleFieldChange = () => {
+    if (!isEditing) {
+      setIsEditing(true);
+      setError(null);
+      setSuccessMessage(null);
     }
   };
 
@@ -168,8 +197,7 @@ export default function AccountInfo() {
             value={displayName}
             onChange={(e) => {
               setDisplayName(e.target.value);
-              setError(null);
-              setSuccessMessage(null);
+              handleFieldChange();
             }}
           />
         </div>
@@ -185,13 +213,15 @@ export default function AccountInfo() {
             value={email}
             onChange={(e) => {
               setEmail(e.target.value);
-              setError(null);
-              setSuccessMessage(null);
+              handleFieldChange();
             }}
           />
         </div>
 
-        {hasChanges && (
+        {error && <p className={styles.loginError}>{error}</p>}
+        {successMessage && <p className={styles.successMessage}>{successMessage}</p>}
+
+        {isEditing && hasChanges && (
           <div className={styles.buttonGroup}>
             <button type="button" onClick={handleDiscard} className={styles.discardButton}>
               <FaTimes /> discard changes
@@ -204,20 +234,12 @@ export default function AccountInfo() {
       </form>
 
       {/* Password reset, logout, delete account */}
-      {!hasChanges && (
+      {(!isEditing || !hasChanges) && (
         <div>
           <div className={styles.accountFormGroup}>
             <div className={styles.forgotPasswordLink}>
               <Link href="/auth/forgot-password">forgot your password?</Link>
             </div>
-          </div>
-
-          <div className={styles.messageContainer}>
-            {error ? (
-              <p className={styles.accountError}>error: {error}</p>
-            ) : successMessage ? (
-              <p className={styles.successMessage}>{successMessage}</p>
-            ) : null}
           </div>
 
           <div className={styles.accountActionButtons}>
@@ -251,7 +273,6 @@ export default function AccountInfo() {
           >
             <div className={styles.modalBody}>
               <p>Are you sure you want to permanently delete your account?</p>
-              {deleteError && <p className={styles.loginError}>{deleteError}</p>}
             </div>
             <div className={styles.modalButtonGroup}>
               <button

@@ -1,21 +1,7 @@
 import { createAdminClient } from '@/lib/supabase/server-admin';
 import { notifyUsers } from '@/lib/server/nearbySessionsAndBookmarks';
 import { NextResponse } from 'next/server';
-//import { z } from 'zod';
-
-// TODO : Validate incoming request body
-
-// const Body = z.object({
-//   latitude: z.number().min(-90).max(90),
-//   longitude: z.number().min(-180).max(180),
-//   ticket_report_date: z.string().datetime().optional().nullable(), // ISO date string
-//   ticket_report_hour: z
-//     .string()
-//     .regex(/^\d{2}:\d{2}$/)
-//     .optional()
-//     .nullable(), // e.g., "14:30"
-//   violation_type: z.enum(['default parking ticket']).optional().nullable(), // current enum
-// });
+import { ViolationType, isValidViolationType } from '@/lib/enums/ticketViolationType';
 
 export async function POST(req: Request) {
   // 1) Parse & validate
@@ -24,7 +10,8 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 });
   }
 
-  const { latitude, longitude, ticket_report_date, ticket_report_hour, violation_type } = json;
+  const { latitude, longitude, ticket_report_date, ticket_report_hour, ticket_violation_type } =
+    json;
 
   // 2) Insert using admin client
   const sb = createAdminClient();
@@ -35,7 +22,9 @@ export async function POST(req: Request) {
       longitude,
       ticket_report_date,
       ticket_report_hour,
-      violation_type: violation_type ?? 'default parking ticket',
+      ticket_violation_type: isValidViolationType(ticket_violation_type) // Semicolon here is Object assigning, not type assigning
+        ? ticket_violation_type
+        : ViolationType.Other,
       user_id: null,
     })
     .select('*')
@@ -51,7 +40,12 @@ export async function POST(req: Request) {
   // 3) Trigger nearby parking session check server-side
   if (typeof latitude === 'number' && typeof longitude === 'number') {
     try {
-      await notifyUsers(latitude, longitude, ticket_report_timestamp ?? new Date().toISOString());
+      await notifyUsers(
+        latitude,
+        longitude,
+        ticket_report_timestamp ?? new Date().toISOString(),
+        data.ticket_id
+      );
     } catch (err) {
       console.error('Failed to log nearby parking sessions:', err);
     }

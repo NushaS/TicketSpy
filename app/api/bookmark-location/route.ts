@@ -9,7 +9,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 });
   }
 
-  const { user_id, latitude, longitude } = json;
+  const { user_id, latitude, longitude, name } = json;
 
   // Validate required fields
   if (user_id === undefined || latitude === undefined || longitude === undefined) {
@@ -21,15 +21,20 @@ export async function POST(req: Request) {
 
   // 2) Insert using admin client
   const sb = createAdminClient();
-  await sb.from('bookmarked_locations').delete().eq('user_id', user_id);
+
+  const payload: Record<string, unknown> = {
+    user_id,
+    latitude,
+    longitude,
+  };
+
+  if (typeof name === 'string' && name.trim()) {
+    payload.name = name.trim();
+  }
 
   const { data, error } = await sb
     .from('bookmarked_locations')
-    .insert({
-      user_id,
-      latitude,
-      longitude,
-    })
+    .insert(payload)
     .select('*')
     .single();
 
