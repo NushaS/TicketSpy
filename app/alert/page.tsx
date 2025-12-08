@@ -112,9 +112,6 @@ function AlertPageInner() {
       {effectiveError && (
         <div style={{ padding: 16, color: 'crimson' }}>{effectiveError ?? 'Invalid request'}</div>
       )}
-      {isBusy && !location && (
-        <div style={{ padding: 16, color: '#555' }}>Loading location for alert…</div>
-      )}
       {shouldShowNotFound && !effectiveError && (
         <div style={{ padding: 16, color: '#555' }}>
           No ticket or enforcement sighting alert found
