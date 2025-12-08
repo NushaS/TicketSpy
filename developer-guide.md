@@ -7,34 +7,29 @@ To obtain the source code, the developer needs to clone the repository locally. 
 ## Layout explained
 ```
 ticketspy/
-├── app/
-│ ├── auth/ # next.js auto built the auth. Auth for login
-│ ├── protected/  
-│ ├── instruments/
-│ ├── test-query/
-│ └── welcome/ # include **tests**
-├── components/ # reusable components
-│ ├── tutorial/
-│ └── ui/
-├── lib/ # Supabase client & hooks
-│ ├── hooks/
-│ └── supabase/
-├── reports/ # Our weekly tuesday reports
-├── README.md # README.md
-├── package.json
-├── package-lock.json
-├── tsconfig.json
-├── next.config.ts
-├── eslint.config.mjs
-├── tailwind.config.ts
-└── postcss.config.mjs
+├── app
+│   ├── api          
+│   ├── auth         # built-in Supabase log in functionality
+│   ├── components   # modularization
+│   ├── lib
+│   │   ├── enums   # Supabase enums
+│   │   ├── hooks   # All Supabase table hooks
+│   │   ├── server  # Mostly send-email server functionality
+│   │   ├── supabase
+│   │   └── utils
+│   ├── page.tsx
+│   ├── profile-settings
+│   │   └── page.tsx
+│ 
+├── app/__tests__
+│   ├── api   # test app/api/
+│   └── unit  # common unit tests
+└── .env.local
 ```
 Source files: app, components/, lib/, and config files such as tsconfig.ts, tailwindconfig.ts, etc
 The app source file contains all our pages, the components contains all our react components we made or were auto-made by Next.js template. The lib contains our Supabase logic and hooks. The rest of the files are just our config files.
 
-Tests: For now, we only have app/welcome/_tests_/ for the single test
 Documentation: contains the README.md for our project. Also contains our weekly reports. Also contains our user-guide.md and developer-guide.md just like the README.md
-Data files: N/A
 
 ## How to Build the Software
 
