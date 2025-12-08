@@ -39,7 +39,7 @@ const BookmarkNameModal: React.FC<BookmarkNameModalProps> = ({
         >
           <div className={styles.ticketReportFormGroup}>
             <label className={styles.ticketReportLabel} htmlFor="bookmarkName">
-              bookmark name:
+              Bookmark name:
             </label>
             <input
               id="bookmarkName"
@@ -51,7 +51,13 @@ const BookmarkNameModal: React.FC<BookmarkNameModalProps> = ({
               required
             />
           </div>
-
+          <span className={styles.linkToProfileText}>
+            To receive notifications for events near this spot, ensure that{' '}
+            <a href="profile-settings/" className={styles.profileLink}>
+              notifications are enabled
+            </a>{' '}
+            .
+          </span>
           <button className={styles.ticketReportSubmitButton} disabled={isSubmitting} type="submit">
             {isSubmitting ? 'saving...' : 'save bookmark'}
           </button>

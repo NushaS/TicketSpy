@@ -198,3 +198,15 @@
 .modalCloseButton:hover {
   opacity: 0.4;
 }
+
+/* styles for link to profile settings*/
+.linkToProfileText {
+  text-align: center;
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.profileLink {
+  color: #6b856b;
+  text-decoration: underline;
+}
