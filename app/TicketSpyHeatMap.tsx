@@ -178,7 +178,7 @@ const TicketSpyHeatMap: React.FC<TicketSpyHeatMapProps> = ({
     }, ttlMs);
   };
 
-    // get user location to zoom into relevant map area
+  // get user location to zoom into relevant map area
   const requestUserLocation = (map: any) => {
     if (!navigator.geolocation) return;
     navigator.geolocation.getCurrentPosition(
@@ -199,7 +199,6 @@ const TicketSpyHeatMap: React.FC<TicketSpyHeatMapProps> = ({
       }
     );
   };
-  
   const router = useRouter();
 
   // filters state (client-side representation)
