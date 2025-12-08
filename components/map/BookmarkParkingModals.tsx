@@ -96,15 +96,10 @@ export const BookmarkConversionModal: React.FC<BookmarkConversionModalProps> = (
           <FaTimes size={22} />
         </button>
 
-        <button
-          type="button"
-          className={styles.modalBodyWithIcon}
-          onClick={handleRequestNamedBookmark}
-          style={{ background: 'none', border: 'none', padding: 0, textAlign: 'left' }}
-        >
+        <div className={styles.modalBodyWithIcon} style={{ cursor: 'default' }}>
           <HeartIcon size={16} />
           do you want to bookmark this location?
-        </button>
+        </div>
 
         <div className={styles.yesNoButtonGroup}>
           <button onClick={onDelete} disabled={isDeleting} className={styles.noButton}>
@@ -113,7 +108,7 @@ export const BookmarkConversionModal: React.FC<BookmarkConversionModalProps> = (
           </button>
 
           <button
-            onClick={onConvertToBookmark}
+            onClick={handleRequestNamedBookmark}
             disabled={isConverting}
             className={styles.yesButton}
           >

@@ -9,7 +9,7 @@ export type DataPoint = {
 // Mock data points representing parking ticket locations with intensity values for testing
 const globalIntensity = 1;
 export function useDynamicDatapoints() {
-  const { data, error, isLoading, isFetching } = useTicketTable();
+  const { data } = useTicketTable();
   const longLatOnlyData = data?.map((currRow) => {
     return {
       latitude: Number(currRow.latitude),
@@ -92,7 +92,7 @@ export const heatmapLayer: LayerProps = {
 
 // (background managed via map style onLoad in page.tsx)
 
-// Map initial view state (Seattle area) TODO: use user's general location via ip
+// Map initial view state (Seattle area)
 export const initialViewState = {
   longitude: -122.3321,
   latitude: 47.6582,
