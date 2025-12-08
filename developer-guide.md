@@ -24,7 +24,7 @@ ticketspy/
 ├── app/__tests__
 │   ├── api   # test app/api/
 │   └── unit  # common unit tests
-└── .env.local
+└── .env.local   # Private API keys & secrets
 ```
 Source files: app, components/, lib/, and config files such as tsconfig.ts, tailwindconfig.ts, etc
 The app source file contains all our pages, the components contains all our react components we made or were auto-made by Next.js template. The lib contains our Supabase logic and hooks. The rest of the files are just our config files.
