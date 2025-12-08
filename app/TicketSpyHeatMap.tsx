@@ -30,8 +30,29 @@ import { ViolationType } from '@/lib/enums/ticketViolationType';
 import TicketReportModal from '@/components/map/TicketReportModal';
 import BookmarkNameModal from '@/components/map/BookmarkNameModal';
 import Toast from '@/components/map/Toast';
+import { PinActionPopup } from '@/components/map/PinActionPopup';
+import { InstructionsModal } from '@/components/map/InstructionsModal';
+import {
+  BookmarkActionsModal,
+  BookmarkConversionModal,
+  ParkingInfoModal,
+} from '@/components/map/BookmarkParkingModals';
 
 type MapCenter = { lat: number; lng: number };
+
+type BookmarkPinState = {
+  id: string;
+  latitude: number;
+  longitude: number;
+  bookmarkName?: string | null;
+};
+
+type ParkingPinState = {
+  id: string;
+  latitude: number;
+  longitude: number;
+  startTime?: string | null;
+};
 
 type TicketSpyHeatMapProps = {
   initialCenter?: MapCenter | null;
@@ -87,8 +108,19 @@ const TicketSpyHeatMap: React.FC<TicketSpyHeatMapProps> = ({
     null
   );
   const [isBookmarkSubmitting, setIsBookmarkSubmitting] = useState(false);
+  const [activeBookmarkPin, setActiveBookmarkPin] = useState<BookmarkPinState | null>(null);
+  const [activeParkingPin, setActiveParkingPin] = useState<ParkingPinState | null>(null);
+  const [showBookmarkConversionModal, setShowBookmarkConversionModal] = useState(false);
+  const [conversionLocation, setConversionLocation] = useState<{ lat: number; lng: number } | null>(
+    null
+  );
+  const [isDeletingBookmark, setIsDeletingBookmark] = useState(false);
+  const [isConvertingBookmark, setIsConvertingBookmark] = useState(false);
+  const [isEndingParking, setIsEndingParking] = useState(false);
+  const [isSavingBookmarkFromParking, setIsSavingBookmarkFromParking] = useState(false);
   // When the page is loaded via /alert, show a popup on the highlighted marker
   const [showAlertPopup, setShowAlertPopup] = useState<boolean>(!!alertMarker);
+  const [showPinPopup, setShowPinPopup] = useState(false);
   const [selectedEnforcementPopup, setSelectedEnforcementPopup] = useState<{
     lat: number;
     lng: number;
@@ -212,8 +244,12 @@ const TicketSpyHeatMap: React.FC<TicketSpyHeatMapProps> = ({
   const serverFilters: Pick<Filters, 'timeRange'> = { timeRange: filters.timeRange };
 
   const { data: ticketRows = [], refetch: refetchTickets } = useTicketTable(serverFilters as any);
-  const { refetch: refetchParkingSessions } = useUserParkingSessions(userId || '');
-  const { refetch: refetchBookMarks } = useUserBookmarkedLocations(userId || '');
+  const { data: carData = [], refetch: refetchParkingSessions } = useUserParkingSessions(
+    userId || ''
+  );
+  const { data: bookmarkData = [], refetch: refetchBookMarks } = useUserBookmarkedLocations(
+    userId || ''
+  );
   const { data: enforcementSightings = [], refetch: refetchEnforcement } =
     useEnforcementSightingTable();
 
@@ -421,7 +457,6 @@ const TicketSpyHeatMap: React.FC<TicketSpyHeatMapProps> = ({
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          user_id: userId,
           latitude: bookmarkLocation.lat,
           longitude: bookmarkLocation.lng,
           name: trimmedName,
@@ -456,6 +491,158 @@ const TicketSpyHeatMap: React.FC<TicketSpyHeatMapProps> = ({
     }
   };
 
+  const handleDeleteBookmarkPin = React.useCallback(async () => {
+    if (!activeBookmarkPin || isDeletingBookmark) return;
+
+    setIsDeletingBookmark(true);
+    try {
+      const res = await fetch(`/api/delete-bookmark?id=${activeBookmarkPin.id}`, {
+        method: 'DELETE',
+      });
+      const data = await res.json().catch(() => null);
+
+      if (res.ok) {
+        refetchBookMarks();
+        setActiveBookmarkPin(null);
+        setSuccessMessage('Bookmark deleted successfully!');
+        setShowSuccessToast(true);
+        setTimeout(() => setShowSuccessToast(false), 3000);
+      } else {
+        setErrorMessage((data as any)?.error || 'Failed to delete bookmark');
+        setShowErrorToast(true);
+        setTimeout(() => setShowErrorToast(false), 3000);
+      }
+    } catch (error) {
+      console.error('Error deleting bookmark:', error);
+      setErrorMessage('Network error: Failed to delete bookmark');
+      setShowErrorToast(true);
+      setTimeout(() => setShowErrorToast(false), 3000);
+    } finally {
+      setIsDeletingBookmark(false);
+    }
+  }, [activeBookmarkPin, isDeletingBookmark, refetchBookMarks]);
+
+  const handleConvertBookmarkToParking = React.useCallback(async () => {
+    if (!activeBookmarkPin || isConvertingBookmark) return;
+
+    setIsConvertingBookmark(true);
+    try {
+      const res = await fetch('/api/new-parking-session', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          latitude: activeBookmarkPin.latitude,
+          longitude: activeBookmarkPin.longitude,
+        }),
+      });
+      const data = await res.json().catch(() => null);
+
+      if (res.ok) {
+        refetchParkingSessions();
+        refetchBookMarks();
+        setActiveBookmarkPin(null);
+        setSuccessMessage('Parking session started successfully!');
+        setShowSuccessToast(true);
+        setTimeout(() => setShowSuccessToast(false), 3000);
+      } else {
+        setErrorMessage((data as any)?.error || 'Failed to start parking session');
+        setShowErrorToast(true);
+        setTimeout(() => setShowErrorToast(false), 3000);
+      }
+    } catch (error) {
+      console.error('Error converting bookmark to parking:', error);
+      setErrorMessage('Network error: Failed to start parking session');
+      setShowErrorToast(true);
+      setTimeout(() => setShowErrorToast(false), 3000);
+    } finally {
+      setIsConvertingBookmark(false);
+    }
+  }, [activeBookmarkPin, isConvertingBookmark, refetchBookMarks, refetchParkingSessions]);
+
+  const handleEndParkingSession = React.useCallback(async () => {
+    if (!activeParkingPin || isEndingParking) return;
+
+    const { id, latitude, longitude } = activeParkingPin;
+    setIsEndingParking(true);
+
+    try {
+      const res = await fetch(`/api/delete-parking-session?id=${id}`, { method: 'DELETE' });
+      const data = await res.json().catch(() => null);
+
+      if (res.ok) {
+        refetchParkingSessions();
+        setActiveParkingPin(null);
+        const alreadyBookmarked = (bookmarkData ?? []).some(
+          (b) =>
+            Number(b.latitude) === Number(latitude) && Number(b.longitude) === Number(longitude)
+        );
+        if (!alreadyBookmarked) {
+          setShowBookmarkConversionModal(true);
+          setConversionLocation({ lat: latitude, lng: longitude });
+        } else {
+          setShowBookmarkConversionModal(false);
+          setConversionLocation(null);
+        }
+        setSuccessMessage('Parking session ended');
+        setShowSuccessToast(true);
+        setTimeout(() => setShowSuccessToast(false), 3000);
+      } else {
+        setErrorMessage((data as any)?.error || 'Failed to end parking session');
+        setShowErrorToast(true);
+        setTimeout(() => setShowErrorToast(false), 3000);
+      }
+    } catch (error) {
+      console.error('Error ending parking session:', error);
+      setErrorMessage('Network error: Failed to end parking session');
+      setShowErrorToast(true);
+      setTimeout(() => setShowErrorToast(false), 3000);
+    } finally {
+      setIsEndingParking(false);
+    }
+  }, [activeParkingPin, isEndingParking, refetchParkingSessions, bookmarkData]);
+
+  const handleConvertEndedParkingToBookmark = React.useCallback(async () => {
+    if (!conversionLocation || isSavingBookmarkFromParking) return;
+
+    setIsSavingBookmarkFromParking(true);
+    try {
+      const res = await fetch('/api/bookmark-location', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          latitude: conversionLocation.lat,
+          longitude: conversionLocation.lng,
+        }),
+      });
+      const data = await res.json().catch(() => null);
+
+      if (res.ok) {
+        refetchBookMarks();
+        setShowBookmarkConversionModal(false);
+        setConversionLocation(null);
+        setSuccessMessage('Location bookmarked successfully!');
+        setShowSuccessToast(true);
+        setTimeout(() => setShowSuccessToast(false), 3000);
+      } else {
+        setErrorMessage((data as any)?.error || 'Failed to bookmark location');
+        setShowErrorToast(true);
+        setTimeout(() => setShowErrorToast(false), 3000);
+      }
+    } catch (error) {
+      console.error('Error bookmarking from parking session:', error);
+      setErrorMessage('Network error: Failed to bookmark location');
+      setShowErrorToast(true);
+      setTimeout(() => setShowErrorToast(false), 3000);
+    } finally {
+      setIsSavingBookmarkFromParking(false);
+    }
+  }, [conversionLocation, isSavingBookmarkFromParking, refetchBookMarks]);
+
+  const handleDismissConversionModal = React.useCallback(() => {
+    setShowBookmarkConversionModal(false);
+    setConversionLocation(null);
+  }, []);
+
   // Handle parking session
   const handleParkingSession = async () => {
     if (!pinLocation || !userId) return;
@@ -467,7 +654,6 @@ const TicketSpyHeatMap: React.FC<TicketSpyHeatMapProps> = ({
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          user_id: userId,
           latitude: pinLocation.lat,
           longitude: pinLocation.lng,
         }),
@@ -497,11 +683,7 @@ const TicketSpyHeatMap: React.FC<TicketSpyHeatMapProps> = ({
   {
     /* MapPinsLayer — renders pins for parked cars + bookmarks */
   }
-  function MapPinsLayer({ userId }: { userId: string }) {
-    // fetch raw data from supabase for that userid
-    const { data: bookmarkData } = useUserBookmarkedLocations(userId);
-    const { data: carData } = useUserParkingSessions(userId);
-
+  function MapPinsLayer({ bookmarkData, carData }: { bookmarkData: any[]; carData: any[] }) {
     // convert bookmark records to pin points in heart shape
     const bookmarkPoints = filterValidDataPoints(
       (bookmarkData ?? [])
@@ -535,35 +717,35 @@ const TicketSpyHeatMap: React.FC<TicketSpyHeatMapProps> = ({
       }))
     );
 
-    // Refetch bookmarks and parking sessions when called
-    const handlePinChange = () => {
-      refetchBookMarks();
-      refetchParkingSessions();
-    };
-
-    const allPins = [...bookmarkPoints, ...carPoints];
+    const allPins = React.useMemo(
+      () => [...bookmarkPoints, ...carPoints],
+      [bookmarkPoints, carPoints]
+    );
     // render each point as a MapPin with the corresponding icon
     return (
       <>
-        {allPins.map((point, i) => (
+        {allPins.map((point) => (
           <MapPin
-            key={i}
+            key={point.id}
             latitude={point.latitude}
             longitude={point.longitude}
             icon={point.type === 'car' ? <CarIcon3 /> : <HeartIcon2 />}
             type={point.type}
             id={point.id}
-            userId={userId}
             {...(point.type === 'heart' ? { bookmarkName: point.name } : {})}
             {...(point.type === 'car' ? { startTime: point.start_datetime } : {})}
-            allUserBookmarks={bookmarkData?.map((b) => ({
-              latitude: Number(b.latitude),
-              longitude: Number(b.longitude),
-            }))}
-            onDelete={handlePinChange}
-            onConvertToParking={handlePinChange}
-            onConvertToBookmark={handlePinChange}
-            onRequestNamedBookmark={openBookmarkNameModal}
+            onDismissPinActionPopup={() => {
+              setShowPinPopup(false);
+              setPinLocation(null);
+            }}
+            onOpenBookmarkActions={(pin) => {
+              setActiveBookmarkPin(pin);
+              setActiveParkingPin(null);
+            }}
+            onOpenEndParking={(pin) => {
+              setActiveParkingPin(pin);
+              setActiveBookmarkPin(null);
+            }}
           />
         ))}
       </>
@@ -585,6 +767,37 @@ const TicketSpyHeatMap: React.FC<TicketSpyHeatMapProps> = ({
         onClose={closeBookmarkNameModal}
         onSubmit={handleBookmarkLocation}
         isSubmitting={isBookmarkSubmitting}
+      />
+      <ParkingInfoModal
+        open={!!activeParkingPin}
+        startTime={activeParkingPin?.startTime}
+        onClose={() => setActiveParkingPin(null)}
+        onEndParking={handleEndParkingSession}
+      />
+      <BookmarkConversionModal
+        open={showBookmarkConversionModal}
+        onClose={handleDismissConversionModal}
+        onDelete={handleDismissConversionModal}
+        onConvertToBookmark={handleConvertEndedParkingToBookmark}
+        onRequestNamedBookmark={
+          conversionLocation
+            ? () => {
+                setShowBookmarkConversionModal(false);
+                openBookmarkNameModal(conversionLocation);
+              }
+            : undefined
+        }
+        isDeleting={false}
+        isConverting={isSavingBookmarkFromParking}
+      />
+      <BookmarkActionsModal
+        open={!!activeBookmarkPin}
+        onClose={() => setActiveBookmarkPin(null)}
+        onDelete={handleDeleteBookmarkPin}
+        onConvertToParking={handleConvertBookmarkToParking}
+        isDeleting={isDeletingBookmark}
+        isConverting={isConvertingBookmark}
+        bookmarkName={activeBookmarkPin?.bookmarkName}
       />
       {/* Header */}
       <header className={styles.header}>
@@ -732,6 +945,7 @@ const TicketSpyHeatMap: React.FC<TicketSpyHeatMapProps> = ({
           onClick={(e) => {
             setPinLocation({ lng: e.lngLat.lng, lat: e.lngLat.lat });
             setShowInstructions(false);
+            setShowPinPopup(true);
           }}
         >
           <Source id="tickets" type="geojson" data={geoJsonData}>
@@ -814,7 +1028,7 @@ const TicketSpyHeatMap: React.FC<TicketSpyHeatMapProps> = ({
             </Marker>
           )}
           {/* Render ticket + car pins on top of heatmap if user is logged*/}
-          {userId && <MapPinsLayer userId={userId} />}
+          {userId && <MapPinsLayer bookmarkData={bookmarkData} carData={carData} />}
           {/* Persistent enforcement sightings from Supabase */}
           {(enforcementSightings as any[]).map((sighting, idx) => {
             const lat = Number((sighting as any)?.latitude);
@@ -891,245 +1105,40 @@ const TicketSpyHeatMap: React.FC<TicketSpyHeatMapProps> = ({
           )}
         </Map>
       </div>
-      {/* Instructions Modal (Logged In) */}
-      {showInstructions && (
-        <div
-          className={styles.modalOverlay}
-          onClick={() => setShowInstructions(false)}
-          role="presentation"
-        >
-          <div
-            className={styles.modalContent}
-            role="dialog"
-            aria-modal="true"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <header className={styles.modalHeader}>
-              <h2 className={styles.modalTitle}>how to use ticketspy</h2>
-              <button
-                type="button"
-                aria-label="Close instructions"
-                onClick={() => setShowInstructions(false)}
-                className={styles.modalCloseBtn}
-              >
-                <FaTimes size={22} />
-              </button>
-            </header>
-
-            <div className={styles.modalBody}>
-              <section>
-                <h3>Heatmap overview</h3>
-                <p>
-                  This map displays a heatmap of parking ticket density based on real user reports.
-                </p>
-              </section>
-
-              <section>
-                <h3>Reporting a parking ticket you received</h3>
-                <ol>
-                  <li>
-                    1. Click the location on the map where you got the ticket (as close as possible)
-                  </li>
-                  <li>
-                    2. Select <em>“report a ticket”</em>
-                  </li>
-                  <li>3. Enter the date and time of the ticket issued, and violation type</li>
-                  <li>
-                    4. Click <em>submit</em> and your report will appear on the map!
-                  </li>
-                </ol>
-              </section>
-
-              <section>
-                <h3>Reporting parking enforcement you spotted</h3>
-                <ol>
-                  <li>1. Click the location where you saw the parking enforcement officer</li>
-                  <li>
-                    2. Select <em>“report parking enforcement nearby”</em>
-                  </li>
-                  <li>3. Confirm in popup to submit the report</li>
-                </ol>
-              </section>
-
-              <section>
-                <h3>
-                  Start a parking session + receive notifs for tickets/parking enforcement near your
-                  car
-                </h3>
-                <ol>
-                  <li>1. Create an account or log in.</li>
-                  <li>
-                    2. Select your parking spot on the map and click <em>“i just parked”</em>
-                  </li>
-                  <li>3. Open your profile (person icon, upper-right) </li>
-                  <li>
-                    {' '}
-                    4. Enable notifications for tickets and parking enforcement reported within 0.5
-                    miles of your parking spot (session)
-                  </li>
-                  <li>
-                    5. To end your session: click the car icon → <em>“end parking session”</em>
-                  </li>
-                  <li>6. Optionally bookmark the spot when ending a session</li>
-                </ol>
-              </section>
-
-              <section>
-                <h3>
-                  Bookmark favorite spots + receive notifs for tickets/parking enforcement near your
-                  bookmarks{' '}
-                </h3>
-                <ol>
-                  <li>1. Create an account or log in</li>
-                  <li>
-                    2. Select a spot and click <em>“bookmark this spot”</em>
-                  </li>
-                  <li>3. A heart icon marks the bookmarked spot.</li>
-                  <li>4. Open your profile (person icon, upper-right)</li>
-                  <li>
-                    5. Enable notifications for tickets and parking enforcement reported within 0.5
-                    miles of your bookmarked spots
-                  </li>
-                  <li>
-                    6. To remove: click the heart icon → <em>“remove bookmark”</em>
-                  </li>
-                </ol>
-              </section>
-            </div>
-
-            <footer className={styles.modalFooter}>
-              <button
-                type="button"
-                onClick={() => setShowInstructions(false)}
-                className={styles.modalButton}
-              >
-                <FaCheck size={16} />
-                got it!
-              </button>
-            </footer>
-          </div>
-        </div>
-      )}
+      <InstructionsModal isOpen={showInstructions} onClose={() => setShowInstructions(false)} />
       {/* Pin Location Popup Modal */}
-      {pinLocation && (
-        // for authenticated users
-        <>
-          {isLoggedIn ? (
-            <div className={styles.pinPopupWrapper}>
-              <div className={styles.authOptionsContent}>
-                <button onClick={() => setPinLocation(null)} className={styles.closeButton}>
-                  <FaTimes size={22} />
-                </button>
-
-                <div className={styles.actionButtons}>
-                  <button
-                    className={styles.reportTicketButton}
-                    onClick={() => {
-                      setShowTicketReportModal(true);
-                      setReportLocation(pinLocation);
-                      setPinLocation(null);
-                    }}
-                  >
-                    <TicketIcon2 />
-                    <span>report a ticket</span>
-                  </button>
-
-                  <button
-                    className={styles.reportEnforcementButton}
-                    onClick={() => {
-                      console.debug('Open enforcement confirm for', pinLocation);
-                      setEnforcementLocation(pinLocation);
-                      setShowEnforcementConfirm(true);
-                      setPinLocation(null);
-                    }}
-                  >
-                    <SightingIcon />
-                    report parking enforcement nearby
-                  </button>
-
-                  <button
-                    className={styles.bookmarkButton}
-                    onClick={() => openBookmarkNameModal(pinLocation)}
-                  >
-                    <HeartIcon color="white" />
-                    <span>bookmark this spot</span>
-                  </button>
-
-                  <button className={styles.parkingSessionButton} onClick={handleParkingSession}>
-                    <CarIcon2 size={46} />
-                    <span>just parked here</span>
-                  </button>
-                </div>
-              </div>
-            </div>
-          ) : (
-            // for unauthenticated users
-            <div className={styles.pinPopupWrapper}>
-              <div className={styles.unauthInstructionsContent}>
-                <button onClick={() => setPinLocation(null)} className={styles.closeButton}>
-                  <FaTimes size={22} />
-                </button>
-
-                <div className={styles.actionButtons}>
-                  <button
-                    className={styles.reportTicketButton}
-                    onClick={() => {
-                      setShowTicketReportModal(true);
-                      setReportLocation(pinLocation);
-                      setPinLocation(null);
-                    }}
-                  >
-                    <TicketIcon2 />
-                    <span>report a ticket</span>
-                  </button>
-                  <button
-                    className={styles.reportEnforcementButton}
-                    onClick={() => {
-                      console.debug('Open enforcement confirm for', pinLocation);
-                      setEnforcementLocation(pinLocation);
-                      setShowEnforcementConfirm(true);
-                      setPinLocation(null);
-                    }}
-                  >
-                    <SightingIcon />
-                    report parking enforcement nearby
-                  </button>
-                </div>
-
-                <div className={styles.instructionsText}>
-                  <p>
-                    to <strong>mark where you parked</strong>, get{' '}
-                    <strong>notifications for tickets issued</strong> or{' '}
-                    <strong>parking enforcement spotted</strong> near your important locations, and{' '}
-                    <strong>bookmark your favorite parking spots:</strong>
-                  </p>
-                </div>
-
-                <div className={styles.authButtons}>
-                  <Link href="/auth/sign-up">
-                    <button className={styles.createAccountBtn}>create account</button>
-                  </Link>
-                  <span className={styles.orText}>or</span>
-                  <button
-                    onClick={() => {
-                      setPinLocation(null);
-                      router.push('/auth/login');
-                    }}
-                    className={styles.logInBtn}
-                  >
-                    log in
-                  </button>
-                </div>
-              </div>
-            </div>
-          )}
-        </>
+      {pinLocation && showPinPopup && (
+        <PinActionPopup
+          isLoggedIn={isLoggedIn}
+          pinLocation={pinLocation}
+          onClose={() => {
+            setShowPinPopup(false);
+            setPinLocation(null);
+          }}
+          onReportTicket={(loc) => {
+            setShowPinPopup(false);
+            setShowTicketReportModal(true);
+            setReportLocation(loc);
+            setPinLocation(null);
+          }}
+          onReportEnforcement={(loc) => {
+            setShowPinPopup(false);
+            setEnforcementLocation(loc);
+            setShowEnforcementConfirm(true);
+            setPinLocation(null);
+          }}
+          onBookmark={(loc) => {
+            setShowPinPopup(false);
+            openBookmarkNameModal(loc);
+          }}
+          onStartParking={() => {
+            setShowPinPopup(false);
+            handleParkingSession();
+          }}
+          router={router}
+        />
       )}
-      {/* <TicketReportModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        onSubmit={(violationType) => console.log('Submitted:', violationType)}
-      /> */}
+
       {/* Ticket Report Modal */}
       <TicketReportModal
         isOpen={showTicketReportModal}
@@ -1164,7 +1173,6 @@ const TicketSpyHeatMap: React.FC<TicketSpyHeatMapProps> = ({
             <p style={{ marginTop: 8, textAlign: 'center' }}>
               Confirm that you would like to report a parking enforcement officer at the selected
               location (within the past 10 minutes)?
-              <br />({enforcementLocation.lat.toFixed(5)}, {enforcementLocation.lng.toFixed(5)})
             </p>
 
             <div className={styles.enforcementButtonGroup}>
@@ -1190,7 +1198,6 @@ const TicketSpyHeatMap: React.FC<TicketSpyHeatMapProps> = ({
                     const body = {
                       latitude: enforcementLocation.lat,
                       longitude: enforcementLocation.lng,
-                      user_id: userId ?? null,
                       sighting_time: new Date().toISOString(),
                     };
 
