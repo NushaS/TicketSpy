@@ -1,6 +1,6 @@
 import { createAdminClient } from '@/lib/supabase/server-admin';
-import { sendNotificationEmail } from '@/lib/server/sendEmail';
 import { milesBetweenPoints } from '../utils/distance'; // exported from lib/utils/distance.ts for testing & modularity
+import { enqueueEmail } from '@/lib/server/sendEmailQueue';
 
 // type ParkingSessionRow = {
 //   parking_session_id: string;
@@ -64,20 +64,25 @@ export async function notifyUsers(
     throw new Error(`Failed to fetch bookmarked locations: ${bookmarkError.message}`);
   }
 
-  // Pre-filter by the maximum supported radius (2 miles) to limit user lookups
-  const nearbySessions =
-    parkingSessions?.filter((session) => {
-      const lat = Number(session.latitude);
-      const lon = Number(session.longitude);
-      if (!Number.isFinite(lat) || !Number.isFinite(lon)) {
-        return false;
-      }
+  // 1) Pre-filter by the maximum supported radius (2 miles) to limit user lookups
+  function filterByMaxRadius(maxRadius: number) {
+    const nearbySessions =
+      parkingSessions?.filter((session) => {
+        const lat = Number(session.latitude);
+        const lon = Number(session.longitude);
+        if (!Number.isFinite(lat) || !Number.isFinite(lon)) {
+          return false;
+        }
 
-      const distanceMiles = milesBetweenPoints(latitude, longitude, lat, lon);
+        const distanceMiles = milesBetweenPoints(latitude, longitude, lat, lon);
 
-      return distanceMiles <= 2;
-    }) ?? [];
+        return distanceMiles <= 2;
+      }) ?? [];
+    return nearbySessions;
+  }
+  const nearbySessions = filterByMaxRadius(2);
 
+  // 2) Find nearby bookmarks
   const nearbyBookmarks =
     bookmarks?.filter((bookmark) => {
       const lat = Number(bookmark.latitude);
@@ -91,6 +96,7 @@ export async function notifyUsers(
       return distanceMiles <= 2;
     }) ?? [];
 
+  // 3) Gather unique user IDs from nearby sessions and bookmarks
   const userIds = new Set<string>();
   nearbySessions.forEach((session) => {
     if (session.user_id) userIds.add(session.user_id);
@@ -99,6 +105,7 @@ export async function notifyUsers(
     if (bookmark.user_id) userIds.add(bookmark.user_id);
   });
 
+  // 4) Fetch user notification preferences in bulk
   const { data: userPrefs = [], error: userPrefsError } =
     userIds.size > 0
       ? await sb
@@ -118,9 +125,12 @@ export async function notifyUsers(
     userMap.set(user.user_id, user);
   });
 
+  ///////////////////////
+  ///////////////////////
+  ///////////////////////
+  // 5) Determine who to notify and send emails
   const notifiedParkingUsers: string[] = [];
   const notifiedBookmarkUsers: string[] = [];
-  const emailSends: Promise<unknown>[] = [];
   const bookmarkNotifications = new Map<
     string,
     { bookmarkNames: string[]; latitude?: number | null; longitude?: number | null }
@@ -141,15 +151,11 @@ export async function notifyUsers(
     if (user.parking_notifications_on && distanceMiles <= allowedDistance) {
       notifiedParkingUsers.push(session.user_id);
       if (user.email) {
-        emailSends.push(
-          sendNotificationEmail({
-            to: user.email,
-            subject: 'TicketSpy: Parking alert near your parked car',
-            alertId,
-          }).catch((err) => {
-            console.error('Failed to send parking notification email:', err);
-          })
-        );
+        enqueueEmail({
+          to: user.email,
+          subject: 'TicketSpy: Parking alert near your parked car',
+          alertId,
+        });
       }
       console.log(
         `Parking notification sent to user ${session.user_id} (session ${session.parking_session_id}, distance ${distanceMiles.toFixed(2)} mi, threshold ${allowedDistance} mi)`
@@ -200,23 +206,16 @@ export async function notifyUsers(
   bookmarkNotifications.forEach((payload, userId) => {
     const user = userMap.get(userId);
     if (!user?.email) return;
-    emailSends.push(
-      sendNotificationEmail({
-        to: user.email,
-        subject: 'TicketSpy: Parking alert near your bookmarks',
-        kind: 'bookmark',
-        latitude: payload.latitude ?? undefined,
-        longitude: payload.longitude ?? undefined,
-        alertId,
-        bookmarkNames: payload.bookmarkNames,
-      }).catch((err) => {
-        console.error('Failed to send bookmark notification email:', err);
-      })
-    );
+    enqueueEmail({
+      to: user.email!,
+      subject: 'TicketSpy: Parking alert near your bookmarks',
+      kind: 'bookmark',
+      latitude: payload.latitude ?? undefined,
+      longitude: payload.longitude ?? undefined,
+      alertId,
+      bookmarkNames: payload.bookmarkNames,
+    });
   });
-
-  // fire and wait for queued email sends
-  await Promise.all(emailSends);
 
   return {
     nearbySessions,
