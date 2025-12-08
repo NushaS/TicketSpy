@@ -77,6 +77,7 @@ For full setup instructions see `How to Build the Software` in the [developer gu
    - `NEXT_PUBLIC_SUPABASE_URL`=YourSupabaseUrl 
    - `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_OR_ANON_KEY`=YourSupabaseApiKey
    - `SUPABASE_SERVICE_ROLE_KEY`=YourServiceRoleKey
+   - `RESEND_API_KEY`=YourResendApiKey
      
    (Note: This is required, as components that use `/lib/supabase` will throw errors if the credentials are not available.)
 
