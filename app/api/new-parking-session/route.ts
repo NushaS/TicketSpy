@@ -1,4 +1,5 @@
 import { createAdminClient } from '@/lib/supabase/server-admin';
+import { createClient as createServerClient } from '@/lib/supabase/server';
 import { NextResponse } from 'next/server';
 
 export async function POST(req: Request) {
@@ -9,7 +10,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 });
   }
 
-  const { user_id, latitude, longitude } = json;
+  const { latitude, longitude } = json;
 
   // Validate required fields
   if (latitude === undefined || longitude === undefined) {
@@ -19,17 +20,29 @@ export async function POST(req: Request) {
     );
   }
 
-  // 2) Check for existing active parking session for this user
+  // 2) Use authenticated user from session
+  const supabase = await createServerClient();
+  const {
+    data: { user },
+    error: userError,
+  } = await supabase.auth.getUser();
+
+  if (userError || !user?.id) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+  const userId = user.id;
+
+  // 3) Check for existing active parking session for this user
   const sb = createAdminClient();
 
   // First, end any existing active sessions for this user
-  await sb.from('parking_sessions').delete().eq('user_id', user_id);
+  await sb.from('parking_sessions').delete().eq('user_id', userId);
 
-  // 3) Insert new parking session
+  // 4) Insert new parking session
   const { data, error } = await sb
     .from('parking_sessions')
     .insert({
-      user_id: user_id ?? null,
+      user_id: userId,
       latitude,
       longitude,
     })

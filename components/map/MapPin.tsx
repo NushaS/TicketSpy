@@ -187,7 +187,6 @@ interface MapPinProps {
   icon: React.ReactNode;
   type: 'car' | 'heart';
   id: string;
-  userId: string;
   bookmarkName?: string | null;
   startTime?: string | null;
   allUserBookmarks?: Array<{ latitude: number; longitude: number }>;
@@ -204,7 +203,6 @@ export const MapPin: React.FC<MapPinProps> = ({
   icon,
   type,
   id,
-  userId,
   bookmarkName,
   startTime,
   allUserBookmarks,
@@ -221,9 +219,8 @@ export const MapPin: React.FC<MapPinProps> = ({
 
   // Deletes bookmark or parking session.
   const deletePin = async (pinType: 'car' | 'heart') => {
-    // choose api endpoint based on pin type
     const endpoint = pinType === 'car' ? '/api/delete-parking-session' : '/api/delete-bookmark';
-    const response = await fetch(`${endpoint}?id=${id}&user_id=${userId}`, { method: 'DELETE' });
+    const response = await fetch(`${endpoint}?id=${id}`, { method: 'DELETE' });
     if (!response.ok) {
       const result = await response.json();
       throw new Error(result.error || 'Delete failed');
@@ -261,7 +258,6 @@ export const MapPin: React.FC<MapPinProps> = ({
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          user_id: userId,
           longitude,
           latitude,
         }),

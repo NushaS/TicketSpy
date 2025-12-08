@@ -1,4 +1,5 @@
 import { createAdminClient } from '@/lib/supabase/server-admin';
+import { createClient as createServerClient } from '@/lib/supabase/server';
 import { NextResponse } from 'next/server';
 
 export async function POST(req: Request) {
@@ -9,21 +10,31 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 });
   }
 
-  const { user_id, latitude, longitude, name } = json;
+  const { latitude, longitude, name } = json;
 
   // Validate required fields
-  if (user_id === undefined || latitude === undefined || longitude === undefined) {
+  if (latitude === undefined || longitude === undefined) {
     return NextResponse.json(
-      { error: 'Missing required fields: user_id, latitude, and longitude' },
+      { error: 'Missing required fields: latitude and longitude' },
       { status: 400 }
     );
+  }
+
+  const supabase = await createServerClient();
+  const {
+    data: { user },
+    error: userError,
+  } = await supabase.auth.getUser();
+
+  if (userError || !user?.id) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
   // 2) Insert using admin client
   const sb = createAdminClient();
 
   const payload: Record<string, unknown> = {
-    user_id,
+    user_id: user.id,
     latitude,
     longitude,
   };
