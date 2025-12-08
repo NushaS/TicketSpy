@@ -194,7 +194,7 @@ const TicketSpyHeatMap: React.FC<TicketSpyHeatMapProps> = ({
         // do nothing if user denies
       },
       {
-        enableHighAccuracy: false,
+        enableHighAccuracy: true,
         timeout: 8000,
       }
     );
