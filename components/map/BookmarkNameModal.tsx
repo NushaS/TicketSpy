@@ -1,5 +1,5 @@
 import React from 'react';
-import { FaTimes } from 'react-icons/fa';
+import { FaTimes, FaCheck } from 'react-icons/fa';
 import styles from '@/app/page.module.css';
 
 type BookmarkNameModalProps = {
@@ -39,7 +39,7 @@ const BookmarkNameModal: React.FC<BookmarkNameModalProps> = ({
         >
           <div className={styles.ticketReportFormGroup}>
             <label className={styles.ticketReportLabel} htmlFor="bookmarkName">
-              bookmark name:
+              Bookmark name:
             </label>
             <input
               id="bookmarkName"
@@ -51,8 +51,15 @@ const BookmarkNameModal: React.FC<BookmarkNameModalProps> = ({
               required
             />
           </div>
-
+          <span className={styles.linkToProfileText}>
+            To receive notifications for events near this spot, ensure that{' '}
+            <a href="profile-settings/" className={styles.profileLink}>
+              notifications are enabled
+            </a>{' '}
+            .
+          </span>
           <button className={styles.ticketReportSubmitButton} disabled={isSubmitting} type="submit">
+            <FaCheck size={16} />
             {isSubmitting ? 'saving...' : 'save bookmark'}
           </button>
         </form>

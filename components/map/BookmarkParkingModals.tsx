@@ -50,6 +50,13 @@ export const ParkingInfoModal: React.FC<ParkingInfoModalProps> = ({
           <CarIcon2 />
           end parking
         </button>
+        <span className={styles.linkToProfileText}>
+          To receive notifications for events near this spot, ensure that{' '}
+          <a href="profile-settings/" className={styles.profileLink}>
+            notifications are enabled
+          </a>{' '}
+          .
+        </span>
       </div>
     </div>
   );
@@ -166,6 +173,14 @@ export const BookmarkActionsModal: React.FC<BookmarkActionsModalProps> = ({
             {isConverting ? 'saving...' : 'just parked here'}
           </button>
         </div>
+
+        <span className={styles.linkToProfileText}>
+          To receive notifications for events near this spot, ensure that{' '}
+          <a href="profile-settings/" className={styles.profileLink}>
+            notifications are enabled
+          </a>{' '}
+          .
+        </span>
       </div>
     </div>
   );
