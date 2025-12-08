@@ -69,6 +69,29 @@ const TicketSpyHeatMap: React.FC = () => {
       setTransientEnforcements((s) => s.filter((m) => m.id !== id));
     }, ttlMs);
   };
+
+  // get user location to zoom into relevant map area
+  const requestUserLocation = (map: any) => {
+    if (!navigator.geolocation) return;
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const { latitude, longitude } = position.coords;
+        map.flyTo({
+          center: [longitude, latitude],
+          zoom: 15,
+          essential: true,
+        });
+      },
+      () => {
+        // do nothing if user denies
+      },
+      {
+        enableHighAccuracy: false,
+        timeout: 8000,
+      }
+    );
+  };
+
   const router = useRouter();
 
   // filters state (client-side representation)
@@ -464,6 +487,7 @@ const TicketSpyHeatMap: React.FC = () => {
             } catch (err) {
               // ignore if background layer not present or setPaintProperty fails
             }
+            requestUserLocation(map);
           }}
           onClick={(e) => {
             setPinLocation({ lng: e.lngLat.lng, lat: e.lngLat.lat });
