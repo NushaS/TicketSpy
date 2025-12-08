@@ -244,8 +244,12 @@ const TicketSpyHeatMap: React.FC<TicketSpyHeatMapProps> = ({
   const serverFilters: Pick<Filters, 'timeRange'> = { timeRange: filters.timeRange };
 
   const { data: ticketRows = [], refetch: refetchTickets } = useTicketTable(serverFilters as any);
-  const { refetch: refetchParkingSessions } = useUserParkingSessions(userId || '');
-  const { refetch: refetchBookMarks } = useUserBookmarkedLocations(userId || '');
+  const { data: carData = [], refetch: refetchParkingSessions } = useUserParkingSessions(
+    userId || ''
+  );
+  const { data: bookmarkData = [], refetch: refetchBookMarks } = useUserBookmarkedLocations(
+    userId || ''
+  );
   const { data: enforcementSightings = [], refetch: refetchEnforcement } =
     useEnforcementSightingTable();
 
@@ -568,8 +572,17 @@ const TicketSpyHeatMap: React.FC<TicketSpyHeatMapProps> = ({
       if (res.ok) {
         refetchParkingSessions();
         setActiveParkingPin(null);
-        setShowBookmarkConversionModal(true);
-        setConversionLocation({ lat: latitude, lng: longitude });
+        const alreadyBookmarked = (bookmarkData ?? []).some(
+          (b) =>
+            Number(b.latitude) === Number(latitude) && Number(b.longitude) === Number(longitude)
+        );
+        if (!alreadyBookmarked) {
+          setShowBookmarkConversionModal(true);
+          setConversionLocation({ lat: latitude, lng: longitude });
+        } else {
+          setShowBookmarkConversionModal(false);
+          setConversionLocation(null);
+        }
         setSuccessMessage('Parking session ended');
         setShowSuccessToast(true);
         setTimeout(() => setShowSuccessToast(false), 3000);
@@ -586,7 +599,7 @@ const TicketSpyHeatMap: React.FC<TicketSpyHeatMapProps> = ({
     } finally {
       setIsEndingParking(false);
     }
-  }, [activeParkingPin, isEndingParking, refetchParkingSessions]);
+  }, [activeParkingPin, isEndingParking, refetchParkingSessions, bookmarkData]);
 
   const handleConvertEndedParkingToBookmark = React.useCallback(async () => {
     if (!conversionLocation || isSavingBookmarkFromParking) return;
@@ -670,11 +683,7 @@ const TicketSpyHeatMap: React.FC<TicketSpyHeatMapProps> = ({
   {
     /* MapPinsLayer — renders pins for parked cars + bookmarks */
   }
-  function MapPinsLayer({ userId }: { userId: string }) {
-    // fetch raw data from supabase for that userid
-    const { data: bookmarkData } = useUserBookmarkedLocations(userId);
-    const { data: carData } = useUserParkingSessions(userId);
-
+  function MapPinsLayer({ bookmarkData, carData }: { bookmarkData: any[]; carData: any[] }) {
     // convert bookmark records to pin points in heart shape
     const bookmarkPoints = filterValidDataPoints(
       (bookmarkData ?? [])
@@ -1019,7 +1028,7 @@ const TicketSpyHeatMap: React.FC<TicketSpyHeatMapProps> = ({
             </Marker>
           )}
           {/* Render ticket + car pins on top of heatmap if user is logged*/}
-          {userId && <MapPinsLayer userId={userId} />}
+          {userId && <MapPinsLayer bookmarkData={bookmarkData} carData={carData} />}
           {/* Persistent enforcement sightings from Supabase */}
           {(enforcementSightings as any[]).map((sighting, idx) => {
             const lat = Number((sighting as any)?.latitude);
