@@ -1,18 +1,26 @@
 import { createAdminClient } from '@/lib/supabase/server-admin';
+import { createClient as createServerClient } from '@/lib/supabase/server';
 import { NextResponse } from 'next/server';
 
 export async function DELETE(req: Request) {
   try {
     const { searchParams } = new URL(req.url);
     const bookmarkId = searchParams.get('id');
-    const userId = searchParams.get('user_id');
 
-    if (!bookmarkId || !userId) {
-      return NextResponse.json(
-        { error: 'Missing required parameters: id and user_id' },
-        { status: 400 }
-      );
+    if (!bookmarkId) {
+      return NextResponse.json({ error: 'Missing required parameter: id' }, { status: 400 });
     }
+
+    const supabase = await createServerClient();
+    const {
+      data: { user },
+      error: userError,
+    } = await supabase.auth.getUser();
+
+    if (userError || !user?.id) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+    const userId = user.id;
 
     const sb = createAdminClient();
 
