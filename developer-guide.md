@@ -42,7 +42,7 @@ Follow these steps to build and run the project locally:
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/<your-username>/TicketSpy.git
+   https://github.com/NushaS/TicketSpy.git
    cd TicketSpy
    ```
 2. **Create a new branch (optional)**

@@ -100,6 +100,28 @@ export default function FilterPanel({ visible, onClose, onApply, initialFilters 
                 <input
                   type="radio"
                   name="time-range"
+                  checked={local.timeRange?.amount === 1 && local.timeRange?.unit === 'weeks'}
+                  onChange={() => setTimeRangeOption('1w')}
+                />{' '}
+                Past 1 week
+              </label>
+            </div>
+            <div>
+              <label>
+                <input
+                  type="radio"
+                  name="time-range"
+                  checked={local.timeRange?.amount === 2 && local.timeRange?.unit === 'weeks'}
+                  onChange={() => setTimeRangeOption('2w')}
+                />{' '}
+                Past 2 weeks
+              </label>
+            </div>
+            <div>
+              <label>
+                <input
+                  type="radio"
+                  name="time-range"
                   checked={local.timeRange?.amount === 3 && local.timeRange?.unit === 'weeks'}
                   onChange={() => setTimeRangeOption('3w')}
                 />{' '}

@@ -22,6 +22,9 @@ export async function POST(req: Request) {
 
   // 2) Insert using admin client
   const sb = createAdminClient();
+  // Map the incoming `sighting_time` to the DB column that exists
+  // (some routes / migrations used `enforcement_report_time`). Use
+  // `enforcement_report_time` here to match the current schema.
   const { data, error } = await sb
     .from('enforcement_sightings')
     .insert({
