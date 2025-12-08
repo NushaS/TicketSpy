@@ -112,15 +112,12 @@ Note that while TicketSpy is available to anyone with web browser access, some a
   4. Click `submit ticket report` to complete the report.
 
 1.  Click the parking ticket issuance location on the heatmap.<br>
-Select `report a ticket`.<br>  
-<img width="200" height="300" alt="ticket-report-1" src="https://github.com/user-attachments/assets/e1f179fe-8d2c-46a9-afd8-360208432c15" />
+Select `report a ticket`.<br><br><img width="200" alt="Screenshot 2025-12-07 at 6 28 22 PM" src="https://github.com/user-attachments/assets/fd9df753-faf3-4c7c-b9f9-fd1d8454d1eb" />
 
 2. Fill out the date, time, and violation type form fields for the ticket.<br>
-Click "Submit ticket report"<br>  
-<img width="200" height="300" alt="ticket-report-2" src="https://github.com/user-attachments/assets/42df0ab6-3772-4312-80b7-44b6d8cfddbc" />
+Click "Submit ticket report"<br><br><img width="200" alt="Screenshot 2025-12-07 at 6 29 49 PM" src="https://github.com/user-attachments/assets/6ec15c36-1708-4507-85bb-6a9559b18643" />
 
-3. View your new report on the map! <br>  
-<img width="200" height="300" alt="ticket-report-3" src="https://github.com/user-attachments/assets/79f604f1-299d-471e-81b1-a864f1547674" />
+3. View your new report on the map!
 
 ## How to Report a Bug
 
