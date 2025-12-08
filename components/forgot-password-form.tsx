@@ -1,6 +1,7 @@
 'use client';
 
 import { createClient } from '@/lib/supabase/client';
+import { FaCheck } from 'react-icons/fa';
 import Link from 'next/link';
 import { useState } from 'react';
 import styles from '@/app/auth/auth.module.css';
@@ -64,6 +65,7 @@ export function ForgotPasswordForm() {
           {error && <p className={styles.loginError}>{error}</p>}
 
           <button type="submit" className={styles.submitButton} disabled={isLoading}>
+            <FaCheck size={16} />
             {isLoading ? 'sending...' : 'send reset email'}
           </button>
 

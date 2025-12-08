@@ -141,22 +141,6 @@
   margin-bottom: 1rem;
 }
 
-.modalButton {
-  width: 100%;
-  padding: 0.5rem 1rem;
-  background-color: rgb(81, 97, 82);
-  color: white;
-  border-radius: 0.5rem;
-  font-weight: 500;
-  transition: background-color 0.2s;
-  border: none;
-  cursor: pointer;
-}
-
-.modalButton:hover {
-  background-color: rgb(21, 128, 61);
-}
-
 /* Container */
 .container {
   position: relative;
@@ -264,7 +248,7 @@
 
 .submitButton {
   margin-top: 1rem;
-  padding: 0.875rem 3rem;
+  padding: 0.75rem 2rem;
   background-color: #6b856b;
   color: white;
   border: none;
@@ -274,9 +258,10 @@
   cursor: pointer;
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.75rem;
   justify-content: center;
   align-self: center;
+  box-shadow: 0 4px 8px rgba(15, 23, 42, 0.25);
   transition: background-color 0.2s;
 }
 

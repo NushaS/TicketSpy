@@ -61,7 +61,7 @@
 .instructionsButton {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.75rem;
   padding: 0.5rem 1rem;
   background-color: rgb(129, 154, 121);
   color: white;
@@ -152,11 +152,11 @@
   transition: all 0.2s;
   border: none;
   cursor: pointer;
+  box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.4);
 }
 
 .filtersButton:hover {
   background-color: rgb(255, 251, 251);
-  box-shadow: 0 20px 25px -7px rgba(0, 0, 0, 0.1);
 }
 
 /* slider base */
@@ -317,13 +317,22 @@
 
 /* primary modal button */
 .modalButton {
-  background: var(--accent, #f79797);
-  color: #fff;
+  margin-top: 1rem;
+  padding: 0.75rem 1.5rem;
+  background-color: #6b856b;
+  color: white;
   border: none;
-  padding: 8px 14px;
-  border-radius: 8px;
+  border-radius: 50px;
+  font-size: 1.125rem;
+  font-weight: 700;
   cursor: pointer;
-  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  justify-content: center;
+  align-self: center;
+  transition: background-color 0.2s;
+  box-shadow: 0 8px 18px rgba(15, 23, 42, 0.14);
 }
 
 /* compact mobile sizing */
@@ -475,7 +484,7 @@
 
 .submitButton {
   margin-top: 1rem;
-  padding: 0.875rem 3rem;
+  padding: 0.75rem 2.5rem;
   background-color: #6b856b;
   color: white;
   border: none;
@@ -555,20 +564,20 @@
 
 .ticketReportSubmitButton {
   margin-top: 1rem;
-  padding: 0.875rem 2rem;
+  padding: 0.75rem 1.5rem;
   background-color: #6b856b;
   color: white;
   border: none;
   border-radius: 50px;
-  font-size: 1rem;
+  font-size: 1.125rem;
   font-weight: 700;
   cursor: pointer;
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.75rem;
   justify-content: center;
-  text-align: center;
   align-self: center;
+  box-shadow: 0 8px 18px rgba(15, 23, 42, 0.14);
   transition: background-color 0.2s;
 }
 
@@ -577,30 +586,39 @@
 }
 
 /* Enforcement confirm modal button tweaks */
-.ticketReportModalContent .ticketReportSubmitButton {
-  margin-top: 0; /* remove extra top margin when used inline with the 'no' button */
-  padding: 0.75rem 1.5rem;
-  min-height: 44px;
+.enforcementButtonGroup {
+  margin-top: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+}
+
+.enforcementButtonGroup .ticketReportSubmitButton {
+  margin-top: 0;
+  width: 9rem;
 }
 
 .enforcementNoButton {
-  padding: 0.75rem 1.25rem;
-  background-color: #ffffff;
-  color: #333;
-  border: 1px solid rgba(16, 24, 40, 0.06);
+  width: 9rem;
+  padding: 0.75rem 1.5rem;
+  background-color: white;
+  color: #445B35;
+  border: 1px solid black;
   border-radius: 50px;
+  font-size: 1.125rem;
   font-weight: 700;
   cursor: pointer;
-  display: inline-flex;
+  display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.75rem;
   justify-content: center;
-  text-align: center;
-  min-height: 44px;
+  box-shadow: 0 8px 18px rgba(15, 23, 42, 0.14);
+  transition: background-color 0.2s;
 }
 
 .enforcementNoButton:hover {
-  background-color: #fbfbfb;
+  background-color: #445B3520;
 }
 
 /* Responsive adjustments for ticket report modal */
@@ -717,6 +735,7 @@
   cursor: pointer;
   transition: background-color 0.2s;
   box-shadow: 0 4px 8px rgba(15, 23, 42, 0.25);
+  
 }
 .parkingSessionButton {
   font-family: 'Jersey 10', sans-serif;
@@ -839,7 +858,7 @@
 }
 
 .createAccountBtn {
-  padding: 0.75rem 1.6rem;
+  padding: 0.75rem 1.5rem;
   background-color: rgb(129, 154, 121);
   color: white;
   border: none;
@@ -1043,18 +1062,16 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 0.3rem;
-  padding: 0.5rem 0.1rem; /* trim padding to offset larger text */
+  gap: 0.75rem;
+  padding: 0.75rem 0.1rem; /* trim padding to offset larger text */
   background-color: var(--accent, rgba(129, 154, 121, 1));
   color: white;
-  font-family: 'Jersey 10', sans-serif;
-  font-size: 1.3rem;
-  letter-spacing: 0.4px;
+  font-size: 1.125rem;
+  font-weight: 700;
   border: none;
-  border-radius: 9999px;
+  border-radius: 50px;
   cursor: pointer;
-  font-weight: 500;
-  box-shadow: 0 8px 20px rgba(16, 24, 40, 0.12);
+  box-shadow: 0 8px 18px rgba(15, 23, 42, 0.14);
 }
 
 .applyFiltersButton:hover {

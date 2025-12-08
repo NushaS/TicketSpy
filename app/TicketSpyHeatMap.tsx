@@ -1,8 +1,8 @@
 'use client';
 
 import React, { useRef, useState } from 'react';
-import { Menu, Info, Check } from 'lucide-react';
-import { FaTimes } from 'react-icons/fa';
+import { Menu, Info } from 'lucide-react';
+import { FaTimes, FaCheck } from 'react-icons/fa';
 import Image from 'next/image';
 import logo from './logo.png';
 import Map, { Source, Layer, Marker, Popup } from 'react-map-gl/maplibre';
@@ -30,7 +30,6 @@ import { ViolationType } from '@/lib/enums/ticketViolationType';
 import TicketReportModal from '@/components/map/TicketReportModal';
 import BookmarkNameModal from '@/components/map/BookmarkNameModal';
 import Toast from '@/components/map/Toast';
-import { FaFontAwesome } from 'react-icons/fa';
 
 type MapCenter = { lat: number; lng: number };
 
@@ -644,7 +643,7 @@ const TicketSpyHeatMap: React.FC<TicketSpyHeatMapProps> = ({
             padding: '8px 10px',
             borderRadius: 10,
             zIndex: 1000,
-            boxShadow: '0 6px 14px rgba(15, 23, 42, 0.14)',
+            boxShadow: '0 2px 4px 0 rgba(0, 0, 0, 0.4)',
             backdropFilter: 'blur(6px)',
             display: 'flex',
             flexDirection: 'column',
@@ -981,6 +980,7 @@ const TicketSpyHeatMap: React.FC<TicketSpyHeatMapProps> = ({
                 onClick={() => setShowInstructions(false)}
                 className={styles.modalButton}
               >
+                <FaCheck size={16} />
                 got it!
               </button>
             </footer>
@@ -1084,7 +1084,7 @@ const TicketSpyHeatMap: React.FC<TicketSpyHeatMapProps> = ({
 
                 <div className={styles.authButtons}>
                   <Link href="/auth/sign-up">
-                    <button className={styles.createAccountBtn}>create an account</button>
+                    <button className={styles.createAccountBtn}>create account</button>
                   </Link>
                   <span className={styles.orText}>or</span>
                   <button
@@ -1144,7 +1144,7 @@ const TicketSpyHeatMap: React.FC<TicketSpyHeatMapProps> = ({
               <br />({enforcementLocation.lat.toFixed(5)}, {enforcementLocation.lng.toFixed(5)})
             </p>
 
-            <div style={{ display: 'flex', gap: 12, marginTop: 18, justifyContent: 'center' }}>
+            <div className={styles.enforcementButtonGroup}>
               <button
                 className={styles.enforcementNoButton}
                 onClick={() => {
@@ -1152,7 +1152,7 @@ const TicketSpyHeatMap: React.FC<TicketSpyHeatMapProps> = ({
                   setEnforcementLocation(null);
                 }}
               >
-                <span>✖</span>
+                <FaTimes size={16} />
                 no
               </button>
 
@@ -1213,7 +1213,7 @@ const TicketSpyHeatMap: React.FC<TicketSpyHeatMapProps> = ({
                 }}
                 disabled={enforcementSubmitting}
               >
-                <Check size={18} />
+                <FaCheck size={16} />
                 <span>{enforcementSubmitting ? 'submitting...' : 'confirm'}</span>
               </button>
             </div>

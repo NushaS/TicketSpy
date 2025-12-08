@@ -1,6 +1,5 @@
 import React from 'react';
-import { Check } from 'lucide-react';
-import { FaTimes } from 'react-icons/fa';
+import { FaTimes, FaCheck } from 'react-icons/fa';
 import styles from '../app/page.module.css';
 import type { Filters } from '@/lib/utils/filterTickets';
 
@@ -204,7 +203,7 @@ export default function FilterPanel({ visible, onClose, onApply, initialFilters 
 
         <div className={styles.filterPanelFooter}>
           <button className={styles.applyFiltersButton} onClick={apply}>
-            <Check size={16} />
+            <FaCheck size={16} />
             <span style={{ marginLeft: 8 }}>apply filters</span>
           </button>
         </div>

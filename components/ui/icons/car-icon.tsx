@@ -22,7 +22,7 @@ export const CarIcon: React.FC<CarIconProps> = ({
     xmlns="http://www.w3.org/2000/svg"
     width={size}
     height={size} // original viewBox is square, so width = height
-    viewBox="0 0 32 32"
+    viewBox="0 1.5 32 32"
     fill="white"
     className={className}
   >
@@ -44,7 +44,7 @@ export const CarIcon2: React.FC<CarIconProps> = ({
     xmlns="http://www.w3.org/2000/svg"
     width={size}
     height={size}
-    viewBox="0 0 22 22"
+    viewBox="0 1.5 22 22"
     fill="none"
     className={className}
     aria-hidden="true"
