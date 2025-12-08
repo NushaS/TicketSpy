@@ -54,7 +54,6 @@ Follow these steps to build and run the project locally:
    To access our Supabase credentials:
    - if you are a UW student, access them [here](https://docs.google.com/document/d/1XV_wcLVr5xJQiNSPcsQuTWJQUjbESwpbuEIlXwFTbkE/edit?usp=sharing).
    - if you are not a UW student, please email us (emails available via the living document in `Acknowledgements`).
-
    ```
 4. **Install dependencies**
    ```bash
