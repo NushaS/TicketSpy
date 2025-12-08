@@ -53,7 +53,7 @@ const BookmarkNameModal: React.FC<BookmarkNameModalProps> = ({
           </div>
 
           <button className={styles.ticketReportSubmitButton} disabled={isSubmitting} type="submit">
-            <FaCheck size={16}/>
+            <FaCheck size={16} />
             {isSubmitting ? 'saving...' : 'save bookmark'}
           </button>
         </form>
