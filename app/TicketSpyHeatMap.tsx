@@ -32,9 +32,27 @@ import BookmarkNameModal from '@/components/map/BookmarkNameModal';
 import Toast from '@/components/map/Toast';
 import { PinActionPopup } from '@/components/map/PinActionPopup';
 import { InstructionsModal } from '@/components/map/InstructionsModal';
-import { FaFontAwesome } from 'react-icons/fa';
+import {
+  BookmarkActionsModal,
+  BookmarkConversionModal,
+  ParkingInfoModal,
+} from '@/components/map/BookmarkParkingModals';
 
 type MapCenter = { lat: number; lng: number };
+
+type BookmarkPinState = {
+  id: string;
+  latitude: number;
+  longitude: number;
+  bookmarkName?: string | null;
+};
+
+type ParkingPinState = {
+  id: string;
+  latitude: number;
+  longitude: number;
+  startTime?: string | null;
+};
 
 type TicketSpyHeatMapProps = {
   initialCenter?: MapCenter | null;
@@ -90,6 +108,16 @@ const TicketSpyHeatMap: React.FC<TicketSpyHeatMapProps> = ({
     null
   );
   const [isBookmarkSubmitting, setIsBookmarkSubmitting] = useState(false);
+  const [activeBookmarkPin, setActiveBookmarkPin] = useState<BookmarkPinState | null>(null);
+  const [activeParkingPin, setActiveParkingPin] = useState<ParkingPinState | null>(null);
+  const [showBookmarkConversionModal, setShowBookmarkConversionModal] = useState(false);
+  const [conversionLocation, setConversionLocation] = useState<{ lat: number; lng: number } | null>(
+    null
+  );
+  const [isDeletingBookmark, setIsDeletingBookmark] = useState(false);
+  const [isConvertingBookmark, setIsConvertingBookmark] = useState(false);
+  const [isEndingParking, setIsEndingParking] = useState(false);
+  const [isSavingBookmarkFromParking, setIsSavingBookmarkFromParking] = useState(false);
   // When the page is loaded via /alert, show a popup on the highlighted marker
   const [showAlertPopup, setShowAlertPopup] = useState<boolean>(!!alertMarker);
   const [showPinPopup, setShowPinPopup] = useState(false);
@@ -412,8 +440,6 @@ const TicketSpyHeatMap: React.FC<TicketSpyHeatMapProps> = ({
     setBookmarkLocation(null);
   };
 
-  const dismissPinActionPopup = React.useCallback(() => setShowPinPopup(false), []);
-
   // Handle bookmark location with a name
   const handleBookmarkLocation = async () => {
     const trimmedName = bookmarkName.trim();
@@ -460,6 +486,149 @@ const TicketSpyHeatMap: React.FC<TicketSpyHeatMapProps> = ({
       setIsBookmarkSubmitting(false);
     }
   };
+
+  const handleDeleteBookmarkPin = React.useCallback(async () => {
+    if (!activeBookmarkPin || isDeletingBookmark) return;
+
+    setIsDeletingBookmark(true);
+    try {
+      const res = await fetch(`/api/delete-bookmark?id=${activeBookmarkPin.id}`, {
+        method: 'DELETE',
+      });
+      const data = await res.json().catch(() => null);
+
+      if (res.ok) {
+        refetchBookMarks();
+        setActiveBookmarkPin(null);
+        setSuccessMessage('Bookmark deleted successfully!');
+        setShowSuccessToast(true);
+        setTimeout(() => setShowSuccessToast(false), 3000);
+      } else {
+        setErrorMessage((data as any)?.error || 'Failed to delete bookmark');
+        setShowErrorToast(true);
+        setTimeout(() => setShowErrorToast(false), 3000);
+      }
+    } catch (error) {
+      console.error('Error deleting bookmark:', error);
+      setErrorMessage('Network error: Failed to delete bookmark');
+      setShowErrorToast(true);
+      setTimeout(() => setShowErrorToast(false), 3000);
+    } finally {
+      setIsDeletingBookmark(false);
+    }
+  }, [activeBookmarkPin, isDeletingBookmark, refetchBookMarks]);
+
+  const handleConvertBookmarkToParking = React.useCallback(async () => {
+    if (!activeBookmarkPin || isConvertingBookmark) return;
+
+    setIsConvertingBookmark(true);
+    try {
+      const res = await fetch('/api/new-parking-session', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          latitude: activeBookmarkPin.latitude,
+          longitude: activeBookmarkPin.longitude,
+        }),
+      });
+      const data = await res.json().catch(() => null);
+
+      if (res.ok) {
+        refetchParkingSessions();
+        refetchBookMarks();
+        setActiveBookmarkPin(null);
+        setSuccessMessage('Parking session started successfully!');
+        setShowSuccessToast(true);
+        setTimeout(() => setShowSuccessToast(false), 3000);
+      } else {
+        setErrorMessage((data as any)?.error || 'Failed to start parking session');
+        setShowErrorToast(true);
+        setTimeout(() => setShowErrorToast(false), 3000);
+      }
+    } catch (error) {
+      console.error('Error converting bookmark to parking:', error);
+      setErrorMessage('Network error: Failed to start parking session');
+      setShowErrorToast(true);
+      setTimeout(() => setShowErrorToast(false), 3000);
+    } finally {
+      setIsConvertingBookmark(false);
+    }
+  }, [activeBookmarkPin, isConvertingBookmark, refetchBookMarks, refetchParkingSessions]);
+
+  const handleEndParkingSession = React.useCallback(async () => {
+    if (!activeParkingPin || isEndingParking) return;
+
+    const { id, latitude, longitude } = activeParkingPin;
+    setIsEndingParking(true);
+
+    try {
+      const res = await fetch(`/api/delete-parking-session?id=${id}`, { method: 'DELETE' });
+      const data = await res.json().catch(() => null);
+
+      if (res.ok) {
+        refetchParkingSessions();
+        setActiveParkingPin(null);
+        setShowBookmarkConversionModal(true);
+        setConversionLocation({ lat: latitude, lng: longitude });
+        setSuccessMessage('Parking session ended');
+        setShowSuccessToast(true);
+        setTimeout(() => setShowSuccessToast(false), 3000);
+      } else {
+        setErrorMessage((data as any)?.error || 'Failed to end parking session');
+        setShowErrorToast(true);
+        setTimeout(() => setShowErrorToast(false), 3000);
+      }
+    } catch (error) {
+      console.error('Error ending parking session:', error);
+      setErrorMessage('Network error: Failed to end parking session');
+      setShowErrorToast(true);
+      setTimeout(() => setShowErrorToast(false), 3000);
+    } finally {
+      setIsEndingParking(false);
+    }
+  }, [activeParkingPin, isEndingParking, refetchParkingSessions]);
+
+  const handleConvertEndedParkingToBookmark = React.useCallback(async () => {
+    if (!conversionLocation || isSavingBookmarkFromParking) return;
+
+    setIsSavingBookmarkFromParking(true);
+    try {
+      const res = await fetch('/api/bookmark-location', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          latitude: conversionLocation.lat,
+          longitude: conversionLocation.lng,
+        }),
+      });
+      const data = await res.json().catch(() => null);
+
+      if (res.ok) {
+        refetchBookMarks();
+        setShowBookmarkConversionModal(false);
+        setConversionLocation(null);
+        setSuccessMessage('Location bookmarked successfully!');
+        setShowSuccessToast(true);
+        setTimeout(() => setShowSuccessToast(false), 3000);
+      } else {
+        setErrorMessage((data as any)?.error || 'Failed to bookmark location');
+        setShowErrorToast(true);
+        setTimeout(() => setShowErrorToast(false), 3000);
+      }
+    } catch (error) {
+      console.error('Error bookmarking from parking session:', error);
+      setErrorMessage('Network error: Failed to bookmark location');
+      setShowErrorToast(true);
+      setTimeout(() => setShowErrorToast(false), 3000);
+    } finally {
+      setIsSavingBookmarkFromParking(false);
+    }
+  }, [conversionLocation, isSavingBookmarkFromParking, refetchBookMarks]);
+
+  const handleDismissConversionModal = React.useCallback(() => {
+    setShowBookmarkConversionModal(false);
+    setConversionLocation(null);
+  }, []);
 
   // Handle parking session
   const handleParkingSession = async () => {
@@ -539,12 +708,6 @@ const TicketSpyHeatMap: React.FC<TicketSpyHeatMapProps> = ({
       }))
     );
 
-    // Refetch bookmarks and parking sessions when called
-    const handlePinChange = React.useCallback(() => {
-      refetchBookMarks();
-      refetchParkingSessions();
-    }, [refetchBookMarks, refetchParkingSessions]);
-
     const allPins = React.useMemo(
       () => [...bookmarkPoints, ...carPoints],
       [bookmarkPoints, carPoints]
@@ -562,15 +725,18 @@ const TicketSpyHeatMap: React.FC<TicketSpyHeatMapProps> = ({
             id={point.id}
             {...(point.type === 'heart' ? { bookmarkName: point.name } : {})}
             {...(point.type === 'car' ? { startTime: point.start_datetime } : {})}
-            allUserBookmarks={bookmarkData?.map((b) => ({
-              latitude: Number(b.latitude),
-              longitude: Number(b.longitude),
-            }))}
-            //onDismissPinActionPopup={dismissPinActionPopup}
-            onDelete={handlePinChange}
-            onConvertToParking={handlePinChange}
-            onConvertToBookmark={handlePinChange}
-            onRequestNamedBookmark={openBookmarkNameModal}
+            onDismissPinActionPopup={() => {
+              setShowPinPopup(false);
+              setPinLocation(null);
+            }}
+            onOpenBookmarkActions={(pin) => {
+              setActiveBookmarkPin(pin);
+              setActiveParkingPin(null);
+            }}
+            onOpenEndParking={(pin) => {
+              setActiveParkingPin(pin);
+              setActiveBookmarkPin(null);
+            }}
           />
         ))}
       </>
@@ -592,6 +758,37 @@ const TicketSpyHeatMap: React.FC<TicketSpyHeatMapProps> = ({
         onClose={closeBookmarkNameModal}
         onSubmit={handleBookmarkLocation}
         isSubmitting={isBookmarkSubmitting}
+      />
+      <ParkingInfoModal
+        open={!!activeParkingPin}
+        startTime={activeParkingPin?.startTime}
+        onClose={() => setActiveParkingPin(null)}
+        onEndParking={handleEndParkingSession}
+      />
+      <BookmarkConversionModal
+        open={showBookmarkConversionModal}
+        onClose={handleDismissConversionModal}
+        onDelete={handleDismissConversionModal}
+        onConvertToBookmark={handleConvertEndedParkingToBookmark}
+        onRequestNamedBookmark={
+          conversionLocation
+            ? () => {
+                setShowBookmarkConversionModal(false);
+                openBookmarkNameModal(conversionLocation);
+              }
+            : undefined
+        }
+        isDeleting={false}
+        isConverting={isSavingBookmarkFromParking}
+      />
+      <BookmarkActionsModal
+        open={!!activeBookmarkPin}
+        onClose={() => setActiveBookmarkPin(null)}
+        onDelete={handleDeleteBookmarkPin}
+        onConvertToParking={handleConvertBookmarkToParking}
+        isDeleting={isDeletingBookmark}
+        isConverting={isConvertingBookmark}
+        bookmarkName={activeBookmarkPin?.bookmarkName}
       />
       {/* Header */}
       <header className={styles.header}>
@@ -992,7 +1189,6 @@ const TicketSpyHeatMap: React.FC<TicketSpyHeatMapProps> = ({
                     const body = {
                       latitude: enforcementLocation.lat,
                       longitude: enforcementLocation.lng,
-                      user_id: userId ?? null,
                       sighting_time: new Date().toISOString(),
                     };
 
