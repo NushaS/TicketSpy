@@ -953,6 +953,7 @@ const TicketSpyHeatMap: React.FC<TicketSpyHeatMapProps> = ({
                   longitude={alertMarkerPosition.lng}
                   latitude={alertMarkerPosition.lat}
                   anchor="top"
+                  className="ts-popup"
                   onClose={() => {
                     setShowAlertPopup(false);
                     if (alertKey) {
@@ -1054,6 +1055,7 @@ const TicketSpyHeatMap: React.FC<TicketSpyHeatMapProps> = ({
               longitude={selectedEnforcementPopup.lng}
               latitude={selectedEnforcementPopup.lat}
               anchor="top"
+              className="ts-popup"
               onClose={() => setSelectedEnforcementPopup(null)}
               closeButton
               closeOnClick={false}
