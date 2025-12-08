@@ -105,10 +105,10 @@ Jest will search under the `_tests_` folder by default, as well as any file that
 
 In general, our tests will be in the **/app/__tests__/unit** folder and a **/app/__tests__/api** folder
 
-To add a new test:
-1.) Decide if it is a unit test or api test
-1.1) If it is neither, add a "__tests__" folder under your module and use JEST to write custom tests
-2.) Use Jest to write custom tests in the folder! Feel free to use our previous tests as a template
+To add a new test: <br>
+1.) Decide if it is a unit test or api test<br>
+1.1) If it is neither, add a "__tests__" folder under your module and use JEST to write custom tests<br>
+2.) Use Jest to write custom tests in the folder! Feel free to use our previous tests as a template<br>
 
 ### Naming Conventions/Patterns
 
