@@ -49,7 +49,7 @@ export function ForgotPasswordForm() {
         <form onSubmit={handleForgotPassword} className={styles.loginForm}>
           <div className={styles.loginFormGroup}>
             <label htmlFor="email" className={styles.loginLabel}>
-              email:
+              Email:
             </label>
             <input
               id="email"

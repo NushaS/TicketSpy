@@ -39,7 +39,7 @@ const BookmarkNameModal: React.FC<BookmarkNameModalProps> = ({
         >
           <div className={styles.ticketReportFormGroup}>
             <label className={styles.ticketReportLabel} htmlFor="bookmarkName">
-              Bookmark name:
+              Bookmark Name:
             </label>
             <input
               id="bookmarkName"

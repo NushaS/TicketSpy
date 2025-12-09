@@ -66,7 +66,7 @@ const WelcomePage: React.FC = () => {
           {/* Input Fields */}
           <form onSubmit={handleSignup} className={styles.form}>
             <div className={styles.formGroup}>
-              <label className={styles.label}>name:</label>
+              <label className={styles.label}>Name:</label>
               <input
                 type="text"
                 className={styles.input}
@@ -78,7 +78,7 @@ const WelcomePage: React.FC = () => {
             </div>
 
             <div className={styles.formGroup}>
-              <label className={styles.label}>phone number:</label>
+              <label className={styles.label}>Phone Number:</label>
               <input
                 type="tel"
                 className={styles.input}
@@ -90,7 +90,7 @@ const WelcomePage: React.FC = () => {
             </div>
 
             <div className={styles.formGroup}>
-              <label className={styles.label}>password:</label>
+              <label className={styles.label}>Password:</label>
               <input
                 type="password"
                 className={styles.input}

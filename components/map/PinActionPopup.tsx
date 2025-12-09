@@ -93,7 +93,7 @@ export const PinActionPopup: React.FC<PinActionPopupProps> = ({
 
         <div className={styles.instructionsText}>
           <p>
-            to <strong>mark where you parked</strong>, get{' '}
+            To <strong>mark where you parked</strong>, get{' '}
             <strong>notifications for tickets issued</strong> or{' '}
             <strong>parking enforcement spotted</strong> near your important locations, and{' '}
             <strong>bookmark your favorite parking spots:</strong>
