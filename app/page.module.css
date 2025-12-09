@@ -339,9 +339,11 @@
 }
 
 .thankYouModalTitle {
+  font-family: 'Jersey 10', sans-serif;
+  letter-spacing: 1px;
+  font-size: 2.5rem;
   margin: 0 0 24px 0;
-  font-size: 1.75rem;
-  font-weight: 700;
+  font-weight: 400;
   color: #111827;
   line-height: 1.3;
 }
