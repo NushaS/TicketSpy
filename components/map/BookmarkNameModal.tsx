@@ -53,14 +53,7 @@ const BookmarkNameModal: React.FC<BookmarkNameModalProps> = ({
             />
           </div>
           <div className={styles.bookmarkSubmit}>
-            <button
-              className={styles.ticketReportSubmitButton}
-              disabled={isSubmitting}
-              type="submit"
-            >
-              <FaCheck size={16} />
-              {isSubmitting ? 'saving...' : 'save bookmark'}
-            </button>
+            
           </div>
           <span className={styles.linkToProfileText}>
             To receive notifications for events near this spot, ensure that{' '}
@@ -69,6 +62,10 @@ const BookmarkNameModal: React.FC<BookmarkNameModalProps> = ({
             </a>{' '}
             .
           </span>
+          <button className={styles.submitBookmarkButton} disabled={isSubmitting} type="submit">
+            <FaCheck size={16} />
+            {isSubmitting ? 'saving...' : 'save bookmark'}
+          </button>
         </form>
       </div>
     </div>

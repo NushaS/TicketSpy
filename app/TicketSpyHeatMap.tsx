@@ -865,7 +865,7 @@ const TicketSpyHeatMap: React.FC<TicketSpyHeatMapProps> = ({
             aria-label="heatmap opacity"
             className={styles.slider}
             style={{
-              background: `linear-gradient(90deg, var(--accent, #7C5CFF) ${Math.round(
+              background: `linear-gradient(90deg, #93A58D ${Math.round(
                 heatmapOpacityMultiplier * 100
               )}%, #E6EEF3 ${Math.round(heatmapOpacityMultiplier * 100)}%)`,
             }}

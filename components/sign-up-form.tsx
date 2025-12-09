@@ -121,7 +121,10 @@ export function SignUpForm() {
       {/* row for “login” link */}
       <div style={{ textAlign: 'center', marginTop: '1rem', fontSize: '0.9rem' }}>
         Already have an account?{' '}
-        <Link href="/auth/login" className="underline underline-offset-4">
+        <Link
+          href="/auth/login"
+          className="text-sm underline underline-offset-4 text-[#566751] font-[700]"
+        >
           Login
         </Link>
       </div>
