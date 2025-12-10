@@ -64,7 +64,7 @@
   font-weight: 500;
   font-size: 1.625rem;
   text-align: center;
-  color: #576450;
+  color: #8a5a5a;
   display: flex;
   flex-direction: row;
   gap: 1rem;
@@ -107,7 +107,7 @@
   font-family: 'Jersey 10', sans-serif;
   letter-spacing: 0.5px;
   padding: 1rem;
-  background-color: #576450;
+  background-color: rgb(156, 124, 119);
   color: white;
   border: none;
   border-radius: 12px;
@@ -125,7 +125,7 @@
 }
 
 .bookmarkButtonVariant:hover {
-  background-color: #465040;
+  background-color: #8a5a5a;
 }
 
 .buttonText {
@@ -151,7 +151,7 @@
   letter-spacing: 0.5px;
   width: 7rem;
   padding: 0.75rem 1.5rem;
-  background-color: #576450;
+  background-color: rgb(156, 124, 119);
   color: white;
   border-radius: 12px;
   font-size: 1.5rem;
@@ -166,7 +166,7 @@
 }
 
 .yesButton:hover {
-  background-color: #465040;
+  background-color: #8a5a5a;
 }
 
 .noButton {
@@ -175,8 +175,8 @@
   width: 7rem;
   padding: 0.75rem 1.5rem;
   background-color: white;
-  color: #465040;
-  border: 1px solid #465040;
+  color: #8a5a5a;
+  border: 1px solid #8a5a5a;
   border-radius: 12px;
   font-size: 1.5rem;
   font-weight: 500;
@@ -190,7 +190,7 @@
 }
 
 .noButton:hover {
-  background-color: #57645010;
+  background-color: #8a5a5a10;
 }
 
 /* close button */

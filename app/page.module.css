@@ -80,7 +80,7 @@
 
 .loginButton {
   padding: 0.5rem 1.25rem;
-  background-color: #b08374;
+  background-color: #967d86;
   color: white;
   border-radius: 9999px;
   font-weight: 510;
@@ -92,12 +92,12 @@
 }
 
 .loginButton:hover {
-  background-color: #956555;
+  background-color: #7a626b;
 }
 
 .signupButton {
   padding: 0.5rem 1.25rem;
-  background-color: #b08374cc;
+  background-color: rgba(154, 110, 104, .8);
   color: white;
   border-radius: 9999px;
   font-weight: 510;
@@ -109,7 +109,7 @@
 }
 
 .signupButton:hover {
-  background-color: #956555cc;
+  background-color: #7c5853;
 }
 
 .profileButtonGroup {
@@ -870,7 +870,7 @@
 }
 
 .reportTicketButton:hover {
-  background-color: #915a5a;
+  background-color: #804f4f;
 }
 .reportEnforcementButton:hover {
   background-color: #bf9367;
@@ -915,7 +915,7 @@
 }
 
 .createAccountBtn:hover {
-  background-color: #956555cc;
+  background-color: #7c5853;
 }
 
 .orText {
@@ -939,7 +939,7 @@
 }
 
 .logInBtn:hover {
-  background-color: #956555;
+  background-color: #7a626b;
 }
 
 .pinPopupWrapper {
@@ -1125,7 +1125,7 @@
 
 /* styles for link to profile page*/
 .linkToProfileText {
-  margin-top: 1rem;
+  margin-top: 1.5rem;
   text-align: center;
   font-size: 0.85rem;
   font-weight: 700;
@@ -1186,9 +1186,8 @@
 
 /* button style for naming bookmark */
 .submitBookmarkButton {
-  margin-top: 1rem;
   padding: 0.75rem 2.5rem;
-  background-color: #576450;
+  background-color: rgb(156, 124, 119);
   color: white;
   border: none;
   border-radius: 50px;
