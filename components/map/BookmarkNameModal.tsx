@@ -32,6 +32,7 @@ const BookmarkNameModal: React.FC<BookmarkNameModalProps> = ({
 
         <form
           className={styles.ticketReportForm}
+          style={{ gap: '0' }}
           onSubmit={(e) => {
             e.preventDefault();
             onSubmit();
@@ -51,6 +52,16 @@ const BookmarkNameModal: React.FC<BookmarkNameModalProps> = ({
               required
             />
           </div>
+          <div className={styles.bookmarkSubmit}>
+            <button
+              className={styles.ticketReportSubmitButton}
+              disabled={isSubmitting}
+              type="submit"
+            >
+              <FaCheck size={16} />
+              {isSubmitting ? 'saving...' : 'save bookmark'}
+            </button>
+          </div>
           <span className={styles.linkToProfileText}>
             To receive notifications for events near this spot, ensure that{' '}
             <a href="profile-settings/" className={styles.profileLink}>
@@ -58,10 +69,6 @@ const BookmarkNameModal: React.FC<BookmarkNameModalProps> = ({
             </a>{' '}
             .
           </span>
-          <button className={styles.ticketReportSubmitButton} disabled={isSubmitting} type="submit">
-            <FaCheck size={16} />
-            {isSubmitting ? 'saving...' : 'save bookmark'}
-          </button>
         </form>
       </div>
     </div>

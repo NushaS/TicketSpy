@@ -149,11 +149,7 @@ export const BookmarkActionsModal: React.FC<BookmarkActionsModalProps> = ({
         <button className={styles.modalCloseButton} onClick={onClose}>
           <FaTimes size={22} />
         </button>
-        {bookmarkName && (
-          <h2 className={styles.modalBody} style={{ fontSize: '2.6rem' }}>
-            {bookmarkName}
-          </h2>
-        )}
+        {bookmarkName && <h2 className={styles.modalBodyBookmarkName}>{bookmarkName}</h2>}
         <div className={styles.modalButtonGroup}>
           <button onClick={onDelete} disabled={isDeleting} className={styles.bookmarkButtonVariant}>
             <FaTrash />

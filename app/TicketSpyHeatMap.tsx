@@ -1140,7 +1140,7 @@ const TicketSpyHeatMap: React.FC<TicketSpyHeatMapProps> = ({
               confirm parking enforcement officer sighting?
             </h2>
 
-            <p style={{ marginTop: 8, textAlign: 'center' }}>
+            <p style={{ textAlign: 'center' }}>
               Would you like to report a parking enforcement officer at the selected location
               (within the past 10 minutes)?
             </p>
