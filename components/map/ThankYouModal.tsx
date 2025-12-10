@@ -1,5 +1,6 @@
 import React from 'react';
 import { X } from 'lucide-react';
+import { FaCheck } from 'react-icons/fa';
 import styles from '@/app/page.module.css';
 
 type ThankYouModalProps = {
@@ -12,7 +13,7 @@ type ThankYouModalProps = {
 const ThankYouModal: React.FC<ThankYouModalProps> = ({
   isOpen,
   onClose,
-  title = 'Thank you for your report! 🎉',
+  title = 'thank you for your report! 🎉',
   message = 'Your sighting will remain on the map to inform other users for the next hour.',
 }) => {
   if (!isOpen) return null;
@@ -33,7 +34,8 @@ const ThankYouModal: React.FC<ThankYouModalProps> = ({
           <p className={styles.thankYouModalMessage}>{message}</p>
         </div>
         <div className={styles.modalFooterSpacing}>
-          <button type="button" className={styles.ticketReportSubmitButton} onClick={onClose}>
+          <button type="button" className={styles.modalButton} onClick={onClose}>
+            <FaCheck size={16} />
             Close
           </button>
         </div>

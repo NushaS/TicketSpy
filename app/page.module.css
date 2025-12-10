@@ -271,10 +271,13 @@
   border-bottom: 1px solid #eef2f6;
 }
 .modalTitle {
+  font-family: 'Jersey 10', sans-serif;
+  letter-spacing: 0.8px;
+  font-size: 2.25rem;
   margin: 0;
-  font-size: 1.125rem;
-  font-weight: 700;
-  color: #111827;
+  font-size: 2rem;
+  font-weight: 500;
+  color: #758b6d;
 }
 
 /* close button in header */
@@ -336,9 +339,11 @@
 }
 
 .thankYouModalTitle {
+  font-family: 'Jersey 10', sans-serif;
+  letter-spacing: 1px;
+  font-size: 2.5rem;
   margin: 0 0 24px 0;
-  font-size: 1.75rem;
-  font-weight: 700;
+  font-weight: 400;
   color: #111827;
   line-height: 1.3;
 }
@@ -402,7 +407,7 @@
 
 /* body: scrollable area */
 .modalBody {
-  padding: 32px 24px 48px 24px;
+  padding: 20px 24px 24px 24px;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
   flex: 1 1 auto; /* fill remaining vertical space so scroll works */
@@ -440,6 +445,10 @@
   align-self: center;
   transition: background-color 0.2s;
   box-shadow: 0 8px 18px rgba(15, 23, 42, 0.14);
+}
+
+.instructionGroup {
+  margin-bottom: 1rem;
 }
 
 /* compact mobile sizing */
@@ -628,7 +637,9 @@
 }
 
 .ticketReportTitle {
-  font-size: 1.75rem;
+  font-family: 'Jersey 10', sans-serif;
+  letter-spacing: 0.8px;
+  font-size: 2.25rem;
   font-weight: 500;
   color: #333;
   text-align: center;

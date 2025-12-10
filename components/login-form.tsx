@@ -37,7 +37,7 @@ export function LoginForm() {
     <form onSubmit={handleLogin} className={styles.loginForm}>
       <div className={styles.loginFormGroup}>
         <label htmlFor="email" className={styles.loginLabel}>
-          email:
+          Email:
         </label>
         <input
           id="email"
@@ -52,7 +52,7 @@ export function LoginForm() {
 
       <div className={styles.loginFormGroup}>
         <label htmlFor="password" className={styles.loginLabel}>
-          password:
+          Password:
         </label>
         <input
           id="password"
