@@ -63,7 +63,7 @@
   align-items: center;
   gap: 0.75rem;
   padding: 0.5rem 1rem;
-  background-color: #93A58D;
+  background-color: #93a58d;
   color: white;
   border-radius: 9999px;
   font-weight: 510;
@@ -80,7 +80,7 @@
 
 .loginButton {
   padding: 0.5rem 1.25rem;
-  background-color: #B08374;
+  background-color: #b08374;
   color: white;
   border-radius: 9999px;
   font-weight: 510;
@@ -97,7 +97,7 @@
 
 .signupButton {
   padding: 0.5rem 1.25rem;
-  background-color: #B08374CC;
+  background-color: #b08374cc;
   color: white;
   border-radius: 9999px;
   font-weight: 510;
@@ -109,7 +109,7 @@
 }
 
 .signupButton:hover {
-  background-color: #956555CC;
+  background-color: #956555cc;
 }
 
 .profileButtonGroup {
@@ -118,7 +118,7 @@
   align-items: center;
   justify-content: center;
   gap: 0.2rem;
-  color: #B08374;
+  color: #b08374;
   font-weight: 500;
   font-size: 1.4em;
   line-height: 1.2;
@@ -145,7 +145,7 @@
   gap: 0.5rem;
   padding: 0.3rem 1rem;
   background-color: #ffffff;
-  color: #62535C;
+  color: #62535c;
   border-radius: 2rem;
   box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
   font-family: 'Jersey 10', sans-serif;
@@ -203,7 +203,7 @@
   height: 18px;
   border-radius: 50%;
   background: white;
-  border: 3px solid #93A58D;
+  border: 3px solid #93a58d;
   box-shadow: 0 2px 6px rgba(16, 24, 40, 0.12);
   cursor: pointer;
 }
@@ -222,7 +222,7 @@
   height: 18px;
   border-radius: 50%;
   background: white;
-  border: 3px solid #93A58D;
+  border: 3px solid #93a58d;
   box-shadow: 0 2px 6px rgba(16, 24, 40, 0.12);
   cursor: pointer;
 }
@@ -292,7 +292,7 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  opacity: 0.6
+  opacity: 0.6;
 }
 
 .modalCloseBtn:hover {
@@ -434,7 +434,7 @@
 .modalButton {
   margin-top: 1rem;
   padding: 0.75rem 1.5rem;
-  background-color: #93A58D;
+  background-color: #93a58d;
   color: white;
   border: none;
   border-radius: 50px;
@@ -538,7 +538,7 @@
   padding: 0.25rem;
   display: flex;
   align-items: center;
-  opacity: 0.6
+  opacity: 0.6;
 }
 
 .closeButton:hover {
@@ -604,7 +604,7 @@
 .ticketReportSubmitButton {
   margin-top: 0.5rem;
   padding: 0.75rem 1.5rem;
-  background-color: #7B4949;
+  background-color: #7b4949;
   color: white;
   border: none;
   border-radius: 50px;
@@ -636,13 +636,12 @@
 .enforcementButtonGroup .ticketReportSubmitButton {
   margin-top: 0;
   width: 9rem;
-  background-color: #9B6834;
+  background-color: #b97634;
 }
 
 .enforcementButtonGroup .ticketReportSubmitButton:hover {
   background-color: #7e542a;
 }
-
 
 .enforcementNoButton {
   width: 9rem;
@@ -663,7 +662,7 @@
 }
 
 .enforcementNoButton:hover {
-  background-color: #9B683410;
+  background-color: #9b683410;
 }
 
 /* Responsive adjustments for ticket report modal */
@@ -771,7 +770,7 @@
   font-family: 'Jersey 10', sans-serif;
   letter-spacing: 0.5px;
   padding: 1rem 1.5rem;
-  background-color: #576450;
+  background-color: #9c7c77;
   color: white;
   border: none;
   border-radius: 12px;
@@ -780,7 +779,6 @@
   cursor: pointer;
   transition: background-color 0.2s;
   box-shadow: 0 4px 8px rgba(15, 23, 42, 0.25);
-  
 }
 .parkingSessionButton {
   font-family: 'Jersey 10', sans-serif;
@@ -798,7 +796,7 @@
 }
 
 .bookmarkButton:hover {
-  background-color: #465040;
+  background-color: #8a5a5a;
 }
 .parkingSessionButton:hover {
   background-color: #667d5f;
@@ -839,7 +837,7 @@
   font-family: 'Jersey 10', sans-serif;
   letter-spacing: 0.5px;
   padding: 1rem 3.6rem;
-  background-color: #7B4949;
+  background-color: #9f6464;
   color: white;
   border: none;
   border-radius: 12px;
@@ -854,7 +852,7 @@
   font-family: 'Jersey 10', sans-serif;
   letter-spacing: 0.5px;
   padding: 0.5rem 0.2rem;
-  background-color: #9B6834;
+  background-color: #d1a46d;
   color: white;
   border: none;
   border-radius: 12px;
@@ -872,10 +870,10 @@
 }
 
 .reportTicketButton:hover {
-  background-color: #623a3a;
+  background-color: #915a5a;
 }
 .reportEnforcementButton:hover {
-  background-color: #7c532a;
+  background-color: #bf9367;
 }
 
 .instructionsText {
@@ -904,7 +902,7 @@
 
 .createAccountBtn {
   padding: 0.75rem 1.5rem;
-  background-color: #B08374CC;
+  background-color: #9a6e68cc;
   color: white;
   border: none;
   border-radius: 50px;
@@ -917,7 +915,7 @@
 }
 
 .createAccountBtn:hover {
-  background-color: #956555CC;
+  background-color: #956555cc;
 }
 
 .orText {
@@ -928,7 +926,7 @@
 
 .logInBtn {
   padding: 0.75rem 1.6rem;
-  background-color: #B08374;
+  background-color: #967d86;
   color: white;
   border: none;
   border-radius: 50px;
@@ -1111,7 +1109,7 @@
   justify-content: center;
   gap: 0.75rem;
   padding: 0.75rem 0.1rem; /* trim padding to offset larger text */
-  background-color: #93A58D;
+  background-color: #93a58d;
   color: white;
   font-size: 1.125rem;
   font-weight: 700;
@@ -1154,8 +1152,8 @@
   margin-bottom: 8px; /* lift above anchor */
   border-radius: 9999px;
   background: radial-gradient(circle at 30% 30%, #ffffff, #f6efe9 30%);
-  box-shadow: 0 8px 22px rgba(0,0,0,0.28);
-  border: 2px solid rgba(176,123,111,0.12);
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.28);
+  border: 2px solid rgba(176, 123, 111, 0.12);
 }
 
 .transientMarkerInner {
@@ -1166,15 +1164,24 @@
   height: 44px;
   border-radius: 9999px;
   background: linear-gradient(180deg, #f7eaea 0%, #b07b6f 100%);
-  box-shadow: 0 6px 18px rgba(176,123,111,0.28);
+  box-shadow: 0 6px 18px rgba(176, 123, 111, 0.28);
   transform: translateY(-2px);
   animation: transientPulse 2.6s ease-out infinite;
 }
 
 @keyframes transientPulse {
-  0% { box-shadow: 0 6px 18px rgba(176,123,111,0.28); transform: scale(1); }
-  50% { box-shadow: 0 18px 36px rgba(176,123,111,0.12); transform: scale(1.05); }
-  100% { box-shadow: 0 6px 18px rgba(176,123,111,0.28); transform: scale(1); }
+  0% {
+    box-shadow: 0 6px 18px rgba(176, 123, 111, 0.28);
+    transform: scale(1);
+  }
+  50% {
+    box-shadow: 0 18px 36px rgba(176, 123, 111, 0.12);
+    transform: scale(1.05);
+  }
+  100% {
+    box-shadow: 0 6px 18px rgba(176, 123, 111, 0.28);
+    transform: scale(1);
+  }
 }
 
 /* button style for naming bookmark */
