@@ -12,7 +12,7 @@ export default function ProfilePage() {
         <Link href="/" className={styles.backButton}>
           <ArrowLeft className={styles.arrowLeft} />
         </Link>
-        <h1 className={styles.headerTitle}>profile settings</h1>
+        <h1 className={styles.headerTitle}>profile</h1>
         <div>ticketspy</div>
       </header>
       <div className={styles.profilePage}>
