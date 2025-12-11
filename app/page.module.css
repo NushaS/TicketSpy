@@ -63,10 +63,11 @@
   align-items: center;
   gap: 0.75rem;
   padding: 0.5rem 1rem;
-  background-color: rgb(129, 154, 121);
+  background-color: #93a58d;
   color: white;
   border-radius: 9999px;
-  font-weight: 500;
+  font-weight: 510;
+  letter-spacing: 0.5px;
   transition: background-color 0.2s;
   border: none;
   cursor: pointer;
@@ -74,15 +75,16 @@
 }
 
 .instructionsButton:hover {
-  background-color: rgb(110, 140, 90);
+  background-color: #758b6d;
 }
 
 .loginButton {
   padding: 0.5rem 1.25rem;
-  background-color: rgb(98, 83, 92);
+  background-color: #967d86;
   color: white;
   border-radius: 9999px;
-  font-weight: 500;
+  font-weight: 510;
+  letter-spacing: 0.5px;
   transition: background-color 0.2s;
   border: none;
   cursor: pointer;
@@ -90,15 +92,16 @@
 }
 
 .loginButton:hover {
-  background-color: rgb(79, 66, 76);
+  background-color: #7a626b;
 }
 
 .signupButton {
   padding: 0.5rem 1.25rem;
-  background-color: rgb(190, 131, 125);
+  background-color: rgba(154, 110, 104, .8);
   color: white;
   border-radius: 9999px;
-  font-weight: 500;
+  font-weight: 510;
+  letter-spacing: 0.5px;
   transition: background-color 0.2s;
   border: none;
   cursor: pointer;
@@ -106,7 +109,7 @@
 }
 
 .signupButton:hover {
-  background-color: rgb(210, 124, 124);
+  background-color: #7c5853;
 }
 
 .profileButtonGroup {
@@ -115,16 +118,16 @@
   align-items: center;
   justify-content: center;
   gap: 0.2rem;
-  color: #865858;
+  color: #b08374;
   font-weight: 500;
   font-size: 1.4em;
-  line-height: 1.1;
+  line-height: 1.2;
   margin: 0 28px;
 }
 
 .profileButtonGroup span {
   font-family: 'Jersey 10', sans-serif;
-  letter-spacing: 0.7px;
+  letter-spacing: 1.2px;
 }
 
 .profileButtonGroup:hover {
@@ -142,7 +145,7 @@
   gap: 0.5rem;
   padding: 0.3rem 1rem;
   background-color: #ffffff;
-  color: rgb(79, 66, 76);
+  color: #62535c;
   border-radius: 2rem;
   box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
   font-family: 'Jersey 10', sans-serif;
@@ -175,8 +178,8 @@
 
 .sliderLabel {
   font-size: 13px;
-  color: #222;
-  font-weight: 580;
+  color: #62535c;
+  font-weight: 600;
   font-family: inherit;
   display: inline-flex;
   align-items: center;
@@ -200,7 +203,7 @@
   height: 18px;
   border-radius: 50%;
   background: white;
-  border: 3px solid var(--accent, #7c5cff);
+  border: 3px solid #93a58d;
   box-shadow: 0 2px 6px rgba(16, 24, 40, 0.12);
   cursor: pointer;
 }
@@ -219,7 +222,7 @@
   height: 18px;
   border-radius: 50%;
   background: white;
-  border: 3px solid var(--accent, #7c5cff);
+  border: 3px solid #93a58d;
   box-shadow: 0 2px 6px rgba(16, 24, 40, 0.12);
   cursor: pointer;
 }
@@ -289,7 +292,7 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  opacity: 0.6
+  opacity: 0.6;
 }
 
 .modalCloseBtn:hover {
@@ -431,7 +434,7 @@
 .modalButton {
   margin-top: 1rem;
   padding: 0.75rem 1.5rem;
-  background-color: #6b856b;
+  background-color: #93a58d;
   color: white;
   border: none;
   border-radius: 50px;
@@ -449,6 +452,10 @@
 
 .instructionGroup {
   margin-bottom: 1rem;
+}
+
+.modalButton:hover {
+  background-color: #758b6d;
 }
 
 /* compact mobile sizing */
@@ -521,17 +528,6 @@
   animation: slideDown 0.3s ease-out;
 }
 
-/* Login Modal */
-.loginModalContent {
-  background-color: #f5f1e8;
-  border-radius: 1rem;
-  padding: 2.5rem 2rem;
-  max-width: 500px;
-  width: 90%;
-  margin: 0 1rem;
-  position: relative;
-}
-
 .closeButton {
   position: absolute;
   top: 1rem;
@@ -542,87 +538,11 @@
   padding: 0.25rem;
   display: flex;
   align-items: center;
-  opacity: 0.6
+  opacity: 0.6;
 }
 
 .closeButton:hover {
   opacity: 0.4;
-}
-
-.loginTitle {
-  font-size: 2rem;
-  font-weight: 500;
-  color: #4a5d4a;
-  text-align: center;
-  margin-bottom: 2rem;
-}
-
-.loginForm {
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-}
-
-.loginFormGroup {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-}
-
-.loginLabel {
-  font-size: 1.125rem;
-  color: #333;
-  min-width: 140px;
-  text-align: left;
-}
-
-.loginInput {
-  flex: 1;
-  padding: 0.75rem 1rem;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  font-size: 1rem;
-  background-color: white;
-  transition: border-color 0.2s;
-}
-
-.loginInput:focus {
-  outline: none;
-  border-color: #4a5d4a;
-}
-
-.loginError {
-  color: #a01f1f;
-  font-size: 0.875rem;
-  text-align: center;
-  margin-top: -0.5rem;
-}
-
-.submitButton {
-  margin-top: 1rem;
-  padding: 0.75rem 2.5rem;
-  background-color: #6b856b;
-  color: white;
-  border: none;
-  border-radius: 50px;
-  font-size: 1.125rem;
-  font-weight: 700;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  justify-content: center;
-  align-self: center;
-  transition: background-color 0.2s;
-}
-
-.submitButton:hover:not(:disabled) {
-  background-color: #5a7259;
-}
-
-.submitButton:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
 }
 
 /* Ticket Report Modal */
@@ -691,7 +611,7 @@ select.ticketReportInput {
 .ticketReportSubmitButton {
   margin-top: 0.5rem;
   padding: 0.75rem 1.5rem;
-  background-color: #6b856b;
+  background-color: #9f6464;
   color: white;
   border: none;
   border-radius: 50px;
@@ -708,7 +628,7 @@ select.ticketReportInput {
 }
 
 .ticketReportSubmitButton:hover {
-  background-color: #5a7259;
+  background-color: #804f4f;
 }
 
 /* Enforcement confirm modal button tweaks */
@@ -723,14 +643,19 @@ select.ticketReportInput {
 .enforcementButtonGroup .ticketReportSubmitButton {
   margin-top: 0;
   width: 9rem;
+  background-color: #bf9367;
+}
+
+.enforcementButtonGroup .ticketReportSubmitButton:hover {
+  background-color: #b97634;
 }
 
 .enforcementNoButton {
   width: 9rem;
   padding: 0.75rem 1.5rem;
   background-color: white;
-  color: #445B35;
-  border: 1px solid black;
+  color: #b97634;
+  border: 1px solid #b97634;
   border-radius: 50px;
   font-size: 1.125rem;
   font-weight: 700;
@@ -744,7 +669,7 @@ select.ticketReportInput {
 }
 
 .enforcementNoButton:hover {
-  background-color: #445B3520;
+  background-color: #b9763410;
 }
 
 /* Responsive adjustments for ticket report modal */
@@ -852,7 +777,7 @@ select.ticketReportInput {
   font-family: 'Jersey 10', sans-serif;
   letter-spacing: 0.5px;
   padding: 1rem 1.5rem;
-  background-color: #63705b;
+  background-color: #9c7c77;
   color: white;
   border: none;
   border-radius: 12px;
@@ -861,7 +786,6 @@ select.ticketReportInput {
   cursor: pointer;
   transition: background-color 0.2s;
   box-shadow: 0 4px 8px rgba(15, 23, 42, 0.25);
-  
 }
 .parkingSessionButton {
   font-family: 'Jersey 10', sans-serif;
@@ -879,10 +803,10 @@ select.ticketReportInput {
 }
 
 .bookmarkButton:hover {
-  background-color: #45574b;
+  background-color: #8a5a5a;
 }
 .parkingSessionButton:hover {
-  background-color: #5e8067;
+  background-color: #667d5f;
 }
 
 /* Unauthenticated Instructions Modal */
@@ -920,7 +844,7 @@ select.ticketReportInput {
   font-family: 'Jersey 10', sans-serif;
   letter-spacing: 0.5px;
   padding: 1rem 3.6rem;
-  background-color: rgb(98, 83, 92);
+  background-color: #9f6464;
   color: white;
   border: none;
   border-radius: 12px;
@@ -935,7 +859,7 @@ select.ticketReportInput {
   font-family: 'Jersey 10', sans-serif;
   letter-spacing: 0.5px;
   padding: 0.5rem 0.2rem;
-  background-color: #957070;
+  background-color: #d1a46d;
   color: white;
   border: none;
   border-radius: 12px;
@@ -953,10 +877,10 @@ select.ticketReportInput {
 }
 
 .reportTicketButton:hover {
-  background-color: rgb(76, 64, 71);
+  background-color: #804f4f;
 }
 .reportEnforcementButton:hover {
-  background-color: #8f5f5f;
+  background-color: #bf9367;
 }
 
 .instructionsText {
@@ -985,19 +909,20 @@ select.ticketReportInput {
 
 .createAccountBtn {
   padding: 0.75rem 1.5rem;
-  background-color: rgb(129, 154, 121);
+  background-color: #9a6e68cc;
   color: white;
   border: none;
   border-radius: 50px;
   font-size: 1.05rem;
-  font-weight: 500;
+  font-weight: 510;
+  letter-spacing: 0.5px;
   cursor: pointer;
   transition: background-color 0.2s;
   box-shadow: 0 8px 18px rgba(15, 23, 42, 0.14);
 }
 
 .createAccountBtn:hover {
-  background-color: rgb(111, 132, 104);
+  background-color: #7c5853;
 }
 
 .orText {
@@ -1008,19 +933,20 @@ select.ticketReportInput {
 
 .logInBtn {
   padding: 0.75rem 1.6rem;
-  background-color: #6b856b;
+  background-color: #967d86;
   color: white;
   border: none;
   border-radius: 50px;
   font-size: 1.05rem;
-  font-weight: 500;
+  font-weight: 510;
+  letter-spacing: 0.7px;
   cursor: pointer;
   transition: background-color 0.2s;
   box-shadow: 0 8px 18px rgba(15, 23, 42, 0.14);
 }
 
 .logInBtn:hover {
-  background-color: #5a7259;
+  background-color: #7a626b;
 }
 
 .pinPopupWrapper {
@@ -1190,7 +1116,7 @@ select.ticketReportInput {
   justify-content: center;
   gap: 0.75rem;
   padding: 0.75rem 0.1rem; /* trim padding to offset larger text */
-  background-color: var(--accent, rgba(129, 154, 121, 1));
+  background-color: #93a58d;
   color: white;
   font-size: 1.125rem;
   font-weight: 700;
@@ -1201,19 +1127,19 @@ select.ticketReportInput {
 }
 
 .applyFiltersButton:hover {
-  filter: brightness(0.95);
+  background-color: #758b6d;
 }
 
 /* styles for link to profile page*/
 .linkToProfileText {
-  margin-top: 1rem;
+  margin-top: 1.5rem;
   text-align: center;
   font-size: 0.85rem;
   font-weight: 700;
 }
 
 .profileLink {
-  color: #6b856b;
+  color: #566751;
   text-decoration: underline;
 }
 
@@ -1233,8 +1159,8 @@ select.ticketReportInput {
   margin-bottom: 8px; /* lift above anchor */
   border-radius: 9999px;
   background: radial-gradient(circle at 30% 30%, #ffffff, #f6efe9 30%);
-  box-shadow: 0 8px 22px rgba(0,0,0,0.28);
-  border: 2px solid rgba(176,123,111,0.12);
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.28);
+  border: 2px solid rgba(176, 123, 111, 0.12);
 }
 
 .transientMarkerInner {
@@ -1245,13 +1171,44 @@ select.ticketReportInput {
   height: 44px;
   border-radius: 9999px;
   background: linear-gradient(180deg, #f7eaea 0%, #b07b6f 100%);
-  box-shadow: 0 6px 18px rgba(176,123,111,0.28);
+  box-shadow: 0 6px 18px rgba(176, 123, 111, 0.28);
   transform: translateY(-2px);
   animation: transientPulse 2.6s ease-out infinite;
 }
 
 @keyframes transientPulse {
-  0% { box-shadow: 0 6px 18px rgba(176,123,111,0.28); transform: scale(1); }
-  50% { box-shadow: 0 18px 36px rgba(176,123,111,0.12); transform: scale(1.05); }
-  100% { box-shadow: 0 6px 18px rgba(176,123,111,0.28); transform: scale(1); }
+  0% {
+    box-shadow: 0 6px 18px rgba(176, 123, 111, 0.28);
+    transform: scale(1);
+  }
+  50% {
+    box-shadow: 0 18px 36px rgba(176, 123, 111, 0.12);
+    transform: scale(1.05);
+  }
+  100% {
+    box-shadow: 0 6px 18px rgba(176, 123, 111, 0.28);
+    transform: scale(1);
+  }
+}
+
+/* button style for naming bookmark */
+.submitBookmarkButton {
+  padding: 0.75rem 2.5rem;
+  background-color: rgb(156, 124, 119);
+  color: white;
+  border: none;
+  border-radius: 50px;
+  font-size: 1.125rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  justify-content: center;
+  align-self: center;
+  transition: background-color 0.2s;
+}
+
+.submitBookmarkButton:hover {
+  background-color: #465040;
 }

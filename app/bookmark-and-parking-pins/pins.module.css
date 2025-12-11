@@ -64,7 +64,7 @@
   font-weight: 500;
   font-size: 1.625rem;
   text-align: center;
-  color: #63705B;
+  color: #8a5a5a;
   display: flex;
   flex-direction: row;
   gap: 1rem;
@@ -100,14 +100,14 @@
 }
 
 .parkingButtonVariant:hover {
-  background-color: #596e53;
+  background-color: #667d5f;
 }
 
 .bookmarkButtonVariant {
   font-family: 'Jersey 10', sans-serif;
   letter-spacing: 0.5px;
   padding: 1rem;
-  background-color: #63705B;
+  background-color: rgb(156, 124, 119);
   color: white;
   border: none;
   border-radius: 12px;
@@ -125,7 +125,7 @@
 }
 
 .bookmarkButtonVariant:hover {
-  background-color: #454e40;
+  background-color: #8a5a5a;
 }
 
 .buttonText {
@@ -151,7 +151,7 @@
   letter-spacing: 0.5px;
   width: 7rem;
   padding: 0.75rem 1.5rem;
-  background-color: #63705B;
+  background-color: rgb(156, 124, 119);
   color: white;
   border-radius: 12px;
   font-size: 1.5rem;
@@ -166,7 +166,7 @@
 }
 
 .yesButton:hover {
-  background-color: #454e40;
+  background-color: #8a5a5a;
 }
 
 .noButton {
@@ -175,8 +175,8 @@
   width: 7rem;
   padding: 0.75rem 1.5rem;
   background-color: white;
-  color: #63705B;
-  border: 1px solid black;
+  color: #8a5a5a;
+  border: 1px solid #8a5a5a;
   border-radius: 12px;
   font-size: 1.5rem;
   font-weight: 500;
@@ -190,7 +190,7 @@
 }
 
 .noButton:hover {
-  background-color: #00000020;
+  background-color: #8a5a5a10;
 }
 
 /* close button */
@@ -220,6 +220,6 @@
 }
 
 .profileLink {
-  color: #6b856b;
+  color: #566751;
   text-decoration: underline;
 }

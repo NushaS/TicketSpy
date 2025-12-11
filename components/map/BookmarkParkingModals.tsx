@@ -97,7 +97,7 @@ export const BookmarkConversionModal: React.FC<BookmarkConversionModalProps> = (
         </button>
 
         <div className={styles.modalBodyWithIcon} style={{ cursor: 'default' }}>
-          <HeartIcon size={16} />
+          <HeartIcon size={16} color={'#8a5a5a'} />
           do you want to bookmark this location?
         </div>
 
