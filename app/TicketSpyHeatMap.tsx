@@ -14,8 +14,14 @@ import styles from './page.module.css';
 import { CarIcon3 } from '../components/ui/icons/car-icon';
 import { ProfileIcon } from '../components/ui/icons/profile-icon';
 import { HeartIcon2 } from '../components/ui/icons/heart-icon';
-import { ParkingEnforcementIcon } from '@/components/ui/icons/parking-enforcement';
-import { AlertTicketIcon } from '@/components/ui/icons/alert-ticket-icon';
+import {
+  ParkingEnforcementIcon,
+  computeEnforcementMarkerSizing,
+} from '@/components/ui/icons/parking-enforcement';
+import {
+  AlertTicketIcon,
+  computeTicketMarkerSizing,
+} from '@/components/ui/icons/alert-ticket-icon';
 import { MapPin } from '../components/map/MapPin';
 import FilterPanel from '../components/FilterPanel';
 import { useUserParkingSessions } from '@/lib/hooks/useParkingSessionTable';
@@ -100,27 +106,11 @@ const TicketSpyHeatMap: React.FC<TicketSpyHeatMapProps> = ({
     initialCenter ? (initialZoom ?? 17) : (initialViewState.zoom ?? 12)
   );
   // Compute marker sizes so they scale down when zoomed out but stay readable up close.
-  const markerSizing = React.useMemo(() => {
-    const minZoom = 5; // smallest zoom level we care about for scaling
-    const maxZoom = 25; // largest zoom level before we cap growth
-    const clamped = Math.min(Math.max(mapZoom, minZoom), maxZoom); // keep zoom within the range
-    const t = (clamped - minZoom) / (maxZoom - minZoom); // normalize zoom to 0..1
-    const scale = t; // 25% size at min zoom, 100% at max zoom
-    const baseOuter = 44 * 2; // default outer bubble size
-    const baseInner = 40 * 2; // default inner bubble size
-    const baseIcon = 38 * 2; // default icon size
-    const outer = Math.round(baseOuter * scale); // scaled outer bubble
-    const inner = Math.round(baseInner * scale); // scaled inner bubble
-    const icon = Math.round(baseIcon * scale); // scaled icon size
-    return {
-      outer,
-      inner,
-      icon,
-      offset: Math.round(outer * 0.14), // lift the marker slightly above its anchor
-    };
-  }, [mapZoom]);
-  const enforcementMarkerSizing = markerSizing;
-  const ticketMarkerSizing = markerSizing;
+  const enforcementMarkerSizing = React.useMemo(
+    () => computeEnforcementMarkerSizing(mapZoom),
+    [mapZoom]
+  );
+  const ticketMarkerSizing = React.useMemo(() => computeTicketMarkerSizing(mapZoom), [mapZoom]);
   // Scale heatmap ticket dots based on zoom so they shrink when zoomed out.
   const heatmapRadiusStops = React.useMemo(() => {
     const minZoom = 2; // clamp zoom floor
@@ -176,6 +166,7 @@ const TicketSpyHeatMap: React.FC<TicketSpyHeatMapProps> = ({
     if (!Number.isFinite(lat) || !Number.isFinite(lng)) return null;
     return { lat, lng };
   }, [alertMarker]);
+  const alertIconSize = 36; // fixed size for alert markers (not scaled by zoom)
   const alertEnforcementKey =
     alertMarkerPosition && alertMarker?.kind === 'enforcement'
       ? `${alertMarkerPosition.lat.toFixed(6)}:${alertMarkerPosition.lng.toFixed(6)}`
@@ -217,21 +208,23 @@ const TicketSpyHeatMap: React.FC<TicketSpyHeatMapProps> = ({
     if (alertKey !== prevAlertKeyRef.current) {
       prevAlertKeyRef.current = alertKey;
       if (alertKey) {
-        try {
-          const stored = localStorage.getItem(`alert-dismissed:${alertKey}`);
-          if (stored === 'true') {
-            setShowAlertPopup(false);
-            return;
+        if (!alertMarker) {
+          try {
+            const stored = localStorage.getItem(`alert-dismissed:${alertKey}`);
+            if (stored === 'true') {
+              setShowAlertPopup(false);
+              return;
+            }
+          } catch {
+            // ignore storage errors
           }
-        } catch {
-          // ignore storage errors
         }
         setShowAlertPopup(true);
       } else {
         setShowAlertPopup(false);
       }
     }
-  }, [initialCenter, initialZoom, alertKey]);
+  }, [initialCenter, initialZoom, alertKey, alertMarker]);
 
   // Add a transient enforcement marker that auto-removes after `ttlMs` (default 1 hour)
   const addTransientEnforcement = (lat: number, lng: number, ttlMs = 1000 * 60 * 60) => {
@@ -1009,13 +1002,13 @@ const TicketSpyHeatMap: React.FC<TicketSpyHeatMapProps> = ({
                     }
                   }}
                 >
-                  {alertMarker.kind === 'enforcement' ? (
-                    <ParkingEnforcementIcon size={enforcementMarkerSizing.icon} />
+                  {alertMarker.icon ? (
+                    alertMarker.icon
+                  ) : alertMarker.kind === 'enforcement' ? (
+                    <ParkingEnforcementIcon size={alertIconSize} />
                   ) : alertMarker.kind === 'ticket' ? (
-                    <AlertTicketIcon size={ticketMarkerSizing.icon} />
-                  ) : (
-                    (alertMarker.icon ?? null)
-                  )}
+                    <AlertTicketIcon size={alertIconSize} />
+                  ) : null}
                 </div>
               </Marker>
               {showAlertPopup && (
