@@ -166,7 +166,6 @@ const TicketSpyHeatMap: React.FC<TicketSpyHeatMapProps> = ({
     if (!Number.isFinite(lat) || !Number.isFinite(lng)) return null;
     return { lat, lng };
   }, [alertMarker]);
-  const alertIconSize = 36; // fixed size for alert markers (not scaled by zoom)
   const alertEnforcementKey =
     alertMarkerPosition && alertMarker?.kind === 'enforcement'
       ? `${alertMarkerPosition.lat.toFixed(6)}:${alertMarkerPosition.lng.toFixed(6)}`
@@ -983,33 +982,75 @@ const TicketSpyHeatMap: React.FC<TicketSpyHeatMapProps> = ({
                 latitude={alertMarkerPosition.lat}
                 anchor="bottom"
               >
-                <div
-                  className={styles.mapMarkerWrapper}
-                  title={alertMarker.label ?? 'Alert'}
-                  role="button"
-                  tabIndex={0}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    openAlertPopup();
-                  }}
-                  onMouseDown={(e) => e.stopPropagation()}
-                  onTouchStart={(e) => e.stopPropagation()}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter' || e.key === ' ') {
-                      e.preventDefault();
+                {alertMarker.kind === 'enforcement' ? (
+                  <div
+                    className={styles.transientMarker}
+                    style={{
+                      width: enforcementMarkerSizing.outer,
+                      height: enforcementMarkerSizing.outer,
+                      marginBottom: enforcementMarkerSizing.offset,
+                    }}
+                    role="button"
+                    tabIndex={0}
+                    title={alertMarker.label ?? 'Alert'}
+                    onClick={(e) => {
                       e.stopPropagation();
                       openAlertPopup();
-                    }
-                  }}
-                >
-                  {alertMarker.icon ? (
-                    alertMarker.icon
-                  ) : alertMarker.kind === 'enforcement' ? (
-                    <ParkingEnforcementIcon size={alertIconSize} />
-                  ) : alertMarker.kind === 'ticket' ? (
-                    <AlertTicketIcon size={alertIconSize} />
-                  ) : null}
-                </div>
+                    }}
+                    onMouseDown={(e) => e.stopPropagation()}
+                    onTouchStart={(e) => e.stopPropagation()}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        openAlertPopup();
+                      }
+                    }}
+                  >
+                    <div
+                      className={styles.transientMarkerInner}
+                      style={{
+                        width: enforcementMarkerSizing.inner,
+                        height: enforcementMarkerSizing.inner,
+                        transform: 'translateY(-2px)',
+                      }}
+                    >
+                      <ParkingEnforcementIcon size={enforcementMarkerSizing.icon} />
+                    </div>
+                  </div>
+                ) : (
+                  <div
+                    style={{
+                      width: ticketMarkerSizing.icon,
+                      height: ticketMarkerSizing.icon,
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}
+                    title={alertMarker.label ?? 'Alert'}
+                    role="button"
+                    tabIndex={0}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      openAlertPopup();
+                    }}
+                    onMouseDown={(e) => e.stopPropagation()}
+                    onTouchStart={(e) => e.stopPropagation()}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        openAlertPopup();
+                      }
+                    }}
+                  >
+                    {alertMarker.icon ? (
+                      alertMarker.icon
+                    ) : alertMarker.kind === 'ticket' ? (
+                      <AlertTicketIcon size={ticketMarkerSizing.icon} />
+                    ) : null}
+                  </div>
+                )}
               </Marker>
               {showAlertPopup && (
                 <Popup
