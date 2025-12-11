@@ -93,7 +93,7 @@ export const PinActionPopup: React.FC<PinActionPopupProps> = ({
 
         <div className={styles.instructionsText}>
           <p>
-            to <strong>mark where you parked</strong>, get{' '}
+            To <strong>mark where you parked</strong>, get{' '}
             <strong>notifications for tickets issued</strong> or{' '}
             <strong>parking enforcement spotted</strong> near your important locations, and{' '}
             <strong>bookmark your favorite parking spots:</strong>
@@ -101,10 +101,6 @@ export const PinActionPopup: React.FC<PinActionPopupProps> = ({
         </div>
 
         <div className={styles.authButtons}>
-          <Link href="/auth/sign-up">
-            <button className={styles.createAccountBtn}>create an account</button>
-          </Link>
-          <span className={styles.orText}>or</span>
           <button
             onClick={() => {
               onClose();
@@ -114,6 +110,10 @@ export const PinActionPopup: React.FC<PinActionPopupProps> = ({
           >
             log in
           </button>
+          <span className={styles.orText}>or</span>
+          <Link href="/auth/sign-up">
+            <button className={styles.createAccountBtn}>create an account</button>
+          </Link>
         </div>
       </div>
     </div>

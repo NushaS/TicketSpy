@@ -49,7 +49,7 @@ export function ForgotPasswordForm() {
         <form onSubmit={handleForgotPassword} className={styles.loginForm}>
           <div className={styles.loginFormGroup}>
             <label htmlFor="email" className={styles.loginLabel}>
-              email:
+              Email:
             </label>
             <input
               id="email"
@@ -71,7 +71,10 @@ export function ForgotPasswordForm() {
 
           <div style={{ textAlign: 'center', marginTop: '1rem', fontSize: '0.9rem' }}>
             Remember your password?{' '}
-            <Link href="/auth/login" className="underline underline-offset-4">
+            <Link
+              href="/auth/login"
+              className="text-sm underline underline-offset-4 text-[#566751] font-[700]"
+            >
               Log in
             </Link>
           </div>

@@ -12,7 +12,7 @@ const ToggleSwitch: React.FC<ToggleSwitchProps> = ({ checked, onCheckedChange })
   return (
     <Switch.Root
       className={cn(
-        'w-12 h-6 bg-gray-300 rounded-full relative shadow-inner transition-colors data-[state=checked]:bg-[#445B35] flex-shrink-0'
+        'w-12 h-6 bg-gray-300 rounded-full relative shadow-inner transition-colors data-[state=checked]:bg-[#93A58D] flex-shrink-0'
       )}
       checked={checked}
       onCheckedChange={onCheckedChange}

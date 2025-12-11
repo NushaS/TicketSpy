@@ -208,7 +208,7 @@ export default function AccountInfo() {
         <div>
           <div className={styles.accountFormGroup}>
             <div className={styles.forgotPasswordLink}>
-              <Link href="/auth/forgot-password">forgot your password?</Link>
+              <Link href="/auth/forgot-password">Forgot your password?</Link>
             </div>
           </div>
 

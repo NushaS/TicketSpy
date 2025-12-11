@@ -43,10 +43,20 @@
 .modalBody {
   font-family: 'Jersey 10', sans-serif;
   font-weight: 500;
-  font-size: 1.625rem;
+  font-size: 1.7rem;
   text-align: center;
   opacity: 0.7;
-  padding: 1rem 0;
+  padding: 0.5rem 0;
+}
+
+.modalBodyBookmarkName {
+  font-family: 'Jersey 10', sans-serif;
+  font-weight: 500;
+  font-size: 2.5rem;
+  line-height: 2.5rem;
+  text-align: center;
+  opacity: 0.7;
+  margin-bottom: 0.5rem;
 }
 
 .modalBodyWithIcon {
@@ -54,7 +64,7 @@
   font-weight: 500;
   font-size: 1.625rem;
   text-align: center;
-  color: #63705B;
+  color: #8a5a5a;
   display: flex;
   flex-direction: row;
   gap: 1rem;
@@ -66,7 +76,7 @@
 .modalButtonGroup {
   display: flex;
   flex-direction: column;
-  gap: 2rem;
+  gap: 1.5rem;
 }
 
 .parkingButtonVariant {
@@ -90,14 +100,14 @@
 }
 
 .parkingButtonVariant:hover {
-  background-color: #596e53;
+  background-color: #667d5f;
 }
 
 .bookmarkButtonVariant {
   font-family: 'Jersey 10', sans-serif;
   letter-spacing: 0.5px;
   padding: 1rem;
-  background-color: #63705B;
+  background-color: rgb(156, 124, 119);
   color: white;
   border: none;
   border-radius: 12px;
@@ -115,7 +125,7 @@
 }
 
 .bookmarkButtonVariant:hover {
-  background-color: #454e40;
+  background-color: #8a5a5a;
 }
 
 .buttonText {
@@ -141,7 +151,7 @@
   letter-spacing: 0.5px;
   width: 7rem;
   padding: 0.75rem 1.5rem;
-  background-color: #63705B;
+  background-color: rgb(156, 124, 119);
   color: white;
   border-radius: 12px;
   font-size: 1.5rem;
@@ -156,7 +166,7 @@
 }
 
 .yesButton:hover {
-  background-color: #454e40;
+  background-color: #8a5a5a;
 }
 
 .noButton {
@@ -165,8 +175,8 @@
   width: 7rem;
   padding: 0.75rem 1.5rem;
   background-color: white;
-  color: #63705B;
-  border: 1px solid black;
+  color: #8a5a5a;
+  border: 1px solid #8a5a5a;
   border-radius: 12px;
   font-size: 1.5rem;
   font-weight: 500;
@@ -180,7 +190,7 @@
 }
 
 .noButton:hover {
-  background-color: #00000020;
+  background-color: #8a5a5a10;
 }
 
 /* close button */
@@ -203,12 +213,13 @@
 
 /* styles for link to profile settings*/
 .linkToProfileText {
+  margin-top: 1rem;
   text-align: center;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   font-weight: 700;
 }
 
 .profileLink {
-  color: #6b856b;
+  color: #566751;
   text-decoration: underline;
 }

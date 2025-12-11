@@ -10,6 +10,7 @@
 /* header styles */
 .profileHeader {
   font-family: 'Jersey 10', sans-serif;
+  letter-spacing: 1px;
   font-weight: 500px;
   font-size: 1.5rem;
   top: 0;
@@ -19,8 +20,8 @@
   display: flex;
   text-align: center;
   justify-content: space-between;
-  padding: 0.5rem 2rem 2rem 2rem; 
-  background-color: #445B35;
+  padding: 0.5rem 2rem 1.5rem 2rem; 
+  background-color: #566751;
   backdrop-filter: blur(8px);
   color: #FAF8F1D9;
 }
@@ -34,6 +35,7 @@
 }
 
 .arrowLeft {
+  margin-top: 1rem;
   width: 32px;
   height: 32px;
   color: #fff;
@@ -49,10 +51,11 @@
 }
 
 .sectionHeader {
+  font-family: 'Jersey 10', sans-serif;
+  letter-spacing: 0.8px;
   background-color: #f5f0e1;
-  color: #445B35; /* black text */
-  font-size: 1.5rem;
-  font-weight: bold;
+  color: #566751;
+  font-size: 2rem;
   margin-bottom: 1.5rem;
   text-align: center;
   padding: 0.5rem;
@@ -79,7 +82,7 @@
 }
 
 .mileRadius{
-  color: #445B35;
+  color: #566751;
   font-weight: 700;
 }
 
@@ -103,7 +106,7 @@
   color: #333;
   min-width: 100px;
   text-align: left;
-  font-weight: 700;
+  font-weight: 500;
 }
 
 .accountInput {
@@ -139,7 +142,7 @@
 
 .forgotPasswordLink {
   margin-top: 1rem;
-  color: #445B35;
+  color: #566751;
   font-weight: 700;
   text-decoration: underline;
   text-underline-offset: 4px;
@@ -157,7 +160,7 @@
 .saveButton {
   width: 14rem;
   padding: 0.75rem 1.5rem;
-  background-color: #819A79;
+  background-color: #93A58D;
   color: white;
   border: none;
   border-radius: 50px;
@@ -173,15 +176,15 @@
 }
 
 .saveButton:hover {
-  background-color: #5a7259;
+  background-color: #758b6d;
 }
 
 .discardButton {
   width: 14rem;
   padding: 0.75rem 1.5rem;
   background-color: white;
-  color: #445B35;
-  border: 1px solid #445B35;
+  color: #758b6d;
+  border: 1px solid #758b6d;
   border-radius: 50px;
   font-size: 1.125rem;
   font-weight: 700;
@@ -195,7 +198,7 @@
 }
 
 .discardButton:hover {
-  background-color: #445B3520;
+  background-color: #93A58D33;
 }
 
 /* account action buttons */
@@ -271,8 +274,8 @@
   align-items: center;
   position: relative; 
   color: #B14343;
-  font-size: 1.5rem;
-  font-weight: 700;
+  font-size: 1.25rem;
+  font-weight: 500;
   text-align: center;
   background-color: #fffcfb;
   border-radius: 20px;
@@ -315,8 +318,8 @@
   width: 13rem;
   padding: 0.75rem 1.5rem;
   background-color: white;
-  color: #B14343;
-  border: 1px solid black;
+  color: #963939;
+  border: 1px solid #963939;
   border-radius: 50px;
   font-size: 1.125rem;
   font-weight: 700;
@@ -331,7 +334,7 @@
 }
 
 .cancelDeleteButton:hover {
-  background-color: #00000020;
+  background-color: #B1434310;
 }
 
 /* error message style */

@@ -227,14 +227,14 @@ export default function NotificationSettings() {
                 },
                 '& .MuiSlider-track': {
                   border: 'none',
-                  background: 'linear-gradient(90deg, #6b856b 0%, #7f9d7f 100%)',
+                  background: 'linear-gradient(90deg, #93A58D 0%, #6b856bDD 100%)',
                 },
                 '& .MuiSlider-thumb': {
                   height: 24,
                   width: 24,
                   backgroundColor: '#fff',
                   boxShadow: '0 6px 18px rgba(16,24,40,0.22)',
-                  border: '2px solid #6b856b',
+                  border: '2px solid #6b856bDD',
                   '&:focus, &:hover, &.Mui-active': {
                     boxShadow: '0 8px 22px rgba(16,24,40,0.28)',
                   },

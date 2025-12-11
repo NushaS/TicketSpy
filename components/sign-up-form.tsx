@@ -53,7 +53,7 @@ export function SignUpForm() {
     <form onSubmit={handleSignUp} className={styles.loginForm}>
       <div className={styles.loginFormGroup}>
         <label htmlFor="displayName" className={styles.loginLabel}>
-          display name:
+          Name:
         </label>
         <input
           id="displayName"
@@ -68,7 +68,7 @@ export function SignUpForm() {
 
       <div className={styles.loginFormGroup}>
         <label htmlFor="email" className={styles.loginLabel}>
-          email:
+          Email:
         </label>
         <input
           id="email"
@@ -83,7 +83,7 @@ export function SignUpForm() {
 
       <div className={styles.loginFormGroup}>
         <label htmlFor="password" className={styles.loginLabel}>
-          password:
+          Password:
         </label>
         <input
           id="password"
@@ -98,7 +98,7 @@ export function SignUpForm() {
 
       <div className={styles.loginFormGroup}>
         <label htmlFor="repeat-password" className={styles.loginLabel}>
-          repeat password:
+          Repeat Password:
         </label>
         <input
           id="repeat-password"
@@ -121,7 +121,10 @@ export function SignUpForm() {
       {/* row for “login” link */}
       <div style={{ textAlign: 'center', marginTop: '1rem', fontSize: '0.9rem' }}>
         Already have an account?{' '}
-        <Link href="/auth/login" className="underline underline-offset-4">
+        <Link
+          href="/auth/login"
+          className="text-sm underline underline-offset-4 text-[#566751] font-[700]"
+        >
           Login
         </Link>
       </div>

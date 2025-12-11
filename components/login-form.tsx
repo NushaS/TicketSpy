@@ -37,7 +37,7 @@ export function LoginForm() {
     <form onSubmit={handleLogin} className={styles.loginForm}>
       <div className={styles.loginFormGroup}>
         <label htmlFor="email" className={styles.loginLabel}>
-          email:
+          Email:
         </label>
         <input
           id="email"
@@ -52,7 +52,7 @@ export function LoginForm() {
 
       <div className={styles.loginFormGroup}>
         <label htmlFor="password" className={styles.loginLabel}>
-          password:
+          Password:
         </label>
         <input
           id="password"
@@ -67,7 +67,10 @@ export function LoginForm() {
 
       {/* row for “forgot password?” link */}
       <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '-0.5rem' }}>
-        <Link href="/auth/forgot-password" className="text-sm underline underline-offset-4">
+        <Link
+          href="/auth/forgot-password"
+          className="text-sm underline underline-offset-4 text-[#566751] font-[700]"
+        >
           Forgot your password?
         </Link>
       </div>
@@ -82,7 +85,10 @@ export function LoginForm() {
       {/* row for “sign up” link */}
       <div style={{ textAlign: 'center', marginTop: '1rem', fontSize: '0.9rem' }}>
         Don&apos;t have an account?{' '}
-        <Link href="/auth/sign-up" className="underline underline-offset-4">
+        <Link
+          href="/auth/sign-up"
+          className="text-sm underline underline-offset-4 text-[#566751] font-[700]"
+        >
           Sign up
         </Link>
       </div>

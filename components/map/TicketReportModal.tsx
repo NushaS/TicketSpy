@@ -37,14 +37,15 @@ const TicketReportModal: React.FC<TicketReportModalProps> = ({
           <FaTimes size={22} />
         </button>
 
-        <h2 className={styles.ticketReportTitle}>Report a ticket:</h2>
+        <h2 className={styles.ticketReportTitle}>report a ticket:</h2>
 
         <form onSubmit={onSubmit} className={styles.ticketReportForm}>
           <div className={styles.ticketReportFormGroup}>
-            <label className={styles.ticketReportLabel}>Date issued:</label>
+            <label className={styles.ticketReportLabel}>Date Issued:</label>
             <input
               type="date"
               className={styles.ticketReportInput}
+              style={{ color: ticketDateIssued ? '#000' : '#999' }}
               value={ticketDateIssued}
               onChange={(e) => onDateChange(e.target.value)}
               required
@@ -52,17 +53,18 @@ const TicketReportModal: React.FC<TicketReportModalProps> = ({
           </div>
 
           <div className={styles.ticketReportFormGroup}>
-            <label className={styles.ticketReportLabel}>Time issued:</label>
+            <label className={styles.ticketReportLabel}>Time Issued:</label>
             <input
               type="time"
               className={styles.ticketReportInput}
+              style={{ color: ticketTimeIssued ? '#000' : '#999' }}
               value={ticketTimeIssued}
               onChange={(e) => onTimeChange(e.target.value)}
               required
             />
           </div>
           <div className={styles.ticketReportFormGroup}>
-            <label className={styles.ticketReportLabel}>Violation type:</label>
+            <label className={styles.ticketReportLabel}>Violation Type:</label>
             <select
               className={styles.ticketReportInput}
               value={ticketViolationType}

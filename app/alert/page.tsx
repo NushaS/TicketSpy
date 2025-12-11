@@ -5,8 +5,6 @@ import { useSearchParams } from 'next/navigation';
 import { useMemo, useEffect, useState, Suspense, useRef } from 'react';
 import { useTicketTable } from '@/lib/hooks/useTicketTable';
 import { useEnforcementSightingTable } from '@/lib/hooks/useEnforcementSightingTable';
-import { AlertParkingEnforcementIcon } from '@/components/ui/icons/alert-parking-enforcement';
-import { AlertTicketIcon } from '@/components/ui/icons/alert-ticket-icon';
 import TicketSpyHeatMap from '../TicketSpyHeatMap';
 
 type LocationHit = {
@@ -138,12 +136,6 @@ function AlertPageInner() {
                           : ''
                       }`,
                 kind: markerLocation.source,
-                icon:
-                  markerLocation.source === 'enforcement' ? (
-                    <AlertParkingEnforcementIcon size={36} />
-                  ) : (
-                    <AlertTicketIcon size={36} />
-                  ),
               }
             : null
         }
