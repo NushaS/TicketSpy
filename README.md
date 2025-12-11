@@ -1,37 +1,36 @@
 # Ticket Spy
 🔗 https://ticketspy.vercel.app/
+
 ## Description
 
 ### Project Idea
 
-TicketSpy seeks to turn real local driver experiences with parking tickets into a community platform for viewing ticketing activity. It is a web application that shows where community members are receiving parking tickets through a visually intuitive heatmap interface. The map will dynamically update with new data as users self-report their ticket information, and filtering capabilities (such as by ticket date or violation type) will allow users to customize their experience in order to mitigate parking risk in their own lives. The self-reported data is a valuable aspect of our project that incentivizes users to upload their ticket information in order to prevent future ticketing for themselves and others.
+TicketSpy seeks to turn real local driver experiences with parking tickets into a community platform for viewing ticketing activity. It is a web application that shows where community members have received parking tickets through a visually intuitive heatmap interface. The map dynamically updates with new data as users self-report their ticket information, and filtering capabilities (such as by ticket date or recency) allow users to customize their experience in order to mitigate parking risks and impacts. The self-reported data is a valuable aspect of our project that incentivizes users to upload their ticket information in order to prevent future ticketing for themselves and others.
 
 ### Project Goals
 
-Our goal is to deliver a resouce that the local community can engage with in order to minimize the likelihood of being issued a parking ticket. In a city where ticket fine values and ticket issuance frequency are both on the rise, and where poorly marked parking spaces are not uncommon, providing drivers with a resource for avoiding preventable parking tickets is integral to decreasing confusion and ticket fines. This aligns with our ultimate goal of improving local driver confidence and satisfaction.
+Our goal is to deliver a resource that the local community can engage with in order to minimize the likelihood of being issued a parking ticket. In a city where ticket fine values and ticket issuance frequency are both on the rise, and where poorly marked parking spaces are not uncommon, providing drivers with a resource for avoiding preventable parking tickets is integral to decreasing confusion and ticket fines. This aligns with our ultimate goal of improving local driver confidence and satisfaction.
 
-### Currently Supported (or Partially Supported) Use Cases
+### Use Case Overview
 
-**1. Looking at heatmap to make informed parking decisions (Operational)**
-  - For users wanting to find a place to park without getting ticketed
-  - Currently, the heat map is displaying areas with tickets, so a user could look at the map to figure out a place with no/few recent parking tickets. It is defaulted to tickets within the past year right now.
+For detailed use cases and user instructions, visit the [user guide](./user-guide.md).
+
+**1. View heatmap to make informed parking decisions**
+  - For users wanting to find a place to park without getting ticketed.
+  - Heatmap shows parking ticket density and enforcement sighting alerts
   - The front end for the heat map uses TanStack Query to access the backend and database.
 
-**2. Making reports (Partially-operational)**
+**2. Make reports**
  - Reporting parking ticket
-     - For users trying to report their parking ticket for others to see
-     - Users are able to report a ticket on a location they click. When they do so, they are able to report the ticket time, date, and ticket type. Currently, they are only able to report a "default parking ticket" enum, but we will add more choices for parking tickets in the future
-     - The system components that are used include: The Supabase database, our api route "post-ticket", and the front-end web page to display the ticket coordinates on the heatmap
+     - For users contributing to the heatmap by reporting their parking ticket.
+     - The relevant system components include: The Supabase database, our api route "post-ticket", and the front-end web page to display the ticket coordinates on the heatmap.
   - Reporting enforcement sighting
-    - For users trying to report if they've recently seen parking enforcement.
-    - Reporting button is available next to the button for reporting a parking ticket, but is non-operational as of now.
-    - The system components that are used will include: The Supabase database, the api route "post-enforcement-report", and the front-end web page to display the enforcement report coordinates on the heatmap.
+    - For users contributing to the enforcement alerts on the map by reporting their enfocement sightings.
+    - The relevant system components include: The Supabase database, the api route "post-enforcement-report", and the front-end web page to display the enforcement report coordinates on the heatmap.
   
-**3. Logging in to access additional features (Operational)**
+**3. Log in to access additional features**
   - For users looking to personalize their TicketSpy by keeping track of specific locations.
-  - Currently, users can create an account and log in successfully with that account, which will give them access to bookmark and parking session pins and text notifications once those features become available. 
-  - The login and create account user interface handle user input and invoke requests from the frontend, user authentication and session management is handled in the backend component, and login credentials/profile data are stored in the database.
-
+  - Authentication and session management are handled in the backend component, and login credentials/profile data are stored in the database.
 
 ### Repository Layout
 
@@ -64,32 +63,71 @@ ticketspy/
 
 ### Running the system
 
-DEPENDENCIES
-1. Install node.js v22.20.0 (either via Node.js in Google OR through nvm)
-2. npm install -g npm@10.9.3
+**Prerequisites**
 
-git clone our repo
+- _Node.js v22.20.0_ (install with [Node.js](https://nodejs.org/en) or through [nvm](https://www.nvmnode.com/))
+- _npm v10.9.3_ (run `npm install -g npm@10.9.3`)
 
-1. Add a .env.local file under the main directory "TicketSpy/" for the Supabase credentials  
-   **_.env.local_**  
-   NEXT_PUBLIC_SUPABASE_URL=YourSupabaseUrl 
-   NEXT_PUBLIC_SUPABASE_PUBLISHABLE_OR_ANON_KEY=YourSupabaseApiKey
-   SUPABASE_SERVICE_ROLE_KEY=YourServiceRoleKey
-   (Note: This is required as components that use /lib/supabase throw errors if not)
-   
-   If you are a UW student, you can access our API keys here!
-   https://docs.google.com/document/d/1XV_wcLVr5xJQiNSPcsQuTWJQUjbESwpbuEIlXwFTbkE/edit?usp=sharing
-3. npm install
-4. npm run dev
-5. Head to `http://localhost:3000` to see it in action!
+**Setup Overview**
 
-To see how to build & test the system, follow our 'Developer Guide' <br>
-To see our version control, follow our 'Developer Guide' as well
-- [Developer Guide](./developer-guide.md)
+For full setup instructions see `How to Build the Software` in the [developer guide](./developer-guide.md).
 
-To track our current bugs or report a new one, follow our 'User Guide'
-- [User Guide](./user-guide.md)
+1. git clone this repository
+2. Add a `.env.local` file under the main `TicketSpy` directory for the Supabase credentials. In the file, define:
+   - `NEXT_PUBLIC_SUPABASE_URL`=YourSupabaseUrl 
+   - `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_OR_ANON_KEY`=YourSupabaseApiKey
+   - `SUPABASE_SERVICE_ROLE_KEY`=YourServiceRoleKey
+   - `RESEND_API_KEY`=YourResendApiKey
+     
+   (Note: This is required, as components that use `/lib/supabase` will throw errors if the credentials are not available.)
 
+   To access our Supabase credentials:
+   - if you are a UW student, access them [here](https://docs.google.com/document/d/1XV_wcLVr5xJQiNSPcsQuTWJQUjbESwpbuEIlXwFTbkE/edit?usp=sharing).
+   - if you are not a UW student, please email us (emails available via the living document in `Acknowledgements`).
+     
+4. Run `npm install`
+5. Run `npm run dev`
+6. Navigate to `http://localhost:3000` to see it in action!
+
+
+## Bugs & Issues
+
+To track current or past issues, view our [issue tracker](https://github.com/NushaS/TicketSpy/issues).
+
+To report a new bug, see `How to Report a Bug` in the [user guide](./user-guide.md).
+
+## Privacy Note & Data Disclaimer
+
+TicketSpy does not expose sensitive or private information. Parking enforcement vehicles are deliberately marked and highly visible to the public by nature. The app simply allows users to share information that is already observable in public spaces.
+
+TicketSpy does not track individual users nor does it does not provide tools for evading law enforcement. Reports are crowdsourced from voluntary user submissions, such that inaccurate or incomplete data is a potential risk. Always follow local parking laws; TicketSpy does not take responsibility for users' individual decisions.
+
+For users concerned about personal privacy:
+- Location sharing is opt-in.
+- TicketSpy accounts can be deleted at any time. 
+- All user-generated data is associated only to with the corresponding user ID in Supabase, and is removed if you delete your account (via `CASCADE ON DELETE`).
+
+## Testing Overview
+
+For full build and test details, visit the [developer guide](./developer-guide.md).
+
+### Husky pre-commit hooks
+
+Husky has been added to execute pre-push testing locally.
+
+git hooks triggers the file `.husky/pre-commit` to run, which verifies that the following commands pass:
+
+- `npm test`
+- `npm run lint`
+- `npm run build`
+
+All 3 must pass before changes can be committed. 
+
+### jest
+
+`jest.config.js` - configures jest integration with Next.js
+
+`jest.setup.js`- runs once before all tests to load global utilities
 
 ## Authors
 
@@ -102,45 +140,4 @@ Leonardo Paredes
 
 ## Acknowledgments
 
-- [Living document](https://docs.google.com/document/d/1yHUFKiWZ9WVeeeol_CF2iBfmA2T_carpx6tqQ4-J_iM/edit?usp=sharing)
-
-## DISCLAIMER
-Security & Privacy Note
-
-TicketSpy does not expose sensitive or private information.
-Parking enforcement vehicles are already public, highly visible, and deliberately marked so the public can see them. 
-The app simply allows users to share information that is already observable in public spaces.
-
-TicketSpy does not track individual users and does not provide tools for evading law enforcement. 
-Reports are crowdsourced from voluntary user submissions and may be inaccurate or incomplete. Always follow local parking laws regardless of what the map shows.
-
-If you're concerned about your own privacy:
-- Location sharing is opt-in.
-- You can delete your account at any time.
-- All user-generated data is tied only to your Supabase user ID and is removed if you delete your account (via ON DELETE CASCADE).
-
-## Testing
-
-added husky to do pre-push testing locally
-
-### Husky for pre-commit testing
-
-`.husky/pre-commit`
-git hooks triggers this file to run which ensures the following commands pass:
-
-npm test
-npm run lint
-npm run build
-
-These need to pass before you are allowed to commit your changes
-
-### jest
-
-`jest.config.js`
-configures jest integration with Next.js
-
-`jest.setup.js`
-Runs once before all tests to load global utilities
-
-`app/welcome/__tests__/page.test.tsx`
-Test file while makes sure welcome page loads (can be used as example to make more tests)
+[Living document](https://docs.google.com/document/d/1yHUFKiWZ9WVeeeol_CF2iBfmA2T_carpx6tqQ4-J_iM/edit?usp=sharing)

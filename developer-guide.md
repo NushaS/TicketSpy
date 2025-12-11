@@ -7,34 +7,29 @@ To obtain the source code, the developer needs to clone the repository locally. 
 ## Layout explained
 ```
 ticketspy/
-├── app/
-│ ├── auth/ # next.js auto built the auth. Auth for login
-│ ├── protected/  
-│ ├── instruments/
-│ ├── test-query/
-│ └── welcome/ # include **tests**
-├── components/ # reusable components
-│ ├── tutorial/
-│ └── ui/
-├── lib/ # Supabase client & hooks
-│ ├── hooks/
-│ └── supabase/
-├── reports/ # Our weekly tuesday reports
-├── README.md # README.md
-├── package.json
-├── package-lock.json
-├── tsconfig.json
-├── next.config.ts
-├── eslint.config.mjs
-├── tailwind.config.ts
-└── postcss.config.mjs
+├── app
+│   ├── api          
+│   ├── auth         # built-in Supabase log in functionality
+│   ├── components   # modularization
+│   ├── lib
+│   │   ├── enums   # Supabase enums
+│   │   ├── hooks   # All Supabase table hooks
+│   │   ├── server  # Mostly send-email server functionality
+│   │   ├── supabase
+│   │   └── utils
+│   ├── page.tsx
+│   ├── profile-settings
+│   │   └── page.tsx
+│ 
+├── app/__tests__
+│   ├── api   # test app/api/
+│   └── unit  # common unit tests
+└── .env.local   # Private API keys & secrets
 ```
 Source files: app, components/, lib/, and config files such as tsconfig.ts, tailwindconfig.ts, etc
 The app source file contains all our pages, the components contains all our react components we made or were auto-made by Next.js template. The lib contains our Supabase logic and hooks. The rest of the files are just our config files.
 
-Tests: For now, we only have app/welcome/_tests_/ for the single test
 Documentation: contains the README.md for our project. Also contains our weekly reports. Also contains our user-guide.md and developer-guide.md just like the README.md
-Data files: N/A
 
 ## How to Build the Software
 
@@ -42,23 +37,24 @@ Follow these steps to build and run the project locally:
 
 1. **Clone the repository**
    ```bash
-   https://github.com/NushaS/TicketSpy.git
+   git clone https://github.com/NushaS/TicketSpy.git
    cd TicketSpy
    ```
 2. **Create a new branch (optional)**
    ```bash
    git checkout -b <branch-name>
    ```
-3. **Set up environment variables**
-   Create a file named `.env.local` in the project root.  
-   Add your Supabase credentials and project-specific configuration values, for example:
-   ```bash
-   - NEXT_PUBLIC_SUPABASE_URL=https://zknbtqijbtbkonysrtjr.supabase.co
-- NEXT_PUBLIC_SUPABASE_PUBLISHABLE_OR_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InprbmJ0cWlqYnRia29ueXNydGpyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjAwNDI4MTYsImV4cCI6MjA3NTYxODgxNn0.LjEZQWSYmqsWKptDFaG2WyETQzfld0APEeHdlrI5Tco
-- SUPABASE_SERVICE_ROLE_KEY=YourSupabaseServiceRoleKey
-- If you are a UW student, you can access all our API keys (including SupabaseServiceRoleKey)
-- https://docs.google.com/document/d/1XV_wcLVr5xJQiNSPcsQuTWJQUjbESwpbuEIlXwFTbkE/edit?usp=sharing
-   ```
+3. **Add a `.env.local` file under the main `TicketSpy` directory for the Supabase credentials. In the file, define:**
+   - `NEXT_PUBLIC_SUPABASE_URL`=YourSupabaseUrl 
+   - `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_OR_ANON_KEY`=YourSupabaseApiKey
+   - `SUPABASE_SERVICE_ROLE_KEY`=YourServiceRoleKey
+   - RESEND_API_KEY=YourResendApiKey
+     
+   (Note: This is required, as components that use `/lib/supabase` will throw errors if the credentials are not available.)
+
+   To access our Supabase credentials:
+   - if you are a UW student, access them [here](https://docs.google.com/document/d/1XV_wcLVr5xJQiNSPcsQuTWJQUjbESwpbuEIlXwFTbkE/edit?usp=sharing).
+   - if you are not a UW student, please email us (emails available via the living document in `Acknowledgements`).
 4. **Install dependencies**
    ```bash
    npm install
@@ -68,7 +64,7 @@ Follow these steps to build and run the project locally:
    npm run dev
    ```
 6. **View the application**
-   Once the build completes successfully, open the URL displayed in your terminal (usually [http://localhost:3000](http://localhost:3000)) to view the website.
+   - Once the build completes successfully, open the URL displayed in your terminal (usually [http://localhost:3000](http://localhost:3000)) to view the website.
 
 
 ## How to Test the Software (CI/CD)
@@ -87,14 +83,15 @@ Follow these steps to run and verify the system’s test cases:
      - Run the linter (`eslint`)
      - Install all necessary dependencies
 
-3. **Run the linter and tests manually**
+2. **Run the linter and tests manually**
    If you want to check for linting or run unit tests (respectively):
    ```bash
    npm run lint
    npm run test
    ```
-
-4. **Check for compile-time issues**
+   Any tests that "npm run test" fails will direct you to the relevant lines of code that failed in the test
+   
+3. **Check for compile-time issues**
    When running the development server, any build or compile errors will be displayed automatically:
    ```bash
    npm run dev
@@ -102,20 +99,17 @@ Follow these steps to run and verify the system’s test cases:
 
 ## How to Add New Tests
 
-Are there any naming conventions/patterns to follow when naming test files? Is there a particular test harness to use?
-
 ### Adding New Tests
 
 Our script `npm run test` (configured in `package.json`) will run **Jest**.  
 Jest will search under the `_tests_` folder by default, as well as any file that matches `*.test.js`, `*.test.ts`, or `*.test.tsx` formats.
 
-To add a new test:
+In general, our tests will be in the **/app/__tests__/unit** folder and a **/app/__tests__/api** folder
 
-1. Navigate to the page or component that you want to test.
-2. Create a `__tests__` folder inside the same directory.
-3. Add a file named `yourFileName.test.tsx` inside that folder.
-
-For example, see the `app/welcome/_tests_` folder.
+To add a new test: <br>
+1.) Decide if it is a unit test or api test<br>
+1.1) If it is neither, add a "__tests__" folder under your module and use JEST to write custom tests<br>
+2.) Use Jest to write custom tests in the folder! Feel free to use our previous tests as a template<br>
 
 ### Naming Conventions/Patterns
 
@@ -125,22 +119,30 @@ For example, see the `app/welcome/_tests_` folder.
   componentName.test.tsx
   ```
 
-  **Example:** If the component is `page.tsx`, name the test `page.test.tsx`.
+  **Example:** If the component is `MapPin.tsx`, name the test `MapPin.test.tsx`.
 
 - Test descriptions inside the test file should communicate expected behavior.
 
 - Tests should follow a behavior-driven structure:
   - **Arrange:** Set up the component / mocks
   - **Act:** Perform the interaction
-  - **Assert:** Verify the expected result
+  - **Assert:** Verify the expected result (Jest uses expect())
 
 - Keep each test focused on one behavior.
 
----
+Example.
+```
+// app/__tests__/unit/formatDistance.test.ts
+import { formatDistance } from '@/lib/utils/formatDistance';
 
+describe('formatDistance', () => {
+  it('formats meters into a readable string', () => {
+    const result = formatDistance(153);   // act
+    expect(result).toBe('153 m');         // assert
+  });
+});
+```
 ## How to Build a Release of the Software
-
-Describe any tasks that are not automated. For example, should a developer update a version number (in code and documentation) prior to invoking the build system? Are there any sanity checks a developer should perform after building a release?
 
 ### Update the Version Number
 
