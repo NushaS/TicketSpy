@@ -45,6 +45,7 @@ const TicketReportModal: React.FC<TicketReportModalProps> = ({
             <input
               type="date"
               className={styles.ticketReportInput}
+              style={{ color: ticketDateIssued ? '#000' : '#999' }}
               value={ticketDateIssued}
               onChange={(e) => onDateChange(e.target.value)}
               required
@@ -56,6 +57,7 @@ const TicketReportModal: React.FC<TicketReportModalProps> = ({
             <input
               type="time"
               className={styles.ticketReportInput}
+              style={{ color: ticketTimeIssued ? '#000' : '#999' }}
               value={ticketTimeIssued}
               onChange={(e) => onTimeChange(e.target.value)}
               required
