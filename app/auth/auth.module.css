@@ -1,166 +1,3 @@
-/* Header styles */
-.header {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  z-index: 20;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 1rem;
-  background-color: rgba(255, 255, 255, 0.8);
-  backdrop-filter: blur(8px);
-}
-
-.logoContainer {
-  display: flex;
-  align-items: center;
-}
-
-.logo {
-  height: 3rem;
-  width: auto;
-}
-
-.buttonGroup {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-}
-
-.instructionsButton {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.5rem 1rem;
-  background-color: rgb(129, 154, 121);
-  color: white;
-  border-radius: 9999px;
-  font-weight: 500;
-  transition: background-color 0.2s;
-  border: none;
-  cursor: pointer;
-}
-
-.instructionsButton:hover {
-  background-color: rgb(110, 140, 90);
-}
-
-.loginButton {
-  padding: 0.5rem 1.25rem;
-  background-color: rgb(98, 83, 92);
-  color: white;
-  border-radius: 9999px;
-  font-weight: 500;
-  transition: background-color 0.2s;
-  border: none;
-  cursor: pointer;
-}
-
-.loginButton:hover {
-  background-color: rgb(79, 66, 76);
-}
-
-.signupButton {
-  padding: 0.5rem 1.25rem;
-  background-color: rgb(190, 131, 125);
-  color: white;
-  border-radius: 9999px;
-  font-weight: 500;
-  transition: background-color 0.2s;
-  border: none;
-  cursor: pointer;
-}
-
-.signupButton:hover {
-  background-color: rgb(210, 124, 124);
-}
-
-/* Filters button */
-.filtersButton {
-  position: absolute;
-  top: 9rem;
-  right: 1rem;
-  z-index: 20;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.5rem 1rem;
-  background-color: rgb(132, 127, 132);
-  color: white;
-  border-radius: 0.5rem;
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-  font-weight: 500;
-  transition: all 0.2s;
-  border: none;
-  cursor: pointer;
-}
-
-.filtersButton:hover {
-  background-color: rgb(113, 103, 113);
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
-}
-
-/* Map container */
-.mapContainer {
-  position: absolute;
-  inset: 0;
-  top: 5rem;
-}
-
-/* Modal overlay */
-.modalOverlay {
-  position: absolute;
-  inset: 0;
-  z-index: 30;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background-color: rgba(0, 0, 0, 0.5);
-  backdrop-filter: blur(8px);
-}
-
-.modalContent {
-  background-color: white;
-  border-radius: 0.5rem;
-  padding: 2rem;
-  max-width: 28rem;
-  margin: 0 1rem;
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-}
-
-.modalTitle {
-  font-size: 1.5rem;
-  font-weight: 700;
-  margin-bottom: 1rem;
-}
-
-.modalText {
-  color: rgb(55, 65, 81);
-  margin-bottom: 1rem;
-}
-
-/* Container */
-.container {
-  position: relative;
-  width: 100%;
-  height: 100vh;
-  overflow: hidden;
-  background-color: rgb(243, 244, 246);
-}
-
-/* Login Modal */
-.loginModalContent {
-  background-color: #f5f1e8;
-  border-radius: 1rem;
-  padding: 2.5rem 2rem;
-  max-width: 500px;
-  width: 90%;
-  margin: 0 1rem;
-  position: relative;
-}
-
 .closeButton {
   position: absolute;
   top: 1rem;
@@ -200,7 +37,7 @@
 .loginTitle {
   font-size: 2rem;
   font-weight: 500;
-  color: #4a5d4a;
+  color: #566751;
   text-align: center;
   margin-bottom: 2rem;
 }
@@ -249,7 +86,7 @@
 .submitButton {
   margin-top: 1rem;
   padding: 0.75rem 2rem;
-  background-color: #6b856b;
+  background-color: #93A58D;
   color: white;
   border: none;
   border-radius: 50px;
@@ -266,7 +103,7 @@
 }
 
 .submitButton:hover:not(:disabled) {
-  background-color: #5a7259;
+  background-color: #758b6d;
 }
 
 .submitButton:disabled {
@@ -467,6 +304,6 @@
   font-size: 30px;
   line-height: 32px;
   text-align: center;
-  color: #445b35;
+  color: #566751;
   margin-bottom: 1.5rem; /* space between heading and form */
 }

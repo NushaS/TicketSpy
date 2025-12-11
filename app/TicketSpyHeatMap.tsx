@@ -865,7 +865,7 @@ const TicketSpyHeatMap: React.FC<TicketSpyHeatMapProps> = ({
             aria-label="heatmap opacity"
             className={styles.slider}
             style={{
-              background: `linear-gradient(90deg, var(--accent, #7C5CFF) ${Math.round(
+              background: `linear-gradient(90deg, #93A58D ${Math.round(
                 heatmapOpacityMultiplier * 100
               )}%, #E6EEF3 ${Math.round(heatmapOpacityMultiplier * 100)}%)`,
             }}
@@ -1137,12 +1137,12 @@ const TicketSpyHeatMap: React.FC<TicketSpyHeatMapProps> = ({
             </button>
 
             <h2 className={styles.ticketReportTitle}>
-              Confirm parking enforcement officer sighting?
+              confirm parking enforcement officer sighting?
             </h2>
 
-            <p style={{ marginTop: 8, textAlign: 'center' }}>
-              Confirm that you would like to report a parking enforcement officer at the selected
-              location (within the past 10 minutes)?
+            <p style={{ textAlign: 'center' }}>
+              Would you like to report a parking enforcement officer at the selected location
+              (within the past 10 minutes)?
             </p>
 
             <div className={styles.enforcementButtonGroup}>

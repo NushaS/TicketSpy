@@ -19,14 +19,14 @@ export const ParkingEnforcementIcon: React.FC<Props> = ({ size = 28 }) => {
         display: 'inline-flex',
         alignItems: 'center',
         justifyContent: 'center',
-        background: '#f7c28c', // warm, less obtrusive orange
+        background: '#eab575ff', // warm, less obtrusive orange
         borderRadius: '50%',
         boxShadow: '0 4px 10px rgba(0,0,0,0.12)',
       }}
       aria-label="Parking enforcement officer"
       role="img"
     >
-      <SightingIcon size={innerSize} color="#b45f29" />
+      <SightingIcon size={innerSize} color="#8e5633ff" />
     </div>
   );
 };
