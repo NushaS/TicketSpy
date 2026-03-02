@@ -22,7 +22,7 @@ export async function POST(req: Request) {
       longitude,
       ticket_report_date,
       ticket_report_hour,
-      ticket_violation_type: isValidViolationType(ticket_violation_type) // Semicolon here is Object assigning, not type assigning
+      ticket_violation_type: isValidViolationType(ticket_violation_type) // Colon here is Object assigning, not type assigning
         ? ticket_violation_type
         : ViolationType.Other,
       user_id: null,
