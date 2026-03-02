@@ -960,12 +960,15 @@ select.ticketReportInput {
 }
 
 .mapMarkerWrapper {
-  width: 41;
-  height: 49;
-  cursor: 'pointer';
+  width: 41px;
+  height: 49px;
+  cursor: pointer;
 }
 /* Map Marker SVG */
 .mapMarkerSvg {
+  width: 41px;
+  height: 49px;
+  display: block;
   fill: #a24052;
   stroke: none;
   filter: drop-shadow(0 10px 22px rgba(16, 24, 40, 0.32));
