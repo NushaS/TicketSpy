@@ -331,7 +331,6 @@ const TicketSpyHeatMap: React.FC<TicketSpyHeatMapProps> = ({
     } as unknown as import('react-map-gl/maplibre').LayerProps;
     return newLayer;
   }, [heatmapOpacityMultiplier, heatmapRadiusStops]);
-  // TODO: validate testData in heatmapConfig.ts
 
   const resetTicketReportFields = () => {
     setTicketDateIssued('');
@@ -399,7 +398,6 @@ const TicketSpyHeatMap: React.FC<TicketSpyHeatMapProps> = ({
     setReportLocation(null);
   };
 
-  // TODO: check if user is logged in, non functional
   React.useEffect(() => {
     const checkAuth = async () => {
       const supabase = createClient();

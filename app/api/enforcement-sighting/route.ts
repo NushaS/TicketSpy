@@ -56,7 +56,6 @@ export async function POST(req: Request) {
   return NextResponse.json({ enforcement: data }, { status: 201 });
 }
 
-// Optional: block GET
 export function GET() {
   return NextResponse.json({ error: 'Use POST to create enforcement sightings.' }, { status: 405 });
 }
