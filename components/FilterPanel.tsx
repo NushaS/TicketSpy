@@ -13,7 +13,7 @@ type Props = {
 export default function FilterPanel({ visible, onClose, onApply, initialFilters }: Props) {
   const [local, setLocal] = React.useState<Filters>(
     initialFilters ?? {
-      timeRange: { amount: 1, unit: 'months' },
+      timeRange: { amount: 12, unit: 'months' },
       weekdays: { monThu: true, friSun: true },
       timesOfDay: { morning: true, afternoon: true, night: true },
     }
